@@ -1,6 +1,5 @@
 import { Injectable, inject } from "@angular/core";
 import { SupabaseService } from "./supabase.service";
-import { UtilService } from "./util.service";
 import { DatabaseValidationService } from "./database-validation.service";
 import {
   UserProfile,
@@ -18,17 +17,15 @@ import {
   ApiError,
   DatabaseError,
   PaginationOptions,
-} from "../types";
+} from "../../types";
 import {
   SESSION_LIMITS,
-  FIELD_LIMITS,
-  EXERCISE_SET_LIMITS,
   PAGINATION,
   DATABASE_ERROR_CODES,
   APPLICATION_ERROR_CODES,
   ERROR_MESSAGES,
   MOCK_DATA,
-} from "./constants";
+} from "../constants";
 
 /**
  * Database service - wrapper/adapter for database operations
@@ -40,7 +37,6 @@ import {
 })
 export class DbService {
   private readonly supabaseService = inject(SupabaseService);
-  private readonly utilService = inject(UtilService);
   private readonly databaseValidationService = inject(
     DatabaseValidationService,
   );

@@ -1,5 +1,5 @@
 import { Injectable, inject } from "@angular/core";
-import { ConfigService } from "./config.service";
+import { ConfigService } from "../config/config.service";
 
 /**
  * Utility service for common helper functions

@@ -5,13 +5,13 @@ import {
   CreateExerciseSetDto,
   UpdateExerciseSetDto,
   PaginationOptions,
-} from "../types";
+} from "../../types";
 import {
   FIELD_LIMITS,
   EXERCISE_SET_LIMITS,
   ERROR_MESSAGES,
   PAGINATION,
-} from "./constants";
+} from "../constants";
 
 /**
  * Service responsible for validating data structures and parameters
@@ -52,13 +52,19 @@ export class DatabaseValidationService {
     set: CreateExerciseSetDto | UpdateExerciseSetDto,
   ): void {
     if ("reps" in set && set.reps !== undefined) {
-      if (set.reps < EXERCISE_SET_LIMITS.REPS_MIN || set.reps > EXERCISE_SET_LIMITS.REPS_MAX) {
+      if (
+        set.reps < EXERCISE_SET_LIMITS.REPS_MIN ||
+        set.reps > EXERCISE_SET_LIMITS.REPS_MAX
+      ) {
         throw new Error(ERROR_MESSAGES.REPS_OUT_OF_RANGE);
       }
     }
 
     if ("weight" in set && set.weight !== undefined) {
-      if (set.weight < EXERCISE_SET_LIMITS.WEIGHT_MIN || set.weight > EXERCISE_SET_LIMITS.WEIGHT_MAX) {
+      if (
+        set.weight < EXERCISE_SET_LIMITS.WEIGHT_MIN ||
+        set.weight > EXERCISE_SET_LIMITS.WEIGHT_MAX
+      ) {
         throw new Error(ERROR_MESSAGES.WEIGHT_OUT_OF_RANGE);
       }
     }
@@ -84,11 +90,21 @@ export class DatabaseValidationService {
    * @throws Error if pagination options are invalid.
    */
   validatePaginationOptions(options: PaginationOptions): void {
-    if (options.page !== undefined && (!Number.isInteger(options.page) || options.page < 0)) {
-       throw new Error("Invalid pagination option 'page': must be a non-negative integer");
+    if (
+      options.page !== undefined &&
+      (!Number.isInteger(options.page) || options.page < 0)
+    ) {
+      throw new Error(
+        "Invalid pagination option 'page': must be a non-negative integer",
+      );
     }
-    if (options.limit !== undefined && (!Number.isInteger(options.limit) || options.limit <= 0)) {
-       throw new Error("Invalid pagination option 'limit': must be a positive integer");
+    if (
+      options.limit !== undefined &&
+      (!Number.isInteger(options.limit) || options.limit <= 0)
+    ) {
+      throw new Error(
+        "Invalid pagination option 'limit': must be a positive integer",
+      );
     }
   }
 }

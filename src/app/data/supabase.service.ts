@@ -1,9 +1,9 @@
 import { Injectable, inject } from "@angular/core";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { environment } from "../environments/environment";
-import type { Database } from "../db/database.types";
-import { UtilService } from "./util.service";
-import { PAGINATION } from "./constants";
+import { environment } from "../../environments/environment";
+import type { Database } from "../../db/database.types";
+import { UtilService } from "../utils/util.service";
+import { PAGINATION } from "../constants";
 import {
   Exercise,
   Session,
@@ -16,7 +16,7 @@ import {
   UpdateExerciseSetDto,
   UserProfile,
   PaginationOptions,
-} from "../types";
+} from "../../types";
 
 @Injectable({
   providedIn: "root", // Makes the service a singleton and available throughout the app
