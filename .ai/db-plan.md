@@ -43,11 +43,12 @@ CREATE TABLE sessions (
     
     -- Check constraints dla ograniczeń biznesowych
     CONSTRAINT check_description_length CHECK (LENGTH(description) <= 260),
-    CONSTRAINT check_location_length CHECK (LENGTH(location) <= 160),
-    
-    -- Unique constraint zapobiegający duplikatom sesji w tej samej minucie
-    UNIQUE(user_id, DATE_TRUNC('minute', session_datetime))
+    CONSTRAINT check_location_length CHECK (LENGTH(location) <= 160)
 );
+
+-- Unique index zapobiegający duplikatom sesji w tej samej minucie
+CREATE UNIQUE INDEX idx_sessions_user_minute 
+ON sessions (user_id, DATE_TRUNC('minute', session_datetime));
 ```
 
 ### 1.4 exercise_sets
@@ -99,6 +100,10 @@ ON exercise_sets (session_id);
 -- Indeks dla relacji exercises-exercise_sets
 CREATE INDEX idx_exercise_sets_exercise 
 ON exercise_sets (exercise_id);
+
+-- Unique index zapobiegający duplikatom sesji w tej samej minucie
+CREATE UNIQUE INDEX idx_sessions_user_minute 
+ON sessions (user_id, DATE_TRUNC('minute', session_datetime));
 ```
 
 ## 4. Funkcje i Triggery
