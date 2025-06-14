@@ -9,7 +9,7 @@ Aplikacja Unlazy MVP to Angular 19 + TypeScript + Angular Material z mobile-firs
 - Accordion-based lista sesji z pierwszym elementem domyślnie rozwiniętym
 - Wszystkie formularze w modalach z disableClose: true
 - Paginacja numeryczna (10 elementów na stronę)
-- Zarządzanie stanem przez BehaviorSubject w serwisach
+- Zarządzanie stanem przez Angular Signals w serwisach (signals, computed, effects)
 - Responsywne breakpointy: mobile 95%, tablet 80%, desktop max 700px, 2K+ max 900px
 
 ## 2. Lista widoków

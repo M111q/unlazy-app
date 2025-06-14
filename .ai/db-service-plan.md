@@ -125,19 +125,6 @@ async getAllExercises(): Promise<Exercise[]> {
 }
 ```
 
-#### Subscribe to Exercises Changes
-```typescript
-subscribeToExercises(callback: (exercises: Exercise[]) => void): RealtimeChannel {
-  return this.supabase
-    .channel('exercises')
-    .on('postgres_changes', 
-      { event: '*', schema: 'public', table: 'exercises' },
-      () => this.getAllExercises().then(callback)
-    )
-    .subscribe();
-}
-```
-
 ### 2.4 Sessions Service
 
 #### Get Sessions with Pagination
@@ -276,19 +263,6 @@ private async validateDailySessionLimit(sessionDateTime: string): Promise<void> 
 }
 ```
 
-#### Subscribe to Session Changes
-```typescript
-subscribeToSessions(callback: (sessions: SessionWithStats[]) => void): RealtimeChannel {
-  return this.supabase
-    .channel('sessions')
-    .on('postgres_changes',
-      { event: '*', schema: 'public', table: 'sessions' },
-      () => this.getSessions().then(callback)
-    )
-    .subscribe();
-}
-```
-
 ### 2.5 Exercise Sets Service
 
 #### Get Sets for Session
@@ -371,24 +345,6 @@ private async validateSessionSetsLimit(sessionId: number): Promise<void> {
   if (count >= 50) {
     throw new Error('Session sets limit exceeded (maximum 50 sets per session)');
   }
-}
-```
-
-#### Subscribe to Session Sets Changes
-```typescript
-subscribeToSessionSets(sessionId: number, callback: (sets: ExerciseSetWithExercise[]) => void): RealtimeChannel {
-  return this.supabase
-    .channel(`session_sets_${sessionId}`)
-    .on('postgres_changes',
-      { 
-        event: '*', 
-        schema: 'public', 
-        table: 'exercise_sets',
-        filter: `session_id=eq.${sessionId}`
-      },
-      () => this.getSessionSets(sessionId).then(callback)
-    )
-    .subscribe();
 }
 ```
 
@@ -503,28 +459,6 @@ class ErrorHandler {
 }
 ```
 
-### 4.4 Real-Time Updates Configuration
-
-#### Channel Management
-```typescript
-class RealtimeManager {
-  private channels: Map<string, RealtimeChannel> = new Map();
-  
-  subscribeToTable(tableName: string, callback: Function): void {
-    const channel = this.supabase
-      .channel(tableName)
-      .on('postgres_changes', { event: '*', schema: 'public', table: tableName }, callback)
-      .subscribe();
-      
-    this.channels.set(tableName, channel);
-  }
-  
-  unsubscribeAll(): void {
-    this.channels.forEach(channel => channel.unsubscribe());
-    this.channels.clear();
-  }
-}
-```
 
 ### 4.5 Performance Optimization
 
@@ -533,7 +467,6 @@ class RealtimeManager {
 - Implement proper pagination with `range()`
 - Leverage database indexes for sorting and filtering
 - Use prepared statements for repeated queries
-- Implement query result caching where appropriate
 
 #### Connection Pool Configuration
 ```typescript
