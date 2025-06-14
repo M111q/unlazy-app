@@ -1,0 +1,254 @@
+// SCSS Variables (matching main component)
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1024px;
+$desktop-breakpoint: 1200px;
+
+// Spacing variables
+$spacing-xs: 8px;
+$spacing-sm: 16px;
+$spacing-md: 24px;
+$spacing-lg: 32px;
+$spacing-xl: 48px;
+
+// Colors (Material Design inspired)
+$primary-color: #1976d2;
+$accent-color: #ff4081;
+$warn-color: #f44336;
+$success-color: #4caf50;
+$text-primary: rgba(0, 0, 0, 0.87);
+$text-secondary: rgba(0, 0, 0, 0.54);
+$surface-color: #ffffff;
+$background-color: #fafafa;
+
+// Sessions Accordion
+.sessions-accordion {
+  .session-panel {
+    margin-bottom: $spacing-sm;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    transition: box-shadow 0.3s ease;
+
+    &.mat-expanded {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    &:hover:not(.mat-expanded) {
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .session-header {
+      padding: $spacing-sm $spacing-md;
+      min-height: 64px;
+
+      @media (min-width: $mobile-breakpoint) {
+        padding: $spacing-md;
+        min-height: 72px;
+      }
+
+      .session-title {
+        flex: 1;
+        min-width: 0;
+
+        .session-date-time {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          @media (min-width: $mobile-breakpoint) {
+            flex-direction: row;
+            align-items: center;
+            gap: $spacing-sm;
+          }
+
+          .session-date {
+            font-weight: 500;
+            color: $text-primary;
+            font-size: 0.875rem;
+
+            @media (min-width: $mobile-breakpoint) {
+              font-size: 1rem;
+            }
+          }
+
+          .session-time {
+            color: $text-secondary;
+            font-size: 0.75rem;
+
+            @media (min-width: $mobile-breakpoint) {
+              font-size: 0.875rem;
+            }
+          }
+        }
+      }
+
+      .session-description {
+        flex: 2;
+        margin-left: $spacing-sm;
+
+        @media (max-width: $mobile-breakpoint) {
+          display: none; // Hide description on mobile to save space
+        }
+
+        .session-desc-text {
+          color: $text-primary;
+          font-size: 0.875rem;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: 200px;
+
+          @media (min-width: $tablet-breakpoint) {
+            max-width: 300px;
+          }
+        }
+
+        .no-description {
+          color: $text-secondary;
+          font-style: italic;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+}
+
+// Session Content
+.session-content {
+  padding: 0 $spacing-md $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  @media (min-width: $mobile-breakpoint) {
+    padding: 0 $spacing-md $spacing-lg;
+  }
+}
+
+// Session Details
+.session-details {
+  .detail-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-xs 0;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 6px;
+    padding: $spacing-sm;
+
+    .detail-icon {
+      color: $text-secondary;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .detail-label {
+      font-weight: 500;
+      color: $text-secondary;
+      font-size: 0.875rem;
+    }
+
+    .detail-value {
+      color: $text-primary;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+  }
+}
+
+// Session Actions
+.session-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  justify-content: flex-end;
+  padding-top: $spacing-sm;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+
+  @media (max-width: $mobile-breakpoint) {
+    justify-content: center;
+    gap: $spacing-sm;
+  }
+
+  .action-button {
+    min-width: auto;
+    font-size: 0.875rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    @media (max-width: $mobile-breakpoint) {
+      flex: 1;
+      max-width: 120px;
+      min-width: 100px;
+    }
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+
+    mat-icon {
+      margin-right: 4px;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    // Color-specific hover effects
+    &[color="primary"]:hover {
+      background-color: rgba(25, 118, 210, 0.08);
+    }
+
+    &[color="accent"]:hover {
+      background-color: rgba(255, 64, 129, 0.08);
+    }
+
+    &[color="warn"]:hover {
+      background-color: rgba(244, 67, 54, 0.08);
+    }
+  }
+}
+
+// Accessibility improvements
+.session-panel {
+  &:focus-within {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+  }
+}
+
+// Animation for expansion
+.mat-expansion-panel-body {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Loading state for stats (if needed)
+.stats-loading {
+  .stat-value {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+    height: 1.5rem;
+    width: 60px;
+  }
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

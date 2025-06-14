@@ -1,0 +1,70 @@
+<mat-accordion class="sessions-accordion">
+  <mat-expansion-panel
+    *ngFor="let session of sessions; trackBy: trackBySessionId"
+    [expanded]="session.isExpandedByDefault"
+    class="session-panel">
+
+    <!-- Panel Header -->
+    <mat-expansion-panel-header class="session-header">
+      <mat-panel-title class="session-title">
+        <div class="session-date-time">
+          <span class="session-date">{{ session.formattedDate }}</span>
+          <span class="session-time">{{ session.formattedTime }}</span>
+        </div>
+      </mat-panel-title>
+      <mat-panel-description class="session-description">
+        <span class="session-desc-text" *ngIf="session.description; else noDescription">
+          {{ session.description }}
+        </span>
+        <ng-template #noDescription>
+          <span class="no-description">Sesja bez opisu</span>
+        </ng-template>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <!-- Panel Content -->
+    <div class="session-content">
+      <!-- Session Stats -->
+      <app-stats-card
+        [stats]="{ totalWeight: session.totalWeight, totalReps: session.totalReps }">
+      </app-stats-card>
+
+      <!-- Session Details -->
+      <div class="session-details" *ngIf="session.location">
+        <div class="detail-item">
+          <mat-icon class="detail-icon">place</mat-icon>
+          <span class="detail-label">Miejsce:</span>
+          <span class="detail-value">{{ session.location }}</span>
+        </div>
+      </div>
+
+      <!-- Session Actions -->
+      <div class="session-actions">
+        <button mat-button
+                color="primary"
+                (click)="stopPropagation($event); onViewDetails(session.id)"
+                class="action-button"
+                [attr.aria-label]="'Zobacz szczegóły sesji z ' + session.formattedDate">
+          <mat-icon>visibility</mat-icon>
+          Szczegóły
+        </button>
+        <button mat-button
+                color="accent"
+                (click)="stopPropagation($event); onEditSession(session)"
+                class="action-button"
+                [attr.aria-label]="'Edytuj sesję z ' + session.formattedDate">
+          <mat-icon>edit</mat-icon>
+          Edytuj
+        </button>
+        <button mat-button
+                color="warn"
+                (click)="stopPropagation($event); onDeleteSession(session.id)"
+                class="action-button"
+                [attr.aria-label]="'Usuń sesję z ' + session.formattedDate">
+          <mat-icon>delete</mat-icon>
+          Usuń
+        </button>
+      </div>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>

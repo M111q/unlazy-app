@@ -1,0 +1,85 @@
+<div class="session-list-container">
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="viewModel().loading">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="50"
+      aria-label="Ładowanie sesji">
+    </mat-progress-spinner>
+    <p class="loading-text">Ładowanie sesji...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="viewModel().error && !viewModel().loading">
+    <mat-card class="error-card">
+      <mat-card-content>
+        <div class="error-content">
+          <mat-icon class="error-icon">error_outline</mat-icon>
+          <h3 class="error-title">Wystąpił błąd</h3>
+          <p class="error-message">{{ viewModel().error?.message }}</p>
+          <button mat-raised-button color="primary" (click)="onRetry()">
+            <mat-icon>refresh</mat-icon>
+            Spróbuj ponownie
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Empty State -->
+  <app-empty-state
+    *ngIf="!viewModel().loading && !viewModel().error && viewModel().sessions.length === 0"
+    (addFirstSession)="onAddFirstSession()">
+  </app-empty-state>
+
+  <!-- Sessions List -->
+  <div class="sessions-content"
+       *ngIf="!viewModel().loading && !viewModel().error && viewModel().sessions.length > 0">
+
+    <!-- Sessions Accordion -->
+    <app-session-accordion
+      [sessions]="viewModel().sessions"
+      (editSession)="onEditSession($event)"
+      (deleteSession)="onDeleteSession($event)"
+      (viewDetails)="onViewSessionDetails($event)">
+    </app-session-accordion>
+
+    <!-- Pagination -->
+    <div class="pagination-container">
+      <mat-paginator
+        class="sessions-paginator"
+        [length]="viewModel().pagination.totalItems"
+        [pageSize]="viewModel().pagination.pageSize"
+        [pageIndex]="viewModel().pagination.currentPage"
+        [hidePageSize]="true"
+        [showFirstLastButtons]="true"
+        [disabled]="viewModel().loading"
+        (page)="onPageChange($event)"
+        aria-label="Paginacja sesji treningowych">
+      </mat-paginator>
+
+      <!-- Pagination Info -->
+      <div class="pagination-info" *ngIf="viewModel().sessions.length > 0">
+        <span class="pagination-text">
+          Strona {{ viewModel().pagination.currentPage + 1 }}
+          <span *ngIf="viewModel().pagination.totalItems > 0">
+            • {{ viewModel().sessions.length }}
+            {{ viewModel().sessions.length === 1 ? 'sesja' :
+               viewModel().sessions.length < 5 ? 'sesje' : 'sesji' }}
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <button mat-fab
+          color="primary"
+          class="add-session-fab"
+          (click)="onAddSession()"
+          [disabled]="!viewModel().canAddSession"
+          [attr.aria-label]="viewModel().canAddSession ? 'Dodaj nową sesję' : 'Osiągnięto dzienny limit sesji'"
+          *ngIf="!viewModel().loading">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

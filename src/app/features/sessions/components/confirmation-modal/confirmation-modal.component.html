@@ -1,0 +1,51 @@
+<div class="confirmation-modal">
+  <!-- Dialog Title -->
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon" [class.warn-icon]="confirmButtonColor === 'warn'">
+      {{ confirmationIcon }}
+    </mat-icon>
+    {{ data.title }}
+  </h2>
+
+  <!-- Dialog Content -->
+  <div mat-dialog-content class="modal-content">
+    <div class="confirmation-content">
+      <p class="confirmation-message">{{ data.message }}</p>
+
+      <!-- Session specific warning for deletion -->
+      <div class="warning-box" *ngIf="data.sessionDescription && confirmButtonColor === 'warn'">
+        <mat-icon class="warning-icon">info</mat-icon>
+        <div class="warning-text">
+          <p class="warning-title">Uwaga!</p>
+          <p class="warning-description">
+            Ta akcja spowoduje również usunięcie wszystkich serii ćwiczeń
+            przypisanych do tej sesji. Tej operacji nie można cofnąć.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog Actions -->
+  <div mat-dialog-actions class="modal-actions">
+    <div class="actions-container">
+      <button mat-button
+              type="button"
+              (click)="onCancel()"
+              class="cancel-button">
+        {{ data.cancelText }}
+      </button>
+
+      <button mat-raised-button
+              [color]="confirmButtonColor"
+              type="button"
+              (click)="onConfirm()"
+              class="confirm-button"
+              [class.warn-button]="confirmButtonColor === 'warn'"
+              [attr.aria-label]="data.confirmText + ' - ta akcja nie może zostać cofnięta'">
+        <mat-icon>{{ confirmButtonColor === 'warn' ? 'delete_forever' : 'check' }}</mat-icon>
+        {{ data.confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

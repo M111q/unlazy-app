@@ -1,0 +1,269 @@
+// SCSS Variables (matching application theme)
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1024px;
+$desktop-breakpoint: 1200px;
+
+// Spacing variables
+$spacing-xs: 8px;
+$spacing-sm: 16px;
+$spacing-md: 24px;
+$spacing-lg: 32px;
+$spacing-xl: 48px;
+
+// Colors (Material Design inspired)
+$primary-color: #1976d2;
+$accent-color: #ff4081;
+$text-primary: rgba(0, 0, 0, 0.87);
+$text-secondary: rgba(0, 0, 0, 0.54);
+$surface-color: #ffffff;
+$background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+.empty-state-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: $spacing-sm;
+
+  @media (min-width: $mobile-breakpoint) {
+    min-height: 500px;
+    padding: $spacing-md;
+  }
+
+  @media (min-width: $tablet-breakpoint) {
+    min-height: 600px;
+    padding: $spacing-lg;
+  }
+
+  .empty-state-card {
+    max-width: 500px;
+    width: 100%;
+    background: $surface-color;
+    border-radius: 16px !important;
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.1),
+      0 1px 8px rgba(0, 0, 0, 0.06) !important;
+    overflow: hidden;
+    position: relative;
+
+    // Subtle background pattern
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: $background-gradient;
+    }
+
+    @media (min-width: $mobile-breakpoint) {
+      max-width: 600px;
+    }
+
+    .empty-state-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: $spacing-md;
+      padding: $spacing-lg $spacing-md;
+
+      @media (min-width: $mobile-breakpoint) {
+        gap: $spacing-lg;
+        padding: $spacing-xl $spacing-lg;
+      }
+
+      .empty-state-icon {
+        font-size: 72px;
+        width: 72px;
+        height: 72px;
+        color: $primary-color;
+        margin-bottom: $spacing-sm;
+        animation: pulse 2s ease-in-out infinite;
+
+        @media (min-width: $mobile-breakpoint) {
+          font-size: 96px;
+          width: 96px;
+          height: 96px;
+          margin-bottom: $spacing-md;
+        }
+
+        @media (min-width: $tablet-breakpoint) {
+          font-size: 120px;
+          width: 120px;
+          height: 120px;
+        }
+      }
+
+      .empty-state-title {
+        margin: 0;
+        color: $text-primary;
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1.3;
+
+        @media (min-width: $mobile-breakpoint) {
+          font-size: 1.875rem;
+        }
+
+        @media (min-width: $tablet-breakpoint) {
+          font-size: 2.25rem;
+        }
+      }
+
+      .empty-state-description {
+        margin: 0;
+        color: $text-secondary;
+        font-size: 1rem;
+        line-height: 1.6;
+        max-width: 400px;
+
+        @media (min-width: $mobile-breakpoint) {
+          font-size: 1.125rem;
+          max-width: 450px;
+        }
+
+        @media (min-width: $tablet-breakpoint) {
+          font-size: 1.25rem;
+          max-width: 500px;
+        }
+      }
+
+      .add-first-session-button {
+        margin-top: $spacing-sm;
+        padding: 12px 32px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 8px !important;
+        text-transform: none !important;
+        box-shadow:
+          0 4px 12px rgba(25, 118, 210, 0.3),
+          0 2px 4px rgba(25, 118, 210, 0.2) !important;
+        transition: all 0.3s ease;
+
+        @media (min-width: $mobile-breakpoint) {
+          padding: 14px 40px;
+          font-size: 1.125rem;
+          margin-top: $spacing-md;
+        }
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow:
+            0 6px 20px rgba(25, 118, 210, 0.4),
+            0 4px 8px rgba(25, 118, 210, 0.3) !important;
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+
+        mat-icon {
+          margin-right: 8px;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+
+          @media (min-width: $mobile-breakpoint) {
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+// Hover effect for the entire card
+.empty-state-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.15),
+    0 5px 12px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease;
+}
+
+// Focus states for accessibility
+.add-first-session-button:focus-visible {
+  outline: 3px solid rgba(25, 118, 210, 0.5);
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .empty-state-card {
+    border: 2px solid $text-secondary;
+
+    &::before {
+      background: $primary-color;
+      height: 6px;
+    }
+  }
+
+  .empty-state-icon {
+    color: $text-primary;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .empty-state-icon {
+    animation: none;
+  }
+
+  .empty-state-card,
+  .add-first-session-button {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .empty-state-container {
+    min-height: auto;
+    page-break-inside: avoid;
+  }
+
+  .empty-state-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc;
+  }
+
+  .add-first-session-button {
+    display: none;
+  }
+}
+
+// Dark mode support (if implemented later)
+@media (prefers-color-scheme: dark) {
+  .empty-state-card {
+    background-color: #2d2d2d;
+    color: rgba(255, 255, 255, 0.87);
+
+    .empty-state-title {
+      color: rgba(255, 255, 255, 0.87);
+    }
+
+    .empty-state-description {
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+}

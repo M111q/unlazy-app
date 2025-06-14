@@ -1,0 +1,219 @@
+// SCSS Variables
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1024px;
+$desktop-breakpoint: 1200px;
+
+// Spacing variables
+$spacing-xs: 8px;
+$spacing-sm: 16px;
+$spacing-md: 24px;
+$spacing-lg: 32px;
+$spacing-xl: 48px;
+
+// Colors (Material Design inspired)
+$primary-color: #1976d2;
+$accent-color: #ff4081;
+$warn-color: #f44336;
+$success-color: #4caf50;
+$text-primary: rgba(0, 0, 0, 0.87);
+$text-secondary: rgba(0, 0, 0, 0.54);
+$surface-color: #ffffff;
+$background-color: #fafafa;
+
+.session-list-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: $spacing-sm;
+  background-color: $background-color;
+  position: relative;
+
+  @media (min-width: $mobile-breakpoint) {
+    padding: $spacing-md;
+  }
+
+  @media (min-width: $desktop-breakpoint) {
+    padding: $spacing-lg;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+// Loading State
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: $spacing-sm;
+
+  .loading-text {
+    margin: 0;
+    color: $text-secondary;
+    font-size: 0.875rem;
+  }
+}
+
+// Error State
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  padding: $spacing-sm;
+
+  .error-card {
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .error-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: $spacing-sm;
+
+    .error-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: $warn-color;
+    }
+
+    .error-title {
+      margin: 0;
+      color: $text-primary;
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    .error-message {
+      margin: 0;
+      color: $text-secondary;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Sessions Content Container
+.sessions-content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  flex: 1;
+}
+
+// Pagination
+.pagination-container {
+  margin-top: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  @media (min-width: $mobile-breakpoint) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sessions-paginator {
+    background-color: $surface-color;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex: 1;
+
+    @media (max-width: $mobile-breakpoint) {
+      ::ng-deep .mat-mdc-paginator-container {
+        padding: $spacing-xs $spacing-sm;
+      }
+
+      ::ng-deep .mat-mdc-paginator-range-label {
+        font-size: 0.75rem;
+      }
+    }
+
+    &[disabled] {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  }
+
+  .pagination-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: $spacing-xs $spacing-sm;
+
+    @media (min-width: $mobile-breakpoint) {
+      justify-content: flex-end;
+      min-width: 200px;
+    }
+
+    .pagination-text {
+      font-size: 0.875rem;
+      color: $text-secondary;
+      font-weight: 500;
+
+      @media (min-width: $mobile-breakpoint) {
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
+
+// Floating Action Button
+.add-session-fab {
+  position: fixed;
+  bottom: $spacing-md;
+  right: $spacing-md;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+
+  @media (min-width: $mobile-breakpoint) {
+    bottom: $spacing-lg;
+    right: $spacing-lg;
+  }
+
+  &:disabled {
+    background-color: rgba(0, 0, 0, 0.12) !important;
+    color: rgba(0, 0, 0, 0.26) !important;
+    cursor: not-allowed;
+  }
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+// Utility Classes
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Custom Snackbar Styles
+::ng-deep {
+  .success-snack-bar {
+    --mdc-snackbar-container-color: #{$success-color};
+    --mdc-snackbar-supporting-text-color: white;
+  }
+
+  .error-snack-bar {
+    --mdc-snackbar-container-color: #{$warn-color};
+    --mdc-snackbar-supporting-text-color: white;
+  }
+}
+
+// TrackBy function helper (referenced in component)
+// This ensures Angular can efficiently track changes in the sessions list

@@ -1,0 +1,404 @@
+// SCSS Variables (matching application theme)
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1024px;
+$desktop-breakpoint: 1200px;
+
+// Spacing variables
+$spacing-xs: 8px;
+$spacing-sm: 16px;
+$spacing-md: 24px;
+$spacing-lg: 32px;
+$spacing-xl: 48px;
+
+// Colors (Material Design inspired)
+$primary-color: #1976d2;
+$accent-color: #ff4081;
+$warn-color: #f44336;
+$success-color: #4caf50;
+$text-primary: rgba(0, 0, 0, 0.87);
+$text-secondary: rgba(0, 0, 0, 0.54);
+$text-disabled: rgba(0, 0, 0, 0.38);
+$surface-color: #ffffff;
+$background-color: #fafafa;
+$error-color: #f44336;
+$warning-color: #ff9800;
+
+.session-form-modal {
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  max-width: 600px;
+  width: 100%;
+
+  @media (min-width: $mobile-breakpoint) {
+    min-width: 500px;
+  }
+
+  @media (min-width: $tablet-breakpoint) {
+    min-width: 600px;
+  }
+}
+
+// Dialog Title
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-md $spacing-sm;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: $text-primary;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  @media (min-width: $mobile-breakpoint) {
+    font-size: 1.5rem;
+    padding: $spacing-lg $spacing-lg $spacing-md;
+  }
+
+  .title-icon {
+    color: $primary-color;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+
+    @media (min-width: $mobile-breakpoint) {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+}
+
+// Dialog Content
+.modal-content {
+  padding: $spacing-md;
+  max-height: 70vh;
+  overflow-y: auto;
+
+  @media (min-width: $mobile-breakpoint) {
+    padding: $spacing-md $spacing-lg;
+  }
+}
+
+// Session Form
+.session-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+
+    .full-width {
+      width: 100%;
+    }
+  }
+
+  // Form Field Styling
+  ::ng-deep .mat-mdc-form-field {
+    &.mat-form-field-appearance-outline {
+      .mat-mdc-form-field-outline {
+        border-radius: 8px;
+      }
+
+      &.mat-focused .mat-mdc-form-field-outline-thick {
+        border-color: $primary-color;
+      }
+
+      &.mat-form-field-invalid .mat-mdc-form-field-outline-thick {
+        border-color: $error-color;
+      }
+    }
+
+    .mat-mdc-form-field-label {
+      color: $text-secondary;
+      font-weight: 500;
+    }
+
+    .mat-mdc-form-field-hint {
+      color: $text-secondary;
+      font-size: 0.75rem;
+    }
+
+    .mat-mdc-form-field-error {
+      color: $error-color;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    // Textarea specific styling
+    textarea.mat-mdc-input-element {
+      resize: none;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+
+    // Input with prefix icon
+    .mat-mdc-form-field-prefix {
+      .mat-icon {
+        color: $text-secondary;
+        margin-right: $spacing-xs;
+      }
+    }
+  }
+
+  // Date picker specific styling
+  ::ng-deep .mat-datepicker-toggle {
+    .mat-icon-button {
+      color: $text-secondary;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+  }
+}
+
+// Validation Summary
+.validation-summary {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-sm;
+  background-color: rgba($warning-color, 0.08);
+  border: 1px solid rgba($warning-color, 0.3);
+  border-radius: 8px;
+  margin-top: $spacing-sm;
+
+  .warning-icon {
+    color: $warning-color;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .validation-errors {
+    flex: 1;
+
+    .validation-title {
+      margin: 0 0 $spacing-xs 0;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+
+    .validation-list {
+      margin: 0;
+      padding-left: $spacing-md;
+      list-style-type: disc;
+
+      .validation-item {
+        font-size: 0.875rem;
+        color: $text-secondary;
+        margin-bottom: 4px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+// Dialog Actions
+.modal-actions {
+  padding: $spacing-sm $spacing-md $spacing-md;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 0;
+
+  @media (min-width: $mobile-breakpoint) {
+    padding: $spacing-md $spacing-lg $spacing-lg;
+  }
+
+  .actions-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+    width: 100%;
+
+    @media (max-width: $mobile-breakpoint) {
+      flex-direction: column-reverse;
+      gap: $spacing-xs;
+    }
+
+    .cancel-button {
+      min-width: 80px;
+      font-weight: 500;
+      color: $text-secondary;
+
+      @media (max-width: $mobile-breakpoint) {
+        width: 100%;
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+
+      &:disabled {
+        color: $text-disabled;
+        cursor: not-allowed;
+      }
+    }
+
+    .submit-button {
+      min-width: 120px;
+      font-weight: 600;
+      border-radius: 8px !important;
+      text-transform: none !important;
+      box-shadow: 0 2px 8px rgba($primary-color, 0.3) !important;
+
+      @media (max-width: $mobile-breakpoint) {
+        width: 100%;
+      }
+
+      &:hover:not(:disabled) {
+        box-shadow: 0 4px 12px rgba($primary-color, 0.4) !important;
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        background-color: rgba(0, 0, 0, 0.12) !important;
+        color: $text-disabled !important;
+        box-shadow: none !important;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      mat-icon {
+        margin-right: 6px;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+
+        &[ng-reflect-name="sync"] {
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Focus management
+.session-form-modal {
+  &:focus-within {
+    outline: none;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .session-form-modal {
+    border: 2px solid $text-primary;
+  }
+
+  .modal-title,
+  .modal-actions {
+    border-color: $text-primary;
+  }
+
+  .validation-summary {
+    border-color: $warning-color;
+    background-color: transparent;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .submit-button {
+    transition: none !important;
+
+    &:hover {
+      transform: none !important;
+    }
+
+    mat-icon {
+      animation: none !important;
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .session-form-modal {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .modal-actions {
+    display: none;
+  }
+}
+
+// Loading state
+.session-form-modal[data-loading="true"] {
+  .modal-content {
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+  }
+}
+
+// Accessibility improvements
+.session-form {
+  ::ng-deep .mat-mdc-form-field-required-marker {
+    color: $error-color;
+  }
+
+  ::ng-deep .mat-mdc-form-field-label-wrapper {
+    .mat-mdc-form-field-label {
+      &[aria-required="true"] {
+        &::after {
+          content: ' *';
+          color: $error-color;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments for very small screens
+@media (max-width: 320px) {
+  .session-form-modal {
+    min-width: 280px;
+  }
+
+  .modal-title {
+    font-size: 1.125rem;
+    padding: $spacing-sm;
+  }
+
+  .modal-content {
+    padding: $spacing-sm;
+  }
+
+  .modal-actions {
+    padding: $spacing-xs $spacing-sm $spacing-sm;
+  }
+}

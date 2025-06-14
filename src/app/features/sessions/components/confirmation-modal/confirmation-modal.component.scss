@@ -1,0 +1,397 @@
+@use "sass:color";
+
+// SCSS Variables (matching application theme)
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1024px;
+$desktop-breakpoint: 1200px;
+
+// Spacing variables
+$spacing-xs: 8px;
+$spacing-sm: 16px;
+$spacing-md: 24px;
+$spacing-lg: 32px;
+$spacing-xl: 48px;
+
+// Colors (Material Design inspired)
+$primary-color: #1976d2;
+$accent-color: #ff4081;
+$warn-color: #f44336;
+$success-color: #4caf50;
+$text-primary: rgba(0, 0, 0, 0.87);
+$text-secondary: rgba(0, 0, 0, 0.54);
+$text-disabled: rgba(0, 0, 0, 0.38);
+$surface-color: #ffffff;
+$background-color: #fafafa;
+$error-color: #f44336;
+$warning-color: #ff9800;
+$info-color: #2196f3;
+
+.confirmation-modal {
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  max-width: 500px;
+  width: 100%;
+
+  @media (min-width: $mobile-breakpoint) {
+    min-width: 400px;
+  }
+
+  @media (min-width: $tablet-breakpoint) {
+    min-width: 450px;
+  }
+}
+
+// Dialog Title
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-md $spacing-sm;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: $text-primary;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  @media (min-width: $mobile-breakpoint) {
+    font-size: 1.375rem;
+    padding: $spacing-lg $spacing-lg $spacing-md;
+  }
+
+  .title-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: $primary-color;
+
+    @media (min-width: $mobile-breakpoint) {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+
+    &.warn-icon {
+      color: $warn-color;
+    }
+  }
+}
+
+// Dialog Content
+.modal-content {
+  padding: $spacing-md;
+  max-height: 60vh;
+  overflow-y: auto;
+
+  @media (min-width: $mobile-breakpoint) {
+    padding: $spacing-md $spacing-lg;
+  }
+}
+
+// Confirmation Content
+.confirmation-content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  .confirmation-message {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: $text-primary;
+
+    @media (min-width: $mobile-breakpoint) {
+      font-size: 1.125rem;
+    }
+  }
+}
+
+// Warning Box
+.warning-box {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background-color: rgba($warning-color, 0.08);
+  border: 1px solid rgba($warning-color, 0.3);
+  border-radius: 8px;
+  border-left: 4px solid $warning-color;
+
+  .warning-icon {
+    color: $warning-color;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .warning-text {
+    flex: 1;
+
+    .warning-title {
+      margin: 0 0 $spacing-xs 0;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+
+    .warning-description {
+      margin: 0;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: $text-secondary;
+    }
+  }
+}
+
+// Dialog Actions
+.modal-actions {
+  padding: $spacing-sm $spacing-md $spacing-md;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 0;
+
+  @media (min-width: $mobile-breakpoint) {
+    padding: $spacing-md $spacing-lg $spacing-lg;
+  }
+
+  .actions-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+    width: 100%;
+
+    @media (max-width: $mobile-breakpoint) {
+      flex-direction: column-reverse;
+      gap: $spacing-xs;
+    }
+
+    .cancel-button {
+      min-width: 80px;
+      font-weight: 500;
+      color: $text-secondary;
+      border-radius: 6px !important;
+
+      @media (max-width: $mobile-breakpoint) {
+        width: 100%;
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+
+      &:focus-visible {
+        outline: 2px solid $primary-color;
+        outline-offset: 2px;
+      }
+    }
+
+    .confirm-button {
+      min-width: 100px;
+      font-weight: 600;
+      border-radius: 6px !important;
+      text-transform: none !important;
+      transition: all 0.2s ease;
+
+      @media (max-width: $mobile-breakpoint) {
+        width: 100%;
+      }
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+      }
+
+      &:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.5);
+        outline-offset: 2px;
+      }
+
+      &.warn-button {
+        background-color: $warn-color !important;
+        color: white !important;
+        box-shadow: 0 2px 8px rgba($warn-color, 0.3) !important;
+
+        &:hover:not(:disabled) {
+          background-color: color.adjust(
+            $warn-color,
+            $lightness: -8%
+          ) !important;
+          box-shadow: 0 4px 12px rgba($warn-color, 0.4) !important;
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+
+      mat-icon {
+        margin-right: 6px;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+// Focus management
+.confirmation-modal {
+  &:focus-within {
+    outline: none;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .confirmation-modal {
+    border: 2px solid $text-primary;
+  }
+
+  .modal-title,
+  .modal-actions {
+    border-color: $text-primary;
+  }
+
+  .warning-box {
+    border-color: $warning-color;
+    background-color: transparent;
+  }
+
+  .title-icon.warn-icon {
+    color: $text-primary;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .confirm-button {
+    transition: none !important;
+
+    &:hover {
+      transform: none !important;
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .confirmation-modal {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .modal-actions {
+    display: none;
+  }
+}
+
+// Accessibility improvements
+.confirm-button {
+  &[aria-label] {
+    position: relative;
+
+    &::after {
+      content: attr(aria-label);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 1000;
+    }
+
+    &:hover::after,
+    &:focus::after {
+      opacity: 1;
+    }
+  }
+}
+
+// Animation for warning box
+.warning-box {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive adjustments for very small screens
+@media (max-width: 320px) {
+  .confirmation-modal {
+    min-width: 280px;
+  }
+
+  .modal-title {
+    font-size: 1.125rem;
+    padding: $spacing-sm;
+  }
+
+  .modal-content {
+    padding: $spacing-sm;
+  }
+
+  .modal-actions {
+    padding: $spacing-xs $spacing-sm $spacing-sm;
+  }
+
+  .warning-box {
+    padding: $spacing-sm;
+  }
+}
+
+// Dark mode support (if implemented later)
+@media (prefers-color-scheme: dark) {
+  .confirmation-modal {
+    background-color: #2d2d2d;
+    color: rgba(255, 255, 255, 0.87);
+
+    .modal-title {
+      color: rgba(255, 255, 255, 0.87);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .confirmation-message {
+      color: rgba(255, 255, 255, 0.87);
+    }
+
+    .warning-box {
+      background-color: rgba($warning-color, 0.15);
+      border-color: rgba($warning-color, 0.5);
+
+      .warning-title {
+        color: rgba(255, 255, 255, 0.87);
+      }
+
+      .warning-description {
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    .modal-actions {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .cancel-button {
+      color: rgba(255, 255, 255, 0.6);
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+      }
+    }
+  }
+}

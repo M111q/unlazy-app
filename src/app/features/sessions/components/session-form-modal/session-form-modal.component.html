@@ -1,0 +1,107 @@
+<div class="session-form-modal">
+  <!-- Dialog Title -->
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">{{ isCreateMode ? 'add' : 'edit' }}</mat-icon>
+    {{ modalTitle }}
+  </h2>
+
+  <!-- Dialog Content -->
+  <div mat-dialog-content class="modal-content">
+    <form [formGroup]="sessionForm" (ngSubmit)="onSubmit()" class="session-form">
+
+      <!-- Session Date and Time -->
+      <div class="form-row">
+        <mat-form-field class="full-width" appearance="outline">
+          <mat-label>Data i godzina sesji</mat-label>
+          <input matInput
+                 type="datetime-local"
+                 formControlName="sessionDatetime"
+                 placeholder="Wybierz datę i godzinę">
+          <mat-icon matSuffix>schedule</mat-icon>
+          <mat-error *ngIf="hasFieldError('sessionDatetime')">
+            {{ getFieldError('sessionDatetime') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Session Description -->
+      <div class="form-row">
+        <mat-form-field class="full-width" appearance="outline">
+          <mat-label>Opis sesji (opcjonalnie)</mat-label>
+          <textarea matInput
+                    formControlName="description"
+                    [maxlength]="fieldLimits.DESCRIPTION_MAX_LENGTH"
+                    rows="3"
+                    placeholder="Np. Trening klatki piersiowej i tricepsów"
+                    cdkTextareaAutosize
+                    cdkAutosizeMinRows="2"
+                    cdkAutosizeMaxRows="4">
+          </textarea>
+          <mat-hint align="end">
+            {{ sessionForm.get('description')?.value?.length || 0 }} / {{ fieldLimits.DESCRIPTION_MAX_LENGTH }}
+          </mat-hint>
+          <mat-error *ngIf="hasFieldError('description')">
+            {{ getFieldError('description') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Session Location -->
+      <div class="form-row">
+        <mat-form-field class="full-width" appearance="outline">
+          <mat-label>Miejsce (opcjonalnie)</mat-label>
+          <input matInput
+                 formControlName="location"
+                 [maxlength]="fieldLimits.LOCATION_MAX_LENGTH"
+                 placeholder="Np. Siłownia Fitness Club">
+          <mat-icon matPrefix>place</mat-icon>
+          <mat-hint align="end">
+            {{ sessionForm.get('location')?.value?.length || 0 }} / {{ fieldLimits.LOCATION_MAX_LENGTH }}
+          </mat-hint>
+          <mat-error *ngIf="hasFieldError('location')">
+            {{ getFieldError('location') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Form Validation Summary -->
+      <div class="validation-summary" *ngIf="validationErrors().length > 0">
+        <mat-icon class="warning-icon">warning</mat-icon>
+        <div class="validation-errors">
+          <p class="validation-title">Popraw następujące błędy:</p>
+          <ul class="validation-list">
+            <li *ngFor="let error of validationErrors()" class="validation-item">
+              {{ error.message }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Dialog Actions -->
+  <div mat-dialog-actions class="modal-actions">
+    <div class="actions-container">
+      <button mat-button
+              type="button"
+              (click)="onCancel()"
+              [disabled]="isSubmitting()"
+              class="cancel-button">
+        Anuluj
+      </button>
+
+      <button mat-raised-button
+              color="primary"
+              type="submit"
+              (click)="onSubmit()"
+              [disabled]="!isFormValid"
+              class="submit-button">
+        <mat-icon *ngIf="isSubmitting()">sync</mat-icon>
+        <mat-icon *ngIf="!isSubmitting() && isCreateMode">add</mat-icon>
+        <mat-icon *ngIf="!isSubmitting() && isEditMode">save</mat-icon>
+        {{ submitButtonText }}
+      </button>
+    </div>
+  </div>
+</div>
