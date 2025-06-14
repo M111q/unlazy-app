@@ -1,33 +1,27 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
+import { CommonModule } from "@angular/common";
 
-import { MaterialModule } from '../../../../shared/material.module';
-import { SessionStats } from '../../types/sessions-view-models';
+import { MaterialModule } from "../../../../shared/material.module";
 
 @Component({
-  selector: 'app-stats-card',
+  selector: "app-stats-card",
   standalone: true,
   imports: [CommonModule, MaterialModule],
-  templateUrl: './stats-card.component.html',
-  styleUrl: './stats-card.component.scss',
+  templateUrl: "./stats-card.component.html",
+  styleUrl: "./stats-card.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatsCardComponent {
-  @Input({ required: true }) stats: SessionStats = {
-    totalWeight: 0,
-    totalReps: 0,
-  };
+  @Input({ required: true }) totalWeight = 0;
+  @Input({ required: true }) totalReps = 0;
+  @Input({ required: true }) exerciseCount = 0;
 
   /**
    * Get validated total weight value
    * Ensures the value is a non-negative number
    */
   get validatedTotalWeight(): number {
-    return this.isValidNumber(this.stats.totalWeight) ? this.stats.totalWeight : 0;
+    return this.isValidNumber(this.totalWeight) ? this.totalWeight : 0;
   }
 
   /**
@@ -35,7 +29,15 @@ export class StatsCardComponent {
    * Ensures the value is a non-negative number
    */
   get validatedTotalReps(): number {
-    return this.isValidNumber(this.stats.totalReps) ? this.stats.totalReps : 0;
+    return this.isValidNumber(this.totalReps) ? this.totalReps : 0;
+  }
+
+  /**
+   * Get validated exercise count value
+   * Ensures the value is a non-negative number
+   */
+  get validatedExerciseCount(): number {
+    return this.isValidNumber(this.exerciseCount) ? this.exerciseCount : 0;
   }
 
   /**
@@ -56,9 +58,17 @@ export class StatsCardComponent {
   }
 
   /**
+   * Format exercise count for display
+   * Always shows as integer
+   */
+  get formattedExerciseCount(): string {
+    return Math.floor(this.validatedExerciseCount).toString();
+  }
+
+  /**
    * Check if a value is a valid non-negative number
    */
   private isValidNumber(value: number): boolean {
-    return typeof value === 'number' && !isNaN(value) && value >= 0;
+    return typeof value === "number" && !isNaN(value) && value >= 0;
   }
 }

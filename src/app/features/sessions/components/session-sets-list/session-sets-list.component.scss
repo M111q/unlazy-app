@@ -1,0 +1,281 @@
+.sets-card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+
+  mat-card-header {
+    margin-bottom: 16px;
+
+    mat-card-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+    }
+
+    mat-card-subtitle {
+      color: rgba(0, 0, 0, 0.6);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+  }
+
+  mat-card-content {
+    padding: 16px;
+
+    @media (max-width: 480px) {
+      padding: 12px;
+    }
+  }
+}
+
+// Loading State
+.sets-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+
+  mat-spinner {
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 480px) {
+    padding: 24px;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 48px 24px;
+  gap: 16px;
+
+  .empty-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: rgba(0, 0, 0, 0.3);
+    margin-bottom: 8px;
+
+    @media (max-width: 480px) {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+
+    @media (max-width: 480px) {
+      font-size: 18px;
+    }
+  }
+
+  p {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.6);
+    max-width: 300px;
+    line-height: 1.5;
+    font-size: 14px;
+
+    @media (max-width: 480px) {
+      max-width: 250px;
+      font-size: 13px;
+    }
+  }
+
+  .add-first-set-button {
+    margin-top: 8px;
+
+    mat-icon {
+      margin-right: 8px;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    @media (max-width: 480px) {
+      width: 100%;
+      max-width: 200px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 32px 16px;
+    gap: 12px;
+  }
+}
+
+// Sets List
+.sets-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.sets-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  .set-item-wrapper {
+    width: 100%;
+  }
+
+  @media (max-width: 480px) {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+}
+
+// Pagination
+.sets-paginator {
+  margin-top: 16px;
+  background: transparent;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 16px;
+
+  // Override Material paginator styles
+  ::ng-deep {
+    .mat-mdc-paginator-container {
+      padding: 0;
+      min-height: 48px;
+    }
+
+    .mat-mdc-paginator-range-label {
+      margin: 0 16px;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.6);
+
+      @media (max-width: 480px) {
+        margin: 0 8px;
+        font-size: 12px;
+      }
+    }
+
+    .mat-mdc-paginator-navigation-first,
+    .mat-mdc-paginator-navigation-previous,
+    .mat-mdc-paginator-navigation-next,
+    .mat-mdc-paginator-navigation-last {
+      width: 40px;
+      height: 40px;
+      margin: 0 4px;
+
+      @media (max-width: 480px) {
+        width: 36px;
+        height: 36px;
+        margin: 0 2px;
+      }
+
+      .mat-mdc-button-touch-target {
+        width: 40px;
+        height: 40px;
+
+        @media (max-width: 480px) {
+          width: 36px;
+          height: 36px;
+        }
+      }
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+
+        @media (max-width: 480px) {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 600px) {
+  .sets-card {
+    mat-card-content {
+      padding: 12px;
+    }
+  }
+}
+
+// Accessibility improvements
+.add-first-set-button:focus-visible,
+.sets-paginator button:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .sets-card {
+    border-color: rgba(0, 0, 0, 0.3);
+  }
+
+  .sets-paginator {
+    border-top-color: rgba(0, 0, 0, 0.2);
+  }
+
+  .empty-icon {
+    color: rgba(0, 0, 0, 0.6) !important;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .sets-loading mat-spinner {
+    animation: none;
+  }
+}
+
+// Print styles
+@media print {
+  .sets-card {
+    box-shadow: none;
+    border: 1px solid #000;
+    break-inside: avoid;
+  }
+
+  .sets-paginator {
+    display: none;
+  }
+
+  .add-first-set-button {
+    display: none;
+  }
+}
+
+// Loading skeleton animation for future enhancement
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}

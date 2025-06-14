@@ -13,6 +13,7 @@ import { MatPaginatorModule } from "@angular/material/paginator";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatToolbarModule } from "@angular/material/toolbar";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 // Material Core
 import { MatNativeDateModule } from "@angular/material/core";
@@ -36,6 +37,7 @@ const MATERIAL_MODULES = [
   MatRippleModule,
   MatSnackBarModule,
   MatToolbarModule,
+  MatTooltipModule,
   TextFieldModule,
 ];
 

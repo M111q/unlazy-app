@@ -14,6 +14,14 @@ const routes: Routes = [
       ),
     data: { title: "Sesje treningowe" },
   },
+  {
+    path: ":id",
+    loadComponent: () =>
+      import("./components/session-details/session-details.component").then(
+        (c) => c.SessionDetailsComponent,
+      ),
+    data: { title: "Szczegóły treningu" },
+  },
 ];
 
 @NgModule({

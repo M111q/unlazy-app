@@ -1,0 +1,431 @@
+.set-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  min-height: 80px;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  &.invalid-set {
+    border-left: 4px solid #f44336;
+    background: rgba(244, 67, 54, 0.02);
+
+    &:hover {
+      background: rgba(244, 67, 54, 0.04);
+    }
+  }
+
+  &.deleting-set {
+    opacity: 0.6;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.2);
+
+    .set-content {
+      opacity: 0.7;
+    }
+
+    .action-button {
+      pointer-events: auto;
+
+      &.delete-button {
+        background-color: rgba(244, 67, 54, 0.1);
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px;
+    min-height: auto;
+  }
+}
+
+.set-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 0; // Allow content to shrink
+
+  .exercise-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+
+    .exercise-icon {
+      color: #1976d2;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .exercise-title {
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+      font-size: 16px;
+      line-height: 1.2;
+      word-wrap: break-word;
+      hyphens: auto;
+
+      @media (max-width: 480px) {
+        font-size: 14px;
+      }
+    }
+
+    .validation-warning-icon {
+      color: #f57c00;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      margin-left: 8px;
+      flex-shrink: 0;
+      cursor: help;
+
+      @media (max-width: 480px) {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        margin-left: 6px;
+      }
+    }
+  }
+
+  .set-details {
+    display: flex;
+    gap: 16px;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+    line-height: 1.4;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .reps-container,
+    .weight-container {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+
+      &:not(:last-child)::after {
+        content: "•";
+        position: absolute;
+        right: -10px;
+        color: rgba(0, 0, 0, 0.3);
+        font-weight: normal;
+
+        @media (max-width: 480px) {
+          display: none;
+        }
+      }
+    }
+
+    .reps,
+    .weight {
+      font-weight: 500;
+
+      &.invalid-value {
+        color: #f44336;
+        font-weight: 600;
+        text-decoration: underline;
+        text-decoration-color: #f44336;
+        text-decoration-style: wavy;
+      }
+    }
+
+    .field-warning-icon {
+      color: #f44336;
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      cursor: help;
+
+      @media (max-width: 480px) {
+        font-size: 12px;
+        width: 12px;
+        height: 12px;
+      }
+    }
+
+    .reps {
+      min-width: 80px;
+
+      @media (max-width: 480px) {
+        min-width: auto;
+      }
+    }
+
+    .weight {
+      min-width: 60px;
+
+      @media (max-width: 480px) {
+        min-width: auto;
+      }
+    }
+  }
+}
+
+.set-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+  align-items: center;
+
+  @media (max-width: 480px) {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .action-button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    mat-spinner {
+      margin: 0;
+    }
+
+    @media (max-width: 480px) {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  .edit-button {
+    &:hover {
+      background-color: rgba(25, 118, 210, 0.1);
+    }
+  }
+
+  .delete-button {
+    &:hover {
+      background-color: rgba(244, 67, 54, 0.1);
+    }
+  }
+}
+
+// Accessibility improvements
+.action-button:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+.delete-button:focus-visible {
+  outline-color: #f44336;
+}
+
+.deleting-set .action-button:focus-visible {
+  outline-color: rgba(25, 118, 210, 0.5);
+}
+
+// Tooltip positioning
+.action-button[matTooltip] {
+  position: relative;
+}
+
+// Loading state (for future enhancement)
+.set-item.loading {
+  .exercise-title,
+  .reps,
+  .weight {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+    color: transparent;
+    height: 1.2em;
+    display: inline-block;
+    min-width: 60px;
+  }
+
+  .exercise-icon {
+    color: #e0e0e0;
+  }
+
+  .action-button {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+}
+
+// Deleting state animation
+.deleting-set {
+  animation: pulse-deleting 2s infinite;
+}
+
+@keyframes pulse-deleting {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .set-item {
+    border-color: rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      border-color: rgba(0, 0, 0, 0.5);
+    }
+
+    &.invalid-set {
+      border-left-color: #d32f2f;
+    }
+  }
+
+  .exercise-icon {
+    color: rgba(0, 0, 0, 0.87) !important;
+  }
+
+  .invalid-value {
+    color: #d32f2f !important;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .set-item,
+  .action-button,
+  .skeleton-loading,
+  .deleting-set {
+    transition: none;
+    animation: none;
+  }
+
+  .action-button:hover {
+    transform: none;
+  }
+
+  .deleting-set {
+    opacity: 0.6;
+  }
+}
+
+// Print styles
+@media print {
+  .set-item {
+    box-shadow: none;
+    border: 1px solid #000;
+    background: white;
+    break-inside: avoid;
+  }
+
+  .set-actions {
+    display: none;
+  }
+
+  .exercise-icon {
+    color: #000 !important;
+  }
+}
+
+// Validation tooltip styling
+:host ::ng-deep .validation-tooltip {
+  background-color: #f44336 !important;
+  color: white !important;
+  font-size: 12px !important;
+  max-width: 250px !important;
+  word-wrap: break-word !important;
+
+  .mat-mdc-tooltip {
+    background-color: #f44336 !important;
+  }
+}
+
+// Dark theme support (for future enhancement)
+@media (prefers-color-scheme: dark) {
+  .set-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    &.invalid-set {
+      background: rgba(244, 67, 54, 0.1);
+      border-left-color: #f44336;
+    }
+
+    &.deleting-set {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  .exercise-title {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .set-details {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .exercise-icon {
+    color: #64b5f6;
+  }
+
+  .validation-warning-icon {
+    color: #ffb74d;
+  }
+
+  .field-warning-icon {
+    color: #ff8a80;
+  }
+}

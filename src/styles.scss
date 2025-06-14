@@ -1,1 +1,230 @@
-/* You can add global styles to this file, and also import other style files */
+// Custom Theming for Angular Material
+// For more information: https://material.angular.dev/guide/theming
+@use "@angular/material" as mat;
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+// Import Material Icons
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+
+/* Global styles for Angular Material and Unlazy App */
+
+// Reset and base styles
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #fafafa;
+  color: rgba(0, 0, 0, 0.87);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Responsive breakpoints (matching our component styles)
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1024px;
+$desktop-breakpoint: 1200px;
+
+// Material Design utility classes
+.mat-elevation-0 {
+  box-shadow: none !important;
+}
+.mat-elevation-1 {
+  box-shadow:
+    0 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0 1px 1px 0 rgba(0, 0, 0, 0.14),
+    0 1px 3px 0 rgba(0, 0, 0, 0.12) !important;
+}
+.mat-elevation-2 {
+  box-shadow:
+    0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12) !important;
+}
+
+// Custom Material Component overrides for consistent design
+.mat-mdc-card {
+  border-radius: 12px !important;
+}
+
+.mat-mdc-button {
+  border-radius: 8px !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+}
+
+.mat-mdc-fab {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+// Material Expansion Panel customizations
+.mat-expansion-panel {
+  border-radius: 8px !important;
+  margin-bottom: 16px !important;
+
+  &:not(.mat-expanded) {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  &.mat-expanded {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+.mat-expansion-panel-header {
+  padding: 16px 24px !important;
+
+  @media (max-width: $mobile-breakpoint) {
+    padding: 12px 16px !important;
+  }
+}
+
+// Snackbar customizations
+.mat-mdc-snack-bar-container {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+
+  &.success-snackbar {
+    --mdc-snackbar-container-color: #4caf50;
+    --mdc-snackbar-supporting-text-color: white;
+
+    .mat-mdc-snack-bar-action {
+      --mdc-text-button-label-text-color: rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  &.error-snackbar {
+    --mdc-snackbar-container-color: #f44336;
+    --mdc-snackbar-supporting-text-color: white;
+
+    .mat-mdc-snack-bar-action {
+      --mdc-text-button-label-text-color: rgba(255, 255, 255, 0.9);
+    }
+  }
+}
+
+.mat-mdc-snack-bar-label {
+  font-weight: 500 !important;
+  font-size: 14px !important;
+}
+
+.mat-mdc-snack-bar-action {
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+// Accessibility improvements
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+// Focus indicators
+.mat-mdc-button:focus-visible,
+.mat-mdc-icon-button:focus-visible,
+.mat-mdc-fab:focus-visible {
+  outline: 2px solid #1976d2 !important;
+  outline-offset: 2px !important;
+}
+
+// Loading spinner centering utility
+.loading-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+// Responsive utilities
+.mobile-only {
+  @media (min-width: $mobile-breakpoint) {
+    display: none !important;
+  }
+}
+
+.desktop-only {
+  @media (max-width: $mobile-breakpoint) {
+    display: none !important;
+  }
+}
+
+// Text utilities
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-center {
+  text-align: center !important;
+}
+.text-left {
+  text-align: left !important;
+}
+.text-right {
+  text-align: right !important;
+}
+
+// Spacing utilities
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+.mb-8 {
+  margin-bottom: 8px !important;
+}
+.mb-16 {
+  margin-bottom: 16px !important;
+}
+.mb-24 {
+  margin-bottom: 24px !important;
+}
+
+.mt-0 {
+  margin-top: 0 !important;
+}
+.mt-8 {
+  margin-top: 8px !important;
+}
+.mt-16 {
+  margin-top: 16px !important;
+}
+.mt-24 {
+  margin-top: 24px !important;
+}
+
+// Material color utilities
+.text-primary {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+.text-secondary {
+  color: rgba(0, 0, 0, 0.54) !important;
+}
+.text-disabled {
+  color: rgba(0, 0, 0, 0.38) !important;
+}

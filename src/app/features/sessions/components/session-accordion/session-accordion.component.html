@@ -26,7 +26,9 @@
     <div class="session-content">
       <!-- Session Stats -->
       <app-stats-card
-        [stats]="{ totalWeight: session.totalWeight, totalReps: session.totalReps }">
+        [totalWeight]="session.totalWeight"
+        [totalReps]="session.totalReps"
+        [exerciseCount]="0">
       </app-stats-card>
 
       <!-- Session Details -->
