@@ -93,3 +93,33 @@ export interface PaginationOptions {
   page?: number;
   limit?: number;
 }
+
+// Auth form types
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+export interface RegisterFormData {
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface ResetPasswordFormData {
+  email: string;
+}
+
+export interface UpdatePasswordFormData {
+  password: string;
+  confirmPassword: string;
+}
+
+// Auth state for signals-based state management
+export interface AuthState {
+  user: AuthUser | null;
+  session: AuthSession | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+}

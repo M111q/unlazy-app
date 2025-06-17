@@ -1,0 +1,40 @@
+<div class="auth-layout">
+  <!-- Background -->
+  <div class="auth-background"></div>
+
+  <!-- Main Content -->
+  <div class="auth-container">
+    <!-- Header -->
+    <header class="auth-header">
+      <div class="brand-section">
+        <mat-icon class="app-icon">fitness_center</mat-icon>
+        <h1 class="app-title">{{ appName }}</h1>
+        <p class="app-subtitle">{{ appDescription }}</p>
+      </div>
+    </header>
+
+    <!-- Auth Card -->
+    <main class="auth-main">
+      <mat-card class="auth-card mat-elevation-8">
+        <mat-card-content class="auth-card-content">
+          <!-- Content projection for auth components -->
+          <ng-content></ng-content>
+        </mat-card-content>
+      </mat-card>
+    </main>
+
+    <!-- Footer -->
+    <footer class="auth-footer">
+      <div class="footer-content">
+        <p class="copyright">
+          &copy; {{ currentYear }} {{ appName }}. Wszystkie prawa zastrzeżone.
+        </p>
+        <div class="footer-links">
+          <a href="#" class="footer-link" tabindex="-1">Polityka prywatności</a>
+          <span class="separator">•</span>
+          <a href="#" class="footer-link" tabindex="-1">Regulamin</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>

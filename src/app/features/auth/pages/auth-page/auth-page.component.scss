@@ -1,0 +1,349 @@
+// Auth Page Component Styles - Material Design
+@use '@angular/material' as mat;
+
+// Responsive breakpoints (matching global styles)
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1024px;
+
+// Error and loading colors
+$error-color: #f44336;
+$error-background: #ffebee;
+$loading-overlay: rgba(0, 0, 0, 0.4);
+
+.auth-page-component {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+// Global error message styling
+.global-error {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 90%;
+  max-width: 400px;
+  animation: slideInDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .error-card {
+    background: $error-background;
+    border: 1px solid $error-color;
+    border-radius: 12px !important;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(244, 67, 54, 0.2) !important;
+
+    .error-content {
+      padding: 16px !important;
+
+      .error-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+
+        .error-icon {
+          color: $error-color;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+
+        .error-title {
+          font-weight: 600;
+          color: #d32f2f;
+          font-size: 0.875rem;
+        }
+      }
+
+      .error-message {
+        margin: 0 0 12px 0;
+        color: #d32f2f;
+        font-size: 0.8125rem;
+        line-height: 1.4;
+      }
+
+      .error-actions {
+        display: flex;
+        justify-content: flex-end;
+
+        .error-dismiss-button {
+          min-width: auto;
+          padding: 4px 8px;
+          font-size: 0.75rem;
+          height: 32px;
+          border-radius: 6px !important;
+          text-transform: none !important;
+
+          .mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+          }
+
+          &:hover {
+            background-color: rgba(244, 67, 54, 0.08);
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: $mobile-breakpoint) {
+    top: 16px;
+    width: 95%;
+
+    .error-card .error-content {
+      padding: 12px !important;
+
+      .error-header {
+        margin-bottom: 6px;
+
+        .error-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+
+        .error-title {
+          font-size: 0.8125rem;
+        }
+      }
+
+      .error-message {
+        font-size: 0.75rem;
+        margin-bottom: 8px;
+      }
+    }
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+}
+
+// Component loading state
+.component-loading {
+  pointer-events: none;
+  opacity: 0.7;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.5);
+    z-index: 10;
+    border-radius: 16px;
+  }
+}
+
+// Global loading overlay
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $loading-overlay;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease-out;
+
+  .loading-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+
+    .mat-mdc-progress-spinner {
+      --mdc-circular-progress-active-indicator-color: #1976d2;
+    }
+
+    .loading-text {
+      margin: 0;
+      font-size: 0.875rem;
+      color: rgba(0, 0, 0, 0.7);
+      font-weight: 500;
+      text-align: center;
+    }
+
+    @media (max-width: $mobile-breakpoint) {
+      padding: 24px;
+      gap: 12px;
+
+      .loading-text {
+        font-size: 0.8125rem;
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Page title hidden element (for accessibility)
+title {
+  display: none;
+}
+
+// Ensure auth layout takes full height
+::ng-deep app-auth-layout {
+  display: block;
+  min-height: 100vh;
+}
+
+// Auth component transitions
+.auth-component-enter {
+  animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.auth-component-leave {
+  animation: slideOutDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+// Focus management for loading states
+.loading-overlay:focus-within {
+  outline: none;
+}
+
+.loading-overlay .loading-content {
+  &:focus-visible {
+    outline: 2px solid #1976d2;
+    outline-offset: 2px;
+  }
+}
+
+// Accessibility improvements
+@media (prefers-reduced-motion: reduce) {
+  .global-error {
+    animation: none;
+  }
+
+  .loading-overlay {
+    animation: none;
+  }
+
+  .auth-component-enter,
+  .auth-component-leave {
+    animation: none;
+  }
+
+  .component-loading::after {
+    transition: none;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .global-error .error-card {
+    background: #fff;
+    border: 2px solid $error-color;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .loading-overlay {
+    background: rgba(0, 0, 0, 0.8);
+
+    .loading-content {
+      background: #fff;
+      border: 2px solid #000;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  .component-loading::after {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ccc;
+  }
+}
+
+// Print styles
+@media print {
+  .global-error,
+  .loading-overlay,
+  .component-loading::after {
+    display: none !important;
+  }
+}
+
+// Dark mode support (if implemented in future)
+@media (prefers-color-scheme: dark) {
+  .loading-overlay .loading-content {
+    background: rgba(33, 33, 33, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    .loading-text {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  .global-error .error-card {
+    background: #3e2723;
+    border-color: #f44336;
+
+    .error-content {
+      .error-title,
+      .error-message {
+        color: #ffcdd2;
+      }
+
+      .error-actions .error-dismiss-button {
+        color: #ffcdd2;
+
+        &:hover {
+          background-color: rgba(244, 67, 54, 0.12);
+        }
+      }
+    }
+  }
+}

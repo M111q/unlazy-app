@@ -1,0 +1,73 @@
+<app-auth-layout>
+
+
+  <!-- Set page title for accessibility -->
+  <ng-container *ngIf="pageTitle">
+    <title>{{ pageTitle }}</title>
+  </ng-container>
+
+  <!-- Global Error Message -->
+  <div class="global-error"
+       *ngIf="globalError()"
+       role="alert"
+       aria-live="assertive">
+    <mat-card class="error-card mat-elevation-2">
+      <mat-card-content class="error-content">
+        <div class="error-header">
+          <mat-icon class="error-icon">error</mat-icon>
+          <span class="error-title">Wystąpił błąd</span>
+        </div>
+        <p class="error-message">{{ globalError() }}</p>
+        <div class="error-actions">
+          <button mat-button
+                  color="primary"
+                  (click)="clearGlobalError()"
+                  class="error-dismiss-button">
+            <mat-icon>close</mat-icon>
+            Zamknij
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Login Component -->
+  <div *ngIf="currentMode() === 'login'">
+    <app-login (loginSubmit)="onLoginSubmit($event)"
+               [class.component-loading]="isLoading()">
+    </app-login>
+  </div>
+
+  <!-- Fallback if no mode matches -->
+  <div *ngIf="currentMode() !== 'login' && currentMode() !== 'register' && currentMode() !== 'reset-password'"
+       style="padding: 20px; text-align: center; color: red;">
+    <p>No component for mode: {{ currentMode() }}</p>
+  </div>
+
+  <!-- Register Component -->
+  <app-register *ngIf="currentMode() === 'register'"
+                (registerSubmit)="onRegisterSubmit($event)"
+                [class.component-loading]="isLoading()">
+  </app-register>
+
+  <!-- Reset Password Component -->
+  <app-reset-password *ngIf="currentMode() === 'reset-password'"
+                      (resetPasswordSubmit)="onResetPasswordSubmit($event)"
+                      [class.component-loading]="isLoading()">
+  </app-reset-password>
+
+
+
+  <!-- Global Loading Overlay -->
+  <div class="loading-overlay"
+       *ngIf="isLoading()"
+       role="status"
+       aria-live="polite"
+       aria-label="Przetwarzanie żądania">
+    <div class="loading-content">
+      <mat-spinner diameter="32"></mat-spinner>
+      <p class="loading-text">Przetwarzanie...</p>
+    </div>
+  </div>
+
+</app-auth-layout>
