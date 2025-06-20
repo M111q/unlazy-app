@@ -12,7 +12,7 @@ const routes: Routes = [
       import("./components/session-list/session-list.component").then(
         (c) => c.SessionListComponent,
       ),
-    data: { title: "Sesje treningowe" },
+    title: "Sesje treningowe - Unlazy",
   },
   {
     path: ":id",
@@ -20,7 +20,23 @@ const routes: Routes = [
       import("./components/session-details/session-details.component").then(
         (c) => c.SessionDetailsComponent,
       ),
-    data: { title: "Szczegóły treningu" },
+    title: "Szczegóły treningu - Unlazy",
+  },
+  {
+    path: ":id/sets/new",
+    loadComponent: () =>
+      import("./components/add-set-page/add-set-page.component").then(
+        (c) => c.AddSetPageComponent,
+      ),
+    title: "Dodaj serię - Unlazy",
+  },
+  {
+    path: ":id/sets/:setId/edit",
+    loadComponent: () =>
+      import("./components/edit-set-page/edit-set-page.component").then(
+        (c) => c.EditSetPageComponent,
+      ),
+    title: "Edytuj serię - Unlazy",
   },
 ];
 

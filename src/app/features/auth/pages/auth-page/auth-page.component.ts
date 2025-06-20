@@ -14,6 +14,7 @@ import {
   ResetPasswordFormData,
 } from "../../../../../types";
 import { AuthValidationError } from "../../types/auth-validation";
+import { AuthService } from "../../../../core/auth";
 
 type AuthPageMode = "login" | "register" | "reset-password";
 
@@ -41,6 +42,7 @@ export class AuthPageComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly authService = inject(AuthService);
 
   // State management
   protected readonly currentMode = signal<AuthPageMode>("login");
@@ -72,24 +74,18 @@ export class AuthPageComponent implements OnInit {
   /**
    * Handle login form submission
    */
-  onLoginSubmit(loginData: LoginFormData): void {
+  async onLoginSubmit(loginData: LoginFormData): Promise<void> {
     this.isLoading.set(true);
     this.globalError.set(null);
 
     console.log("Login attempt:", { email: loginData.email });
 
-    // TODO: Replace with actual AuthService call
-    // Simulate API call
-    setTimeout(() => {
-      // Mock validation - simulate different scenarios
-      if (loginData.email === "error@test.com") {
-        this.handleLoginError();
-      } else if (loginData.email === "notfound@test.com") {
-        this.handleUserNotFound();
-      } else {
-        this.handleLoginSuccess();
-      }
-    }, 1500);
+    try {
+      await this.authService.signIn(loginData);
+      this.handleLoginSuccess();
+    } catch (error: unknown) {
+      this.handleLoginError(error);
+    }
   }
 
   /**
@@ -104,22 +100,27 @@ export class AuthPageComponent implements OnInit {
       panelClass: ["success-snackbar"],
     });
 
-    // TODO: Navigate to dashboard/sessions when auth is implemented
-    console.log("Login successful - would navigate to /sessions");
-    // this.router.navigate(["/sessions"]);
+    // Navigate to returnUrl if present, otherwise to sessions page
+    const returnUrl =
+      this.route.snapshot.queryParams["returnUrl"] || "/sessions";
+    this.router.navigate([returnUrl]);
   }
 
   /**
    * Handle login error
    */
-  private handleLoginError(): void {
+  private handleLoginError(error: unknown): void {
     this.isLoading.set(false);
     this.loginComponent?.resetSubmissionState();
 
+    console.error("Login error:", error);
+
+    const errorMessage =
+      error instanceof Error ? error.message : "Nieprawidłowy email lub hasło";
     const errors: AuthValidationError[] = [
       {
         field: "email",
-        message: "Nieprawidłowy email lub hasło",
+        message: errorMessage,
         code: "INVALID_CREDENTIALS",
       },
     ];
@@ -149,24 +150,18 @@ export class AuthPageComponent implements OnInit {
   /**
    * Handle registration form submission
    */
-  onRegisterSubmit(registerData: RegisterFormData): void {
+  async onRegisterSubmit(registerData: RegisterFormData): Promise<void> {
     this.isLoading.set(true);
     this.globalError.set(null);
 
     console.log("Registration attempt:", { email: registerData.email });
 
-    // TODO: Replace with actual AuthService call
-    // Simulate API call
-    setTimeout(() => {
-      // Mock validation - simulate different scenarios
-      if (registerData.email === "taken@test.com") {
-        this.handleEmailTakenError();
-      } else if (registerData.email === "error@test.com") {
-        this.handleRegistrationError();
-      } else {
-        this.handleRegistrationSuccess();
-      }
-    }, 2000);
+    try {
+      await this.authService.signUp(registerData);
+      this.handleRegistrationSuccess();
+    } catch (error: unknown) {
+      this.handleRegistrationError(error);
+    }
   }
 
   /**
@@ -192,11 +187,25 @@ export class AuthPageComponent implements OnInit {
   /**
    * Handle registration error
    */
-  private handleRegistrationError(): void {
+  private handleRegistrationError(error: unknown): void {
     this.isLoading.set(false);
     this.registerComponent?.resetSubmissionState();
 
-    this.globalError.set("Rejestracja nieudana. Spróbuj ponownie.");
+    console.error("Registration error:", error);
+
+    // Check if it's an email already taken error
+    const errorMessage = error instanceof Error ? error.message : "";
+    if (
+      errorMessage.includes("already registered") ||
+      errorMessage.includes("already exists")
+    ) {
+      this.handleEmailTakenError();
+      return;
+    }
+
+    this.globalError.set(
+      errorMessage || "Rejestracja nieudana. Spróbuj ponownie.",
+    );
   }
 
   /**
@@ -220,22 +229,18 @@ export class AuthPageComponent implements OnInit {
   /**
    * Handle reset password form submission
    */
-  onResetPasswordSubmit(resetData: ResetPasswordFormData): void {
+  async onResetPasswordSubmit(resetData: ResetPasswordFormData): Promise<void> {
     this.isLoading.set(true);
     this.globalError.set(null);
 
     console.log("Reset password attempt:", { email: resetData.email });
 
-    // TODO: Replace with actual AuthService call
-    // Simulate API call
-    setTimeout(() => {
-      // Mock validation - simulate different scenarios
-      if (resetData.email === "error@test.com") {
-        this.handleResetPasswordError();
-      } else {
-        this.handleResetPasswordSuccess();
-      }
-    }, 1500);
+    try {
+      await this.authService.resetPassword(resetData);
+      this.handleResetPasswordSuccess();
+    } catch (error: unknown) {
+      this.handleResetPasswordError(error);
+    }
   }
 
   /**
@@ -255,11 +260,16 @@ export class AuthPageComponent implements OnInit {
   /**
    * Handle reset password error
    */
-  private handleResetPasswordError(): void {
+  private handleResetPasswordError(error: unknown): void {
     this.isLoading.set(false);
     this.resetPasswordComponent?.resetSubmissionState();
 
-    this.globalError.set("Nie udało się wysłać linku. Spróbuj ponownie.");
+    console.error("Reset password error:", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Nie udało się wysłać linku. Spróbuj ponownie.";
+    this.globalError.set(errorMessage);
   }
 
   /**

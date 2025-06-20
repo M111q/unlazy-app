@@ -18,13 +18,13 @@ import {
   DatabaseError,
   PaginationOptions,
 } from "../../types";
+import { ConfigService } from "../config/config.service"; // Import ConfigService
 import {
   SESSION_LIMITS,
   PAGINATION,
   DATABASE_ERROR_CODES,
   APPLICATION_ERROR_CODES,
   ERROR_MESSAGES,
-  MOCK_DATA,
 } from "../constants";
 
 /**
@@ -40,60 +40,100 @@ export class DbService {
   private readonly databaseValidationService = inject(
     DatabaseValidationService,
   );
+  private readonly configService = inject(ConfigService); // Inject ConfigService
 
   // ========================================
-  // AUTHENTICATION SERVICE (MOCKS)
+  // AUTHENTICATION SERVICE
   // ========================================
 
   /**
-   * Mock: Sign up a new user with email and password
-   * TODO: Implement actual authentication logic
+   * Send password reset email to user
+   * @param email - User email address
+   * @returns Promise that resolves when reset email is sent
    */
-  async signUp(email: string): Promise<AuthResponse> {
-    // Mock implementation
-    return {
-      user: { id: MOCK_DATA.USER_ID, email },
-      session: { access_token: MOCK_DATA.ACCESS_TOKEN },
-    };
+  async resetPassword(email: string): Promise<void> {
+    try {
+      await this.supabaseService.resetPassword(email);
+    } catch (error) {
+      throw this.handleDatabaseError(error);
+    }
   }
 
   /**
-   * Mock: Sign in user with email and password
-   * TODO: Implement actual authentication logic
+   * Sign up a new user with email and password
+   * @param email - User email address
+   * @param password - User password
+   * @returns Promise with authentication response
    */
-  async signIn(email: string): Promise<AuthResponse> {
-    // Mock implementation
-    return {
-      user: { id: MOCK_DATA.USER_ID, email },
-      session: { access_token: MOCK_DATA.ACCESS_TOKEN },
-    };
+  async signUp(email: string, password: string): Promise<AuthResponse> {
+    try {
+      return await this.supabaseService.signUp(email, password);
+    } catch (error) {
+      throw this.handleDatabaseError(error);
+    }
   }
 
   /**
-   * Mock: Sign out the current user
-   * TODO: Implement actual authentication logic
+   * Sign in user with email and password
+   * @param email - User email address
+   * @param password - User password
+   * @returns Promise with authentication response
+   */
+  async signIn(email: string, password: string): Promise<AuthResponse> {
+    try {
+      return await this.supabaseService.signIn(email, password);
+    } catch (error) {
+      throw this.handleDatabaseError(error);
+    }
+  }
+
+  /**
+   * Sign out the current user
+   * @returns Promise that resolves when sign out is complete
    */
   async signOut(): Promise<void> {
-    // Mock implementation
-    console.log("User signed out (mock)");
+    try {
+      await this.supabaseService.signOut();
+    } catch (error) {
+      throw this.handleDatabaseError(error);
+    }
   }
 
   /**
-   * Mock: Get the currently authenticated user
-   * TODO: Implement actual authentication logic
+   * Get the currently authenticated user
+   * @returns Promise with current user or null if not authenticated
    */
   async getCurrentUser(): Promise<AuthUser | null> {
-    // Mock implementation
-    return { id: MOCK_DATA.USER_ID, email: MOCK_DATA.USER_EMAIL };
+    try {
+      return await this.supabaseService.getCurrentUser();
+    } catch (error) {
+      throw this.handleDatabaseError(error);
+    }
   }
 
   /**
-   * Mock: Get current user's internal ID from the users table
-   * TODO: Implement actual user profile retrieval
+   * Get current user's internal ID from the users table
+   * @returns Promise with internal user ID
+   * @throws Error if user not authenticated or not found
    */
   private async getCurrentUserId(): Promise<number> {
-    // Mock implementation - returns a fixed user ID
-    return MOCK_DATA.INTERNAL_USER_ID;
+    try {
+      return await this.supabaseService.getCurrentUserId();
+    } catch (error) {
+      console.error("Error getting current user ID:", error);
+
+      // Add more specific error handling for authentication issues
+      if (
+        error instanceof Error &&
+        error.message?.includes("User not authenticated")
+      ) {
+        // This is a critical error but don't immediately throw
+        // Allow the calling method to handle it gracefully
+        throw new Error("User not authenticated - please refresh the page");
+      }
+
+      throw this.handleDatabaseError(error);
+    }
   }
 
   // ========================================
@@ -108,6 +148,24 @@ export class DbService {
   async getUserProfile(): Promise<UserProfile> {
     try {
       return await this.supabaseService.getUserProfile();
+    } catch (error) {
+      throw this.handleDatabaseError(error);
+    }
+  }
+
+  /**
+   * Create user profile in public.users table after successful registration
+   * @param authUserId - Auth user ID from auth.users
+   * @param email - User email address
+   * @returns Promise with created user profile
+   * @throws Error if profile creation fails
+   */
+  async createUserProfile(
+    authUserId: string,
+    email: string,
+  ): Promise<UserProfile> {
+    try {
+      return await this.supabaseService.createUserProfile(authUserId, email);
     } catch (error) {
       throw this.handleDatabaseError(error);
     }
@@ -191,6 +249,27 @@ export class DbService {
       const userId = await this.getCurrentUserId();
       return await this.supabaseService.createSession(session, userId);
     } catch (error) {
+      console.error("Error creating session:", error);
+
+      // Don't propagate authentication errors that might trigger sign-out
+      if (
+        error instanceof Error &&
+        error.message?.includes("User not authenticated")
+      ) {
+        console.warn(
+          "Authentication error during session creation, retrying...",
+        );
+        // Retry once after a brief delay
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        try {
+          const userId = await this.getCurrentUserId();
+          return await this.supabaseService.createSession(session, userId);
+        } catch (retryError) {
+          console.error("Retry failed:", retryError);
+          throw this.handleDatabaseError(retryError);
+        }
+      }
+
       throw this.handleDatabaseError(error);
     }
   }

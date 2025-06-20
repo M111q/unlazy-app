@@ -78,6 +78,7 @@ export class SessionListComponent implements OnInit {
    */
   onAddSession(): void {
     const viewModel = this.viewModel();
+    console.log("viewModel 1", viewModel);
 
     if (!viewModel.canAddSession) {
       this.snackBar.open(ERROR_MESSAGES.DAILY_LIMIT_EXCEEDED, "Zamknij", {
@@ -86,7 +87,7 @@ export class SessionListComponent implements OnInit {
       });
       return;
     }
-
+    console.log("viewModel 2", viewModel);
     this.openSessionFormModal("create");
   }
 
@@ -94,6 +95,7 @@ export class SessionListComponent implements OnInit {
    * Handle adding first session from empty state
    */
   onAddFirstSession(): void {
+    console.log("onAddFirst");
     this.onAddSession();
   }
 
@@ -145,7 +147,7 @@ export class SessionListComponent implements OnInit {
     }
 
     const modalData: SessionFormModalData = { mode, session };
-
+    console.log("modalData", modalData);
     const dialogRef = this.dialog.open(SessionFormModalComponent, {
       width: "500px",
       maxWidth: "90vw",
@@ -209,24 +211,50 @@ export class SessionListComponent implements OnInit {
     mode: "create" | "edit",
   ): void {
     if (mode === "create") {
+      console.log(
+        "SessionListComponent: Handling session creation",
+        sessionData,
+      );
+
       this.sessionListService
         .addSession(sessionData as CreateSessionDto)
         .subscribe({
           next: () => {
+            console.log("SessionListComponent: Session created successfully");
             this.snackBar.open("Sesja została dodana", "Zamknij", {
               duration: 3000,
               panelClass: ["success-snack-bar"],
             });
           },
           error: (error) => {
-            this.snackBar.open(
-              error.message || "Błąd podczas dodawania sesji",
-              "Zamknij",
-              {
-                duration: 5000,
-                panelClass: ["error-snack-bar"],
-              },
+            console.error(
+              "SessionListComponent: Error creating session:",
+              error,
             );
+
+            // Check if this is an authentication error
+            if (error.message?.includes("User not authenticated")) {
+              console.warn(
+                "SessionListComponent: Authentication error detected, showing specific message",
+              );
+              this.snackBar.open(
+                "Sesja wygasła. Odśwież stronę i spróbuj ponownie.",
+                "Zamknij",
+                {
+                  duration: 7000,
+                  panelClass: ["error-snack-bar"],
+                },
+              );
+            } else {
+              this.snackBar.open(
+                error.message || "Błąd podczas dodawania sesji",
+                "Zamknij",
+                {
+                  duration: 5000,
+                  panelClass: ["error-snack-bar"],
+                },
+              );
+            }
           },
         });
     } else {
@@ -243,14 +271,26 @@ export class SessionListComponent implements OnInit {
               });
             },
             error: (error) => {
-              this.snackBar.open(
-                error.message || "Błąd podczas aktualizacji sesji",
-                "Zamknij",
-                {
-                  duration: 5000,
-                  panelClass: ["error-snack-bar"],
-                },
-              );
+              // Check if this is an authentication error
+              if (error.message?.includes("User not authenticated")) {
+                this.snackBar.open(
+                  "Sesja wygasła. Odśwież stronę i spróbuj ponownie.",
+                  "Zamknij",
+                  {
+                    duration: 7000,
+                    panelClass: ["error-snack-bar"],
+                  },
+                );
+              } else {
+                this.snackBar.open(
+                  error.message || "Błąd podczas aktualizacji sesji",
+                  "Zamknij",
+                  {
+                    duration: 5000,
+                    panelClass: ["error-snack-bar"],
+                  },
+                );
+              }
             },
           });
       }
@@ -269,14 +309,26 @@ export class SessionListComponent implements OnInit {
         });
       },
       error: (error) => {
-        this.snackBar.open(
-          error.message || "Błąd podczas usuwania sesji",
-          "Zamknij",
-          {
-            duration: 5000,
-            panelClass: ["error-snack-bar"],
-          },
-        );
+        // Check if this is an authentication error
+        if (error.message?.includes("User not authenticated")) {
+          this.snackBar.open(
+            "Sesja wygasła. Odśwież stronę i spróbuj ponownie.",
+            "Zamknij",
+            {
+              duration: 7000,
+              panelClass: ["error-snack-bar"],
+            },
+          );
+        } else {
+          this.snackBar.open(
+            error.message || "Błąd podczas usuwania sesji",
+            "Zamknij",
+            {
+              duration: 5000,
+              panelClass: ["error-snack-bar"],
+            },
+          );
+        }
       },
     });
   }

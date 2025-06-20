@@ -3,17 +3,17 @@ import {
   Component,
   EventEmitter,
   Output,
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
+} from "@angular/core";
+import { CommonModule } from "@angular/common";
 
-import { MaterialModule } from '../../../../shared/material.module';
+import { MaterialModule } from "../../../../shared/material.module";
 
 @Component({
-  selector: 'app-empty-state',
+  selector: "app-empty-state",
   standalone: true,
   imports: [CommonModule, MaterialModule],
-  templateUrl: './empty-state.component.html',
-  styleUrl: './empty-state.component.scss',
+  templateUrl: "./empty-state.component.html",
+  styleUrl: "./empty-state.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmptyStateComponent {

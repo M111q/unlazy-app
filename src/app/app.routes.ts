@@ -1,8 +1,10 @@
 import { Routes } from "@angular/router";
+import { authGuard, guestGuard } from "./core/auth";
 
 export const routes: Routes = [
   {
     path: "auth",
+    canActivate: [guestGuard],
     children: [
       {
         path: "login",
@@ -41,12 +43,20 @@ export const routes: Routes = [
       import("./features/sessions/sessions.module").then(
         (m) => m.SessionsModule,
       ),
-    // TODO: Add AuthGuard when implemented
-    // canActivate: [AuthGuard]
+    canActivate: [authGuard],
+    title: "Sesje treningowe - Unlazy",
+  },
+  {
+    path: "unauthorized",
+    loadComponent: () =>
+      import("./features/shared/pages/unauthorized-page.component").then(
+        (c) => c.UnauthorizedPageComponent,
+      ),
+    title: "Brak dostępu - Unlazy",
   },
   {
     path: "",
-    redirectTo: "/auth/login",
+    redirectTo: "/sessions",
     pathMatch: "full",
   },
   {

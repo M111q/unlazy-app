@@ -1,7 +1,7 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, catchError, finalize, of, throwError } from 'rxjs';
+import { Injectable, computed, inject, signal } from "@angular/core";
+import { Observable } from "rxjs";
 
-import { DbService } from '../../../data/db.service';
+import { DbService } from "../../../data/db.service";
 import {
   ApiError,
   CreateSessionDto,
@@ -9,16 +9,16 @@ import {
   Session,
   SessionWithStats,
   UpdateSessionDto,
-} from '../../../../types';
+} from "../../../../types";
 import {
   PaginationViewModel,
   SessionItemViewModel,
   SessionListViewModel,
-} from '../types/sessions-view-models';
-import { PAGINATION, SESSION_LIMITS } from '../../../constants';
+} from "../types/sessions-view-models";
+import { PAGINATION, SESSION_LIMITS } from "../../../constants";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class SessionListService {
   private readonly dbService = inject(DbService);
@@ -65,10 +65,10 @@ export class SessionListService {
         this.updatePaginationState(page, sessionViewModels.length);
       })
       .catch((error) => {
-        console.error('Failed to load sessions:', error);
+        console.error("Failed to load sessions:", error);
         this.error.set({
-          message: 'Nie udało się załadować sesji. Spróbuj ponownie.',
-          code: 'LOAD_SESSIONS_ERROR',
+          message: "Nie udało się załadować sesji. Spróbuj ponownie.",
+          code: "LOAD_SESSIONS_ERROR",
         });
         this.sessions.set([]);
       })
@@ -89,20 +89,35 @@ export class SessionListService {
    * Returns observable for component to handle success/error
    */
   addSession(session: CreateSessionDto): Observable<Session> {
+    console.log(
+      "SessionListService: Starting session creation process",
+      session,
+    );
+
     return new Observable((subscriber) => {
       this.dbService
         .createSession(session)
         .then((createdSession) => {
+          console.log(
+            "SessionListService: Session created successfully",
+            createdSession,
+          );
           // Refresh current page to show new session
           this.refreshCurrentPage();
           subscriber.next(createdSession);
           subscriber.complete();
         })
         .catch((error) => {
-          console.error('Failed to create session:', error);
+          console.error("SessionListService: Failed to create session:", error);
+          console.error("SessionListService: Error details:", {
+            message: error.message,
+            code: error.code,
+            stack: error.stack,
+          });
+
           const apiError: ApiError = {
-            message: 'Nie udało się utworzyć sesji. Spróbuj ponownie.',
-            code: 'CREATE_SESSION_ERROR',
+            message: "Nie udało się utworzyć sesji. Spróbuj ponownie.",
+            code: "CREATE_SESSION_ERROR",
           };
           subscriber.error(apiError);
         });
@@ -124,10 +139,10 @@ export class SessionListService {
           subscriber.complete();
         })
         .catch((error) => {
-          console.error('Failed to update session:', error);
+          console.error("Failed to update session:", error);
           const apiError: ApiError = {
-            message: 'Nie udało się zaktualizować sesji. Spróbuj ponownie.',
-            code: 'UPDATE_SESSION_ERROR',
+            message: "Nie udało się zaktualizować sesji. Spróbuj ponownie.",
+            code: "UPDATE_SESSION_ERROR",
           };
           subscriber.error(apiError);
         });
@@ -149,10 +164,10 @@ export class SessionListService {
           subscriber.complete();
         })
         .catch((error) => {
-          console.error('Failed to delete session:', error);
+          console.error("Failed to delete session:", error);
           const apiError: ApiError = {
-            message: 'Nie udało się usunąć sesji. Spróbuj ponownie.',
-            code: 'DELETE_SESSION_ERROR',
+            message: "Nie udało się usunąć sesji. Spróbuj ponownie.",
+            code: "DELETE_SESSION_ERROR",
           };
           subscriber.error(apiError);
         });
@@ -181,7 +196,10 @@ export class SessionListService {
   /**
    * Update pagination state based on loaded data
    */
-  private updatePaginationState(currentPage: number, loadedCount: number): void {
+  private updatePaginationState(
+    currentPage: number,
+    loadedCount: number,
+  ): void {
     const currentPagination = this.pagination();
 
     this.pagination.set({
@@ -201,9 +219,7 @@ export class SessionListService {
     const todaySessions = this.sessions().filter((session) => {
       const sessionDate = new Date(session.sessionDatetime);
       const today = new Date();
-      return (
-        sessionDate.toDateString() === today.toDateString()
-      );
+      return sessionDate.toDateString() === today.toDateString();
     });
 
     return todaySessions.length < SESSION_LIMITS.MAX_DAILY_SESSIONS;
@@ -213,10 +229,10 @@ export class SessionListService {
    * Format date for display (DD.MM.YYYY)
    */
   private formatDate(date: Date): string {
-    return date.toLocaleDateString('pl-PL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
+    return date.toLocaleDateString("pl-PL", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   }
 
@@ -224,9 +240,9 @@ export class SessionListService {
    * Format time for display (HH:MM)
    */
   private formatTime(date: Date): string {
-    return date.toLocaleTimeString('pl-PL', {
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleTimeString("pl-PL", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   }
 }
