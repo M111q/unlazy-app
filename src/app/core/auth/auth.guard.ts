@@ -3,7 +3,7 @@ import { toObservable } from "@angular/core/rxjs-interop";
 import { Router } from "@angular/router";
 import { CanActivateFn, UrlTree } from "@angular/router";
 import { Observable } from "rxjs";
-import { map, take, tap } from "rxjs/operators";
+import { filter, map, take, tap } from "rxjs/operators";
 
 import { AuthService } from "./auth.service";
 import { AuthState } from "../../../types";
@@ -23,18 +23,27 @@ export const authGuard: CanActivateFn = (
   console.log("AuthGuard: Checking authentication for route:", state.url);
 
   return toObservable(authService.authState).pipe(
-    take(1), // Take only the first emission to avoid infinite loops
-    map((authState: AuthState) => {
+    filter((authState: AuthState) => {
       // Validate auth state integrity
       if (!authState || typeof authState !== "object") {
         console.error("AuthGuard: Invalid auth state received", authState);
-        return router.createUrlTree(["/auth/login"]);
+        return true; // Allow processing of invalid state to redirect to login
       }
 
-      // If still loading, allow navigation but auth service will handle redirect
+      // Wait for loading to complete before making navigation decisions
       if (authState.isLoading) {
-        console.log("AuthGuard: Auth state is loading, allowing navigation");
-        return true;
+        console.log("AuthGuard: Auth state is loading, waiting...");
+        return false;
+      }
+
+      return true;
+    }),
+    take(1), // Take only the first emission after loading is complete
+    map((authState: AuthState) => {
+      // Validate auth state integrity (after loading is complete)
+      if (!authState || typeof authState !== "object") {
+        console.error("AuthGuard: Invalid auth state received", authState);
+        return router.createUrlTree(["/auth/login"]);
       }
 
       // Enhanced authentication check with user validation
@@ -80,18 +89,27 @@ export const guestGuard: CanActivateFn = (
   console.log("GuestGuard: Checking authentication for route:", state.url);
 
   return toObservable(authService.authState).pipe(
-    take(1),
-    map((authState: AuthState) => {
+    filter((authState: AuthState) => {
       // Validate auth state integrity
       if (!authState || typeof authState !== "object") {
         console.error("GuestGuard: Invalid auth state received", authState);
-        return true; // Allow navigation to auth pages on error
+        return true; // Allow processing to handle error case
       }
 
-      // If still loading, allow navigation
+      // Wait for loading to complete before making navigation decisions
       if (authState.isLoading) {
-        console.log("GuestGuard: Auth state is loading, allowing navigation");
-        return true;
+        console.log("GuestGuard: Auth state is loading, waiting...");
+        return false;
+      }
+
+      return true;
+    }),
+    take(1),
+    map((authState: AuthState) => {
+      // Validate auth state integrity (after loading is complete)
+      if (!authState || typeof authState !== "object") {
+        console.error("GuestGuard: Invalid auth state received", authState);
+        return true; // Allow navigation to auth pages on error
       }
 
       // Enhanced check for authenticated users with user validation
@@ -137,9 +155,24 @@ export const roleGuard = (allowedRoles: string[] = []): CanActivateFn => {
     );
 
     return toObservable(authService.authState).pipe(
+      filter((authState: AuthState) => {
+        // Validate auth state integrity
+        if (!authState || typeof authState !== "object") {
+          console.error("RoleGuard: Invalid auth state received", authState);
+          return true; // Allow processing to handle error case
+        }
+
+        // Wait for loading to complete before making navigation decisions
+        if (authState.isLoading) {
+          console.log("RoleGuard: Auth state is loading, waiting...");
+          return false;
+        }
+
+        return true;
+      }),
       take(1),
       map((authState: AuthState) => {
-        // Validate auth state integrity
+        // Validate auth state integrity (after loading is complete)
         if (!authState || typeof authState !== "object") {
           console.error("RoleGuard: Invalid auth state received", authState);
           return router.createUrlTree(["/auth/login"]);
