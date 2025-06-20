@@ -1,5 +1,6 @@
 import { Routes } from "@angular/router";
 import { authGuard, guestGuard } from "./core/auth";
+import { MainLayoutComponent } from "./shared/layouts/main-layout/main-layout.component";
 
 export const routes: Routes = [
   {
@@ -39,11 +40,17 @@ export const routes: Routes = [
   },
   {
     path: "sessions",
-    loadChildren: () =>
-      import("./features/sessions/sessions.module").then(
-        (m) => m.SessionsModule,
-      ),
+    component: MainLayoutComponent,
     canActivate: [authGuard],
+    children: [
+      {
+        path: "",
+        loadChildren: () =>
+          import("./features/sessions/sessions.module").then(
+            (m) => m.SessionsModule,
+          ),
+      },
+    ],
     title: "Sesje treningowe - Unlazy",
   },
   {
