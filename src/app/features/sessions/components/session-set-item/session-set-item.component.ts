@@ -18,17 +18,19 @@ import { EXERCISE_SET_LIMITS } from "../../../../constants";
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
-      class="set-item"
-      [class.invalid-set]="!isValidSet()"
-      [class.deleting-set]="isDeleting"
+      class="d-flex align-center justify-between p-md border rounded-md bg-white card-interactive"
+      [class.invalid-field]="!isValidSet()"
+      [class.deleting-animation]="isDeleting"
     >
-      <div class="set-content">
-        <div class="exercise-name">
-          <mat-icon class="exercise-icon">fitness_center</mat-icon>
-          <strong class="exercise-title">{{ set.exercises.name }}</strong>
+      <div class="d-flex flex-column gap-xs flex-grow-1">
+        <div class="d-flex align-center gap-xs mb-xs">
+          <mat-icon class="text-primary">fitness_center</mat-icon>
+          <strong class="text-primary font-medium text-base mobile-text-sm">{{
+            set.exercises.name
+          }}</strong>
           <mat-icon
             *ngIf="!isValidSet()"
-            class="validation-warning-icon"
+            class="text-warning text-lg"
             matTooltip="{{ getValidationWarnings().join('; ') }}"
             matTooltipClass="validation-tooltip"
             aria-label="Ostrzeżenia walidacji"
@@ -36,14 +38,14 @@ import { EXERCISE_SET_LIMITS } from "../../../../constants";
             warning
           </mat-icon>
         </div>
-        <div class="set-details">
-          <span class="reps-container">
-            <span class="reps" [class.invalid-value]="!isValidReps()">
+        <div class="d-flex gap-md mobile-stack text-secondary text-sm">
+          <span class="d-flex align-center gap-xs position-relative">
+            <span class="font-medium" [class.invalid-field]="!isValidReps()">
               {{ validatedReps }} {{ getRepsLabel(validatedReps) }}
             </span>
             <mat-icon
               *ngIf="!isValidReps()"
-              class="field-warning-icon"
+              class="text-error text-sm"
               [matTooltip]="getRepsValidationMessage()"
               matTooltipClass="validation-tooltip"
               aria-label="Nieprawidłowa liczba powtórzeń"
@@ -51,13 +53,13 @@ import { EXERCISE_SET_LIMITS } from "../../../../constants";
               error_outline
             </mat-icon>
           </span>
-          <span class="weight-container">
-            <span class="weight" [class.invalid-value]="!isValidWeight()">
+          <span class="d-flex align-center gap-xs">
+            <span class="font-medium" [class.invalid-field]="!isValidWeight()">
               {{ formattedWeight }} kg
             </span>
             <mat-icon
               *ngIf="!isValidWeight()"
-              class="field-warning-icon"
+              class="text-error text-sm"
               [matTooltip]="getWeightValidationMessage()"
               matTooltipClass="validation-tooltip"
               aria-label="Nieprawidłowy ciężar"
@@ -67,38 +69,28 @@ import { EXERCISE_SET_LIMITS } from "../../../../constants";
           </span>
         </div>
       </div>
-      <div class="set-actions">
+      <div class="d-flex gap-xs flex-shrink-0 align-center mobile-center">
         <button
           mat-icon-button
-          color="primary"
           (click)="handleEdit()"
           [attr.aria-label]="getEditAriaLabel()"
           [disabled]="disabled || isDeleting"
           matTooltip="Edytuj serię"
-          class="action-button edit-button"
+          class="action-btn action-btn-edit"
         >
           <mat-icon>edit</mat-icon>
         </button>
         <button
           mat-icon-button
-          color="warn"
           (click)="handleDelete()"
           [attr.aria-label]="getDeleteAriaLabel()"
           [disabled]="disabled || isDeleting"
           matTooltip="Usuń serię"
-          class="action-button delete-button"
+          class="action-btn action-btn-delete"
         >
           <mat-spinner *ngIf="isDeleting" diameter="16"></mat-spinner>
           <mat-icon *ngIf="!isDeleting">delete</mat-icon>
         </button>
-      </div>
-      <div
-        class="set-warning"
-        *ngIf="!isValidSet()"
-        [matTooltip]="getValidationWarnings().join(', ')"
-        matTooltipPosition="below"
-      >
-        <mat-icon class="warning-icon">warning</mat-icon>
       </div>
     </div>
   `,

@@ -1,40 +1,43 @@
+@use "../../../../../styles/variables" as vars;
+@use "../../../../../styles/mixins" as mixins;
+
 .session-details-card {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: vars.$shadow-card;
+  border: vars.$border-width-thin solid vars.$border-color-light;
 
   mat-card-header {
-    margin-bottom: 16px;
+    margin-bottom: vars.$spacing-sm;
 
     mat-card-title {
-      font-size: 20px;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.87);
+      font-size: vars.$font-size-xl;
+      font-weight: vars.$font-weight-medium;
+      color: vars.$text-primary;
     }
   }
 
   .session-info {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: vars.$spacing-md;
   }
 
   .info-item {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding: 12px 0;
+    gap: vars.$spacing-xs;
+    padding: vars.$spacing-xs 0;
 
     &:not(:last-child) {
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      border-bottom: vars.$border-width-thin solid vars.$border-color-light;
     }
 
     .info-icon {
-      color: #1976d2;
+      color: vars.$color-primary;
       margin-top: 2px;
       flex-shrink: 0;
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
+      font-size: vars.$font-size-xl;
+      width: vars.$font-size-xl;
+      height: vars.$font-size-xl;
     }
 
     .info-content {
@@ -45,38 +48,35 @@
       min-width: 0; // Allow text to wrap
 
       .info-label {
-        font-weight: 500;
-        color: rgba(0, 0, 0, 0.87);
-        font-size: 14px;
+        font-weight: vars.$font-weight-medium;
+        color: vars.$text-primary;
+        font-size: vars.$font-size-sm;
         margin-bottom: 2px;
       }
 
       .info-value {
-        color: rgba(0, 0, 0, 0.6);
-        font-size: 14px;
-        line-height: 1.4;
+        color: vars.$text-secondary;
+        font-size: vars.$font-size-sm;
+        line-height: vars.$line-height-normal;
         word-wrap: break-word;
         hyphens: auto;
       }
     }
 
-    @media (max-width: 480px) {
-      gap: 8px;
-      padding: 8px 0;
+    @include mixins.media-max(xs) {
+      gap: vars.$spacing-xs;
+      padding: vars.$spacing-xs 0;
 
       .info-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
+        font-size: vars.$font-size-lg;
+        width: vars.$font-size-lg;
+        height: vars.$font-size-lg;
       }
 
       .info-content {
-        .info-label {
-          font-size: 13px;
-        }
-
+        .info-label,
         .info-value {
-          font-size: 13px;
+          font-size: vars.$font-size-xs;
         }
       }
     }
@@ -85,20 +85,20 @@
 
 // Material Card overrides
 mat-card-content {
-  padding: 16px;
+  padding: vars.$spacing-sm;
 
-  @media (max-width: 480px) {
-    padding: 12px;
+  @include mixins.media-max(xs) {
+    padding: vars.$spacing-xs;
   }
 }
 
 // High contrast mode support
 @media (prefers-contrast: high) {
   .session-details-card {
-    border-color: rgba(0, 0, 0, 0.3);
+    border-color: vars.$border-color-dark;
 
     .info-item {
-      border-bottom-color: rgba(0, 0, 0, 0.2);
+      border-bottom-color: vars.$border-color-medium;
     }
   }
 }
@@ -107,6 +107,6 @@ mat-card-content {
 @media print {
   .session-details-card {
     box-shadow: none;
-    border: 1px solid #000;
+    border: vars.$border-width-thin solid vars.$color-black;
   }
 }

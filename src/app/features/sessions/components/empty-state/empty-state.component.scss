@@ -1,63 +1,54 @@
-// SCSS Variables (matching application theme)
-$mobile-breakpoint: 768px;
-$tablet-breakpoint: 1024px;
-$desktop-breakpoint: 1200px;
+@use "../../../../../styles/variables" as vars;
+@use "../../../../../styles/mixins" as mixins;
 
-// Spacing variables
-$spacing-xs: 8px;
-$spacing-sm: 16px;
-$spacing-md: 24px;
-$spacing-lg: 32px;
-$spacing-xl: 48px;
-
-// Colors (Material Design inspired)
-$primary-color: #1976d2;
-$accent-color: #ff4081;
-$text-primary: rgba(0, 0, 0, 0.87);
-$text-secondary: rgba(0, 0, 0, 0.54);
-$surface-color: #ffffff;
-$background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+// =============================================================================
+// EMPTY STATE COMPONENT
+// =============================================================================
+// Displays when no sessions are available, encourages user action
 
 .empty-state-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include mixins.flex-center;
   min-height: 400px;
-  padding: $spacing-sm;
+  @include mixins.responsive-padding(
+    vars.$spacing-sm,
+    vars.$spacing-md,
+    vars.$spacing-lg
+  );
 
-  @media (min-width: $mobile-breakpoint) {
+  @include mixins.media(tablet) {
     min-height: 500px;
-    padding: $spacing-md;
   }
 
-  @media (min-width: $tablet-breakpoint) {
+  @include mixins.media(desktop) {
     min-height: 600px;
-    padding: $spacing-lg;
   }
 
   .empty-state-card {
+    @include mixins.card-base(true, vars.$spacing-lg);
     max-width: 500px;
     width: 100%;
-    background: $surface-color;
-    border-radius: 16px !important;
-    box-shadow:
-      0 10px 30px rgba(0, 0, 0, 0.1),
-      0 1px 8px rgba(0, 0, 0, 0.06) !important;
+    background: vars.$surface-primary;
+    border-radius: vars.$border-radius-xl !important;
+    box-shadow: vars.$shadow-6 !important;
     overflow: hidden;
     position: relative;
 
-    // Subtle background pattern
+    // Subtle top accent
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
-      background: $background-gradient;
+      height: vars.$border-width-thick;
+      background: linear-gradient(
+        135deg,
+        vars.$color-primary-light,
+        vars.$color-primary
+      );
     }
 
-    @media (min-width: $mobile-breakpoint) {
+    @include mixins.media(tablet) {
       max-width: 600px;
     }
 
@@ -66,93 +57,101 @@ $background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       flex-direction: column;
       align-items: center;
       text-align: center;
-      gap: $spacing-md;
-      padding: $spacing-lg $spacing-md;
+      gap: vars.$spacing-md;
+      padding: vars.$spacing-lg vars.$spacing-md;
 
-      @media (min-width: $mobile-breakpoint) {
-        gap: $spacing-lg;
-        padding: $spacing-xl $spacing-lg;
+      @include mixins.media(tablet) {
+        gap: vars.$spacing-lg;
+        padding: vars.$spacing-xl vars.$spacing-lg;
       }
 
       .empty-state-icon {
         font-size: 72px;
         width: 72px;
         height: 72px;
-        color: $primary-color;
-        margin-bottom: $spacing-sm;
+        color: vars.$color-primary;
+        margin-bottom: vars.$spacing-sm;
         animation: pulse 2s ease-in-out infinite;
 
-        @media (min-width: $mobile-breakpoint) {
+        @include mixins.media(tablet) {
           font-size: 96px;
           width: 96px;
           height: 96px;
-          margin-bottom: $spacing-md;
+          margin-bottom: vars.$spacing-md;
         }
 
-        @media (min-width: $tablet-breakpoint) {
+        @include mixins.media(desktop) {
           font-size: 120px;
           width: 120px;
           height: 120px;
+        }
+
+        @include mixins.reduced-motion {
+          animation: none;
         }
       }
 
       .empty-state-title {
         margin: 0;
-        color: $text-primary;
-        font-size: 1.5rem;
-        font-weight: 600;
-        line-height: 1.3;
+        @include mixins.typography(
+          vars.$font-size-2xl,
+          vars.$font-weight-medium,
+          vars.$line-height-tight
+        );
+        color: vars.$text-primary;
 
-        @media (min-width: $mobile-breakpoint) {
-          font-size: 1.875rem;
+        @include mixins.media(tablet) {
+          font-size: vars.$font-size-3xl;
         }
 
-        @media (min-width: $tablet-breakpoint) {
-          font-size: 2.25rem;
+        @include mixins.media(desktop) {
+          font-size: vars.$font-size-4xl;
         }
       }
 
       .empty-state-description {
         margin: 0;
-        color: $text-secondary;
-        font-size: 1rem;
-        line-height: 1.6;
+        @include mixins.typography(
+          vars.$font-size-base,
+          vars.$font-weight-regular,
+          vars.$line-height-relaxed
+        );
+        color: vars.$text-secondary;
         max-width: 400px;
 
-        @media (min-width: $mobile-breakpoint) {
-          font-size: 1.125rem;
+        @include mixins.media(tablet) {
+          font-size: vars.$font-size-lg;
           max-width: 450px;
         }
 
-        @media (min-width: $tablet-breakpoint) {
-          font-size: 1.25rem;
+        @include mixins.media(desktop) {
+          font-size: vars.$font-size-xl;
           max-width: 500px;
         }
       }
 
       .add-first-session-button {
-        margin-top: $spacing-sm;
-        padding: 12px 32px;
-        font-size: 1rem;
-        font-weight: 600;
-        border-radius: 8px !important;
+        @include mixins.button-state(vars.$color-primary, vars.$color-white);
+        margin-top: vars.$spacing-sm;
+        padding: vars.$spacing-xs vars.$spacing-lg;
+        @include mixins.typography(
+          vars.$font-size-base,
+          vars.$font-weight-medium
+        );
+        border-radius: vars.$border-radius-md !important;
         text-transform: none !important;
-        box-shadow:
-          0 4px 12px rgba(25, 118, 210, 0.3),
-          0 2px 4px rgba(25, 118, 210, 0.2) !important;
-        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(vars.$color-primary, 0.3) !important;
+        transition: vars.$transition-default;
 
-        @media (min-width: $mobile-breakpoint) {
-          padding: 14px 40px;
-          font-size: 1.125rem;
-          margin-top: $spacing-md;
+        @include mixins.media(tablet) {
+          padding: vars.$spacing-sm vars.$spacing-xl;
+          font-size: vars.$font-size-lg;
+          margin-top: vars.$spacing-md;
         }
 
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow:
-            0 6px 20px rgba(25, 118, 210, 0.4),
-            0 4px 8px rgba(25, 118, 210, 0.3) !important;
+        &:hover:not(:disabled) {
+          @include mixins.hover-lift(-2px);
+          box-shadow: 0 6px 20px rgba(vars.$color-primary, 0.4) !important;
         }
 
         &:active {
@@ -160,15 +159,25 @@ $background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
 
         mat-icon {
-          margin-right: 8px;
-          font-size: 20px;
-          width: 20px;
-          height: 20px;
+          margin-right: vars.$spacing-xs;
+          font-size: vars.$font-size-xl;
+          width: vars.$font-size-xl;
+          height: vars.$font-size-xl;
 
-          @media (min-width: $mobile-breakpoint) {
-            font-size: 24px;
-            width: 24px;
-            height: 24px;
+          @include mixins.media(tablet) {
+            font-size: vars.$font-size-2xl;
+            width: vars.$font-size-2xl;
+            height: vars.$font-size-2xl;
+          }
+        }
+
+        @include mixins.focus-visible(rgba(vars.$color-primary, 0.5), 3px);
+
+        @include mixins.reduced-motion {
+          transition: none;
+
+          &:hover {
+            transform: none;
           }
         }
       }
@@ -176,9 +185,12 @@ $background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   }
 }
 
-// Animations
+// =============================================================================
+// ANIMATIONS
+// =============================================================================
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -188,39 +200,22 @@ $background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   }
 }
 
-// Hover effect for the entire card
+// Card hover effect
 .empty-state-card:hover {
   transform: translateY(-4px);
-  box-shadow:
-    0 15px 40px rgba(0, 0, 0, 0.15),
-    0 5px 12px rgba(0, 0, 0, 0.1) !important;
-  transition: all 0.3s ease;
-}
+  box-shadow: vars.$shadow-8 !important;
+  transition: vars.$transition-default;
 
-// Focus states for accessibility
-.add-first-session-button:focus-visible {
-  outline: 3px solid rgba(25, 118, 210, 0.5);
-  outline-offset: 2px;
-}
-
-// High contrast mode support
-@media (prefers-contrast: high) {
-  .empty-state-card {
-    border: 2px solid $text-secondary;
-
-    &::before {
-      background: $primary-color;
-      height: 6px;
-    }
-  }
-
-  .empty-state-icon {
-    color: $text-primary;
+  @include mixins.reduced-motion {
+    transform: none;
+    transition: none;
   }
 }
 
-// Reduced motion support
-@media (prefers-reduced-motion: reduce) {
+// =============================================================================
+// ACCESSIBILITY ENHANCEMENTS
+// =============================================================================
+@include mixins.reduced-motion {
   .empty-state-icon {
     animation: none;
   }
@@ -235,35 +230,93 @@ $background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   }
 }
 
-// Print styles
+// =============================================================================
+// HIGH CONTRAST SUPPORT
+// =============================================================================
+@include mixins.high-contrast {
+  .empty-state-card {
+    border: vars.$border-width-medium solid vars.$text-primary;
+
+    &::before {
+      background: vars.$color-primary;
+      height: vars.$border-width-thick * 1.5;
+    }
+  }
+
+  .empty-state-icon {
+    color: vars.$text-primary;
+  }
+
+  .add-first-session-button {
+    border: vars.$border-width-thin solid vars.$color-primary;
+  }
+}
+
+// =============================================================================
+// PRINT STYLES
+// =============================================================================
 @media print {
   .empty-state-container {
     min-height: auto;
     page-break-inside: avoid;
+    padding: 0;
   }
 
   .empty-state-card {
     box-shadow: none !important;
-    border: 1px solid #ccc;
+    border: vars.$border-width-thin solid vars.$color-gray-600;
+
+    &::before {
+      display: none;
+    }
   }
 
   .add-first-session-button {
     display: none;
   }
+
+  .empty-state-icon {
+    color: vars.$color-black;
+  }
 }
 
-// Dark mode support (if implemented later)
+// =============================================================================
+// DARK THEME SUPPORT
+// =============================================================================
 @media (prefers-color-scheme: dark) {
   .empty-state-card {
-    background-color: #2d2d2d;
-    color: rgba(255, 255, 255, 0.87);
+    background-color: vars.$color-gray-800;
 
-    .empty-state-title {
-      color: rgba(255, 255, 255, 0.87);
+    &::before {
+      background: linear-gradient(
+        135deg,
+        vars.$color-primary-light,
+        vars.$color-primary-dark
+      );
     }
 
-    .empty-state-description {
-      color: rgba(255, 255, 255, 0.6);
+    .empty-state-content {
+      .empty-state-title {
+        color: vars.$text-primary-dark;
+      }
+
+      .empty-state-description {
+        color: vars.$text-secondary-dark;
+      }
+
+      .empty-state-icon {
+        color: vars.$color-primary-light;
+      }
+
+      .add-first-session-button {
+        background-color: vars.$color-primary-light;
+        color: vars.$color-gray-900;
+
+        &:hover:not(:disabled) {
+          background-color: vars.$color-primary;
+          box-shadow: 0 6px 20px rgba(vars.$color-primary-light, 0.4) !important;
+        }
+      }
     }
   }
 }

@@ -30,41 +30,54 @@ interface SessionSetsListProps {
   imports: [CommonModule, MaterialModule, SessionSetItemComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <mat-card class="sets-card">
-      <mat-card-header>
-        <mat-card-title>Serie ćwiczeń</mat-card-title>
-        <mat-card-subtitle>
+    <mat-card class="shadow border rounded-lg bg-white">
+      <mat-card-header class="mb-sm">
+        <mat-card-title class="text-xl font-medium text-primary m-0"
+          >Serie ćwiczeń</mat-card-title
+        >
+        <mat-card-subtitle class="text-secondary text-sm mt-xs m-0">
           {{ totalCount }}
           {{ getSetsCountLabel(totalCount) }}
         </mat-card-subtitle>
       </mat-card-header>
-      <mat-card-content>
+      <mat-card-content class="p-md mobile-p-sm">
         <!-- Loading State -->
-        <div *ngIf="loading" class="sets-loading">
+        <div *ngIf="loading" class="loading-state">
           <mat-spinner diameter="32"></mat-spinner>
-          <span>Ładowanie serii...</span>
+          <span class="text-secondary text-sm m-0">Ładowanie serii...</span>
         </div>
 
         <!-- Empty State -->
         <div *ngIf="!loading && sets.length === 0" class="empty-state">
-          <mat-icon class="empty-icon">fitness_center</mat-icon>
-          <h3>Brak serii ćwiczeń</h3>
-          <p>Ta sesja nie zawiera jeszcze żadnych serii ćwiczeń.</p>
+          <mat-icon class="text-6xl text-gray-300 mb-xs"
+            >fitness_center</mat-icon
+          >
+          <h3 class="text-xl font-medium text-primary m-0 mobile-text-lg">
+            Brak serii ćwiczeń
+          </h3>
+          <p
+            class="text-secondary text-sm m-0 text-center leading-relaxed mobile-text-xs"
+            style="max-width: 300px;"
+          >
+            Ta sesja nie zawiera jeszcze żadnych serii ćwiczeń.
+          </p>
           <button
             mat-raised-button
-            color="primary"
             (click)="onAddSet.emit()"
             [disabled]="disabled"
-            class="add-first-set-button"
+            class="btn-primary d-flex align-center gap-xs mt-xs mobile-full-width"
+            style="max-width: 200px;"
           >
-            <mat-icon>add</mat-icon>
+            <mat-icon class="text-lg">add</mat-icon>
             Dodaj pierwszą serię
           </button>
         </div>
 
         <!-- Sets List -->
-        <div *ngIf="!loading && sets.length > 0" class="sets-list">
-          <div class="sets-container">
+        <div *ngIf="!loading && sets.length > 0" class="d-flex flex-column">
+          <div
+            class="d-flex flex-column gap-sm mb-md mobile-gap-xs mobile-mb-sm"
+          >
             <app-session-set-item
               *ngFor="let set of sets; trackBy: trackBySetId"
               [set]="set"
@@ -72,7 +85,7 @@ interface SessionSetsListProps {
               [disabled]="disabled || deletingSetId !== null"
               (editSet)="onEditSet.emit($event)"
               (deleteSet)="onDeleteSet.emit($event)"
-              class="set-item-wrapper"
+              class="w-full"
             ></app-session-set-item>
           </div>
 
@@ -88,7 +101,7 @@ interface SessionSetsListProps {
             [disabled]="disabled || loading"
             (page)="onPageChange.emit($event.pageIndex + 1)"
             aria-label="Wybierz stronę serii ćwiczeń"
-            class="sets-paginator"
+            class="mt-md border-top-subtle pt-md mobile-mt-sm mobile-pt-sm"
           >
           </mat-paginator>
         </div>

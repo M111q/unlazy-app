@@ -1,247 +1,87 @@
-.session-details-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-  min-height: calc(100vh - 64px);
+@use "../../../../../styles/variables" as vars;
 
-  @media (max-width: 768px) {
-    padding: 16px;
-  }
+// Component-specific styles only
+// Most styling is now handled by utility classes in templates
+
+// Container max-width utility
+.max-w-screen-xl {
+  max-width: 1200px !important;
 }
 
-// Loading State
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  gap: 16px;
-
-  p {
-    margin: 0;
-    color: rgba(0, 0, 0, 0.6);
-    font-size: 14px;
-  }
-}
-
-// Error State
-.error-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
-
-.error-card {
-  max-width: 500px;
-  width: 100%;
-}
-
-.error-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 16px;
-
-  .error-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    color: #f44336;
-  }
-
-  .network-error-icon {
-    color: #ff9800;
-  }
-
-  .auth-error-icon {
-    color: #9c27b0;
-  }
-
-  .server-error-icon {
-    color: #607d8b;
-  }
-
-  h3 {
-    margin: 0;
-    color: rgba(0, 0, 0, 0.87);
-    font-size: 20px;
-    font-weight: 500;
-  }
-
-  p {
-    margin: 0;
-    color: rgba(0, 0, 0, 0.6);
-    line-height: 1.5;
-    max-width: 400px;
-  }
-}
-
+// Error details component-specific styling
 .error-details {
-  margin-top: 8px;
-  width: 100%;
-  max-width: 400px;
-
   details {
-    background: rgba(0, 0, 0, 0.02);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 6px;
-    padding: 12px;
-    margin-top: 8px;
-
     summary {
-      cursor: pointer;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.7);
-      font-size: 14px;
-      outline: none;
-
-      &:hover {
-        color: rgba(0, 0, 0, 0.87);
-      }
+      outline: none !important;
 
       &:focus-visible {
-        outline: 2px solid #1976d2;
-        outline-offset: 2px;
-        border-radius: 4px;
-      }
-    }
-
-    p {
-      margin: 8px 0 4px 0;
-      font-size: 12px;
-      text-align: left;
-      line-height: 1.4;
-
-      strong {
-        color: rgba(0, 0, 0, 0.87);
+        outline: 2px solid vars.$color-primary !important;
+        outline-offset: 2px !important;
+        border-radius: 4px !important;
       }
     }
   }
 }
 
-.error-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 8px;
-
-  button {
-    mat-icon {
-      margin-right: 8px;
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    flex-direction: column;
-    width: 100%;
-
-    button {
-      width: 100%;
-    }
-  }
-}
-
-// Success State Content
-.session-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-// Material Card Overrides
+// Material Card overrides for error state
 mat-card {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-
   mat-card-header {
-    margin-bottom: 16px;
-
     mat-card-title {
-      font-size: 20px;
-      font-weight: 500;
-      margin-bottom: 4px;
+      font-size: vars.$font-size-xl !important;
+      font-weight: vars.$font-weight-medium !important;
+      margin-bottom: 4px !important;
+      line-height: vars.$line-height-tight !important;
     }
 
     mat-card-subtitle {
-      color: rgba(0, 0, 0, 0.6);
-      font-size: 14px;
+      color: vars.$text-secondary !important;
+      font-size: vars.$font-size-sm !important;
+      line-height: vars.$line-height-normal !important;
     }
   }
 }
 
-// Loading spinner in buttons
-button[disabled] {
-  mat-spinner {
-    display: inline-block;
-    margin-right: 8px;
-  }
+// Loading spinner in disabled buttons
+button[disabled] mat-spinner {
+  display: inline-block !important;
+  margin-right: vars.$spacing-xs !important;
 }
 
-// Responsive adjustments
-@media (max-width: 600px) {
-  .session-details-container {
-    padding: 12px;
-  }
-}
-
-// Accessibility improvements
-button:focus-visible {
-  outline: 2px solid #1976d2;
-  outline-offset: 2px;
-}
-
-// High contrast mode support
+// High contrast support
 @media (prefers-contrast: high) {
-  .session-details-container {
-    .error-card {
-      border-color: rgba(0, 0, 0, 0.3);
-    }
+  .error-details details {
+    border-color: rgba(0, 0, 0, 0.3) !important;
+  }
 
-    .error-details details {
-      border-color: rgba(0, 0, 0, 0.3);
-    }
-
-    .error-icon,
-    .network-error-icon,
-    .auth-error-icon,
-    .server-error-icon {
-      color: rgba(0, 0, 0, 0.87) !important;
-    }
+  mat-card {
+    border-color: rgba(0, 0, 0, 0.3) !important;
   }
 }
 
 // Reduced motion support
 @media (prefers-reduced-motion: reduce) {
-  .session-details-container {
-    * {
-      transition: none;
-    }
+  .error-details details summary {
+    transition: none !important;
   }
 
-  .error-details details summary {
-    transition: none;
+  button {
+    transition: none !important;
   }
 }
 
-// Print styles for errors
+// Print styles
 @media print {
-  .error-card {
-    box-shadow: none;
-    border: 2px solid #000;
+  .btn-primary,
+  .btn-secondary {
+    display: none !important;
   }
 
-  .error-actions {
-    display: none;
+  mat-card {
+    border: 2px solid #000 !important;
+    break-inside: avoid !important;
   }
 
   .error-details details {
-    border: 1px solid #000;
+    border: 1px solid #000 !important;
   }
 }

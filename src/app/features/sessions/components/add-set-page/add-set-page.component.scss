@@ -1,18 +1,21 @@
+@use "../../../../../styles/variables" as vars;
+@use "../../../../../styles/mixins" as mixins;
+
 .add-set-page {
   max-width: 600px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: vars.$spacing-sm;
 
   .page-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: vars.$spacing-sm;
+    margin-bottom: vars.$spacing-lg;
 
     h1 {
       margin: 0;
-      font-size: 1.5rem;
-      font-weight: 500;
+      font-size: vars.$font-size-2xl;
+      font-weight: vars.$font-weight-medium;
       color: var(--mat-sys-on-surface);
     }
 
@@ -22,44 +25,36 @@
   }
 
   .loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 1rem;
-    text-align: center;
+    @include mixins.loading-container();
+    padding: vars.$spacing-xl vars.$spacing-sm;
 
     p {
-      margin-top: 1rem;
+      margin-top: vars.$spacing-sm;
       color: var(--mat-sys-on-surface-variant);
     }
   }
 
   .error-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 1rem;
-    text-align: center;
+    @include mixins.error-container();
+    padding: vars.$spacing-xl vars.$spacing-sm;
 
     .error-icon {
-      font-size: 3rem;
-      width: 3rem;
-      height: 3rem;
+      font-size: vars.$spacing-xl;
+      width: vars.$spacing-xl;
+      height: vars.$spacing-xl;
       color: var(--mat-sys-error);
-      margin-bottom: 1rem;
+      margin-bottom: vars.$spacing-sm;
     }
 
     h2 {
-      margin: 0 0 0.5rem 0;
+      margin: 0 0 vars.$spacing-xs 0;
       color: var(--mat-sys-error);
-      font-size: 1.25rem;
-      font-weight: 500;
+      font-size: vars.$font-size-xl;
+      font-weight: vars.$font-weight-medium;
     }
 
     p {
-      margin: 0 0 2rem 0;
+      margin: 0 0 vars.$spacing-lg 0;
       color: var(--mat-sys-on-surface-variant);
       max-width: 400px;
     }
@@ -68,22 +63,22 @@
   .form-container {
     .full-width {
       width: 100%;
-      margin-bottom: 1rem;
+      margin-bottom: vars.$spacing-sm;
     }
 
     mat-card {
       mat-card-header {
-        margin-bottom: 1rem;
+        margin-bottom: vars.$spacing-sm;
 
         mat-card-title {
           color: var(--mat-sys-on-surface);
-          font-size: 1.25rem;
-          font-weight: 500;
+          font-size: vars.$font-size-xl;
+          font-weight: vars.$font-weight-medium;
         }
 
         mat-card-subtitle {
           color: var(--mat-sys-on-surface-variant);
-          margin-top: 0.25rem;
+          margin-top: vars.$spacing-xs;
         }
       }
 
@@ -93,7 +88,7 @@
         form {
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
+          gap: vars.$spacing-xs;
         }
 
         mat-form-field {
@@ -104,18 +99,18 @@
       }
 
       mat-card-actions {
-        padding-top: 1.5rem;
-        gap: 0.5rem;
+        padding-top: vars.$spacing-md;
+        gap: vars.$spacing-xs;
 
         button {
           min-width: 100px;
 
           .button-spinner {
-            margin-right: 0.5rem;
+            margin-right: vars.$spacing-xs;
           }
 
           mat-icon {
-            margin-right: 0.5rem;
+            margin-right: vars.$spacing-xs;
           }
         }
       }
@@ -124,15 +119,15 @@
 }
 
 // Responsive design
-@media (max-width: 768px) {
+@include mixins.media-max(tablet) {
   .add-set-page {
-    padding: 0.5rem;
+    padding: vars.$spacing-xs;
 
     .page-header {
-      margin-bottom: 1rem;
+      margin-bottom: vars.$spacing-sm;
 
       h1 {
-        font-size: 1.25rem;
+        font-size: vars.$font-size-xl;
       }
     }
 
@@ -147,7 +142,7 @@
             margin: 0;
 
             &:first-child {
-              margin-top: 0.5rem;
+              margin-top: vars.$spacing-xs;
             }
           }
         }
@@ -157,7 +152,7 @@
 }
 
 // High contrast mode support
-@media (prefers-contrast: high) {
+@include mixins.high-contrast {
   .add-set-page {
     .error-container {
       .error-icon {
@@ -168,7 +163,7 @@
 }
 
 // Reduced motion support
-@media (prefers-reduced-motion: reduce) {
+@include mixins.reduced-motion {
   .add-set-page {
     .loading-container {
       mat-spinner {
@@ -201,8 +196,7 @@
   button:focus-visible,
   input:focus-visible,
   mat-select:focus-visible {
-    outline: 2px solid var(--mat-sys-primary);
-    outline-offset: 2px;
+    @include mixins.focus-visible(var(--mat-sys-primary));
   }
 }
 

@@ -1,18 +1,25 @@
-// Auth Layout Styles - Material Design
-@use '@angular/material' as mat;
+// =============================================================================
+// AUTH LAYOUT COMPONENT STYLES
+// =============================================================================
+// Main layout component for authentication pages
+// Uses the centralized design system for consistency
 
-// Responsive breakpoints (matching global styles)
-$mobile-breakpoint: 768px;
-$tablet-breakpoint: 1024px;
-$desktop-breakpoint: 1200px;
+@use "../../../../../styles/variables" as vars;
+@use "../../../../../styles/mixins" as mixins;
 
+// =============================================================================
+// MAIN LAYOUT CONTAINER
+// =============================================================================
 .auth-layout {
   min-height: 100vh;
-  display: flex;
+  @include flex-center;
   position: relative;
   overflow: hidden;
 }
 
+// =============================================================================
+// ANIMATED BACKGROUND
+// =============================================================================
 .auth-background {
   position: absolute;
   top: 0;
@@ -24,21 +31,39 @@ $desktop-breakpoint: 1200px;
   z-index: 0;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background-image:
-      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      radial-gradient(
+        circle at 25% 25%,
+        rgba(vars.$color-white, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 75% 75%,
+        rgba(vars.$color-white, 0.1) 0%,
+        transparent 50%
+      );
     animation: float 20s ease-in-out infinite;
+
+    @include mixins.reduced-motion {
+      animation: none;
+    }
+  }
+
+  @include mixins.high-contrast {
+    background: vars.$color-black;
+    opacity: 1;
   }
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
@@ -46,275 +71,317 @@ $desktop-breakpoint: 1200px;
   }
 }
 
+// =============================================================================
+// CONTENT CONTAINER
+// =============================================================================
 .auth-container {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
+  @include mixins.container(vars.$breakpoint-desktop, vars.$spacing-md);
+  @include mixins.flex-column;
   min-height: 100vh;
 
-  @media (max-width: $mobile-breakpoint) {
-    padding: 16px;
+  @include mixins.media-max(mobile) {
+    padding: vars.$spacing-sm;
   }
 }
 
+// =============================================================================
+// HEADER SECTION
+// =============================================================================
 .auth-header {
   flex-shrink: 0;
   text-align: center;
-  margin-bottom: 32px;
-  padding-top: 32px;
+  margin-bottom: vars.$spacing-lg;
+  padding-top: vars.$spacing-lg;
 
-  @media (max-width: $mobile-breakpoint) {
-    margin-bottom: 24px;
-    padding-top: 24px;
+  @include mixins.media-max(mobile) {
+    margin-bottom: vars.$spacing-md;
+    padding-top: vars.$spacing-md;
   }
 }
 
 .brand-section {
-  color: white;
+  color: vars.$color-white;
 
   .app-icon {
     font-size: 48px;
     height: 48px;
     width: 48px;
-    margin-bottom: 16px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    margin-bottom: vars.$spacing-sm;
+    filter: drop-shadow(0 2px 4px rgba(vars.$color-black, 0.3));
 
-    @media (max-width: $mobile-breakpoint) {
+    @include mixins.media-max(mobile) {
       font-size: 40px;
       height: 40px;
       width: 40px;
-      margin-bottom: 12px;
+      margin-bottom: vars.$spacing-sm;
     }
   }
 
   .app-title {
-    font-size: 2.5rem;
-    font-weight: 300;
-    margin: 0 0 8px 0;
+    @include mixins.typography(
+      vars.$font-size-4xl,
+      vars.$font-weight-light,
+      vars.$line-height-tight
+    );
+    margin: 0 0 vars.$spacing-xs 0;
     letter-spacing: -0.5px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 4px rgba(vars.$color-black, 0.3);
 
-    @media (max-width: $mobile-breakpoint) {
-      font-size: 2rem;
+    @include mixins.media-max(mobile) {
+      font-size: vars.$font-size-3xl;
+    }
+
+    @include mixins.high-contrast {
+      text-shadow: none;
     }
   }
 
   .app-subtitle {
-    font-size: 1.1rem;
-    font-weight: 400;
+    @include mixins.typography(
+      vars.$font-size-lg,
+      vars.$font-weight-regular,
+      vars.$line-height-normal
+    );
     margin: 0;
     opacity: 0.9;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px rgba(vars.$color-black, 0.3);
 
-    @media (max-width: $mobile-breakpoint) {
-      font-size: 1rem;
+    @include mixins.media-max(mobile) {
+      font-size: vars.$font-size-base;
+    }
+
+    @include mixins.high-contrast {
+      text-shadow: none;
     }
   }
 }
 
+// =============================================================================
+// MAIN CONTENT AREA
+// =============================================================================
 .auth-main {
   flex: 1;
-  display: flex;
+  @include mixins.flex-center;
   justify-content: center;
   align-items: flex-start;
   padding-top: 0;
 
-  @media (max-width: $mobile-breakpoint) {
+  @include mixins.media-max(mobile) {
     align-items: flex-start;
   }
 }
 
+// =============================================================================
+// AUTH CARD
+// =============================================================================
 .auth-card {
   width: 100%;
   max-width: 400px;
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(vars.$color-white, 0.98);
   backdrop-filter: blur(10px);
-  border-radius: 16px !important;
+  border-radius: vars.$border-radius-xl !important;
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 2px 8px rgba(0, 0, 0, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    0 8px 32px rgba(vars.$color-black, 0.1),
+    vars.$shadow-8 !important;
+  border: vars.$border-width-thin solid rgba(vars.$color-white, 0.2);
+  transition: vars.$transition-default;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow:
-      0 12px 40px rgba(0, 0, 0, 0.15),
-      0 4px 12px rgba(0, 0, 0, 0.1) !important;
+      0 12px 40px rgba(vars.$color-black, 0.15),
+      0 4px 12px rgba(vars.$color-black, 0.1) !important;
+
+    @include mixins.reduced-motion {
+      transform: none;
+    }
   }
 
-  @media (max-width: $mobile-breakpoint) {
+  @include mixins.media-max(mobile) {
     max-width: none;
-    border-radius: 12px !important;
+    border-radius: vars.$border-radius-lg !important;
 
     &:hover {
       transform: none;
     }
   }
-}
 
-.auth-card-content {
-  padding: 32px !important;
-
-  @media (max-width: $mobile-breakpoint) {
-    padding: 24px !important;
+  @include mixins.high-contrast {
+    background: vars.$color-white;
+    border: vars.$border-width-medium solid vars.$color-black;
   }
 }
 
+.auth-card-content {
+  @include mixins.card-padding;
+  padding: vars.$spacing-lg !important;
+
+  @include mixins.media-max(mobile) {
+    padding: vars.$spacing-md !important;
+  }
+}
+
+// =============================================================================
+// FOOTER SECTION
+// =============================================================================
 .auth-footer {
   flex-shrink: 0;
-  padding: 24px 0;
+  padding: vars.$spacing-md 0;
   margin-top: auto;
 
-  @media (max-width: $mobile-breakpoint) {
-    padding: 16px 0;
+  @include mixins.media-max(mobile) {
+    padding: vars.$spacing-sm 0;
   }
 }
 
 .footer-content {
   text-align: center;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.875rem;
+  color: rgba(vars.$color-white, 0.8);
+  @include mixins.typography(vars.$font-size-sm);
 
   .copyright {
-    margin: 0 0 8px 0;
-    font-weight: 400;
+    margin: 0 0 vars.$spacing-xs 0;
+    font-weight: vars.$font-weight-regular;
   }
 
   .footer-links {
-    display: flex;
+    @include mixins.flex-center;
     justify-content: center;
-    align-items: center;
-    gap: 8px;
+    gap: vars.$spacing-xs;
     flex-wrap: wrap;
 
     .footer-link {
-      color: rgba(255, 255, 255, 0.7);
+      color: rgba(vars.$color-white, 0.7);
       text-decoration: none;
-      transition: color 0.2s ease;
-      font-size: 0.8125rem;
+      transition: vars.$transition-hover;
+      @include mixins.typography(vars.$font-size-xs);
 
       &:hover {
-        color: rgba(255, 255, 255, 0.9);
+        color: rgba(vars.$color-white, 0.9);
         text-decoration: underline;
       }
 
-      &:focus-visible {
-        outline: 2px solid rgba(255, 255, 255, 0.5);
-        outline-offset: 2px;
-        border-radius: 2px;
-      }
+      @include mixins.focus-visible(rgba(vars.$color-white, 0.5));
     }
 
     .separator {
       opacity: 0.5;
-      font-size: 0.75rem;
+      @include mixins.typography(vars.$font-size-xs);
     }
-  }
 
-  @media (max-width: $mobile-breakpoint) {
-    font-size: 0.8125rem;
-
-    .footer-links {
-      flex-direction: column;
-      gap: 4px;
+    @include mixins.media-max(mobile) {
+      @include mixins.flex-column;
+      gap: vars.$spacing-xs;
 
       .separator {
         display: none;
       }
     }
   }
-}
 
-// Loading state for auth components
-.auth-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
-
-  .mat-mdc-progress-spinner {
-    --mdc-circular-progress-active-indicator-color: #1976d2;
+  @include mixins.media-max(mobile) {
+    @include mixins.typography(vars.$font-size-xs);
   }
 }
 
-// Auth form common styles (will be inherited by child components)
+// =============================================================================
+// LOADING STATE
+// =============================================================================
+.auth-loading {
+  @include mixins.flex-center;
+  min-height: 200px;
+
+  .mat-mdc-progress-spinner {
+    --mdc-circular-progress-active-indicator-color: #{vars.$color-primary};
+  }
+}
+
+// =============================================================================
+// GLOBAL AUTH FORM STYLES
+// =============================================================================
 ::ng-deep .auth-card {
   .auth-form-title {
-    font-size: 1.5rem;
-    font-weight: 500;
+    @include mixins.typography(
+      vars.$font-size-2xl,
+      vars.$font-weight-medium,
+      vars.$line-height-tight
+    );
     text-align: center;
-    margin: 0 0 24px 0;
-    color: rgba(0, 0, 0, 0.87);
-    line-height: 1.3;
+    margin: 0 0 vars.$spacing-md 0;
+    color: vars.$text-primary;
 
-    @media (max-width: $mobile-breakpoint) {
-      font-size: 1.375rem;
-      margin-bottom: 20px;
+    @include mixins.media-max(mobile) {
+      @include mixins.typography(
+        vars.$font-size-xl,
+        vars.$font-weight-medium,
+        vars.$line-height-tight
+      );
+      margin-bottom: vars.$spacing-sm;
     }
   }
 
   .auth-form-subtitle {
-    font-size: 0.875rem;
-    color: rgba(0, 0, 0, 0.6);
+    @include mixins.typography(
+      vars.$font-size-sm,
+      vars.$font-weight-regular,
+      vars.$line-height-relaxed
+    );
+    color: vars.$text-secondary;
     text-align: center;
-    margin: 0 0 32px 0;
-    line-height: 1.4;
+    margin: 0 0 vars.$spacing-lg 0;
 
-    @media (max-width: $mobile-breakpoint) {
-      margin-bottom: 24px;
+    @include mixins.media-max(mobile) {
+      margin-bottom: vars.$spacing-md;
     }
   }
 
   .mat-mdc-form-field {
     width: 100%;
-    margin-bottom: 16px;
+    margin-bottom: vars.$spacing-sm;
 
     &:last-of-type {
-      margin-bottom: 24px;
+      margin-bottom: vars.$spacing-md;
     }
   }
 
   .auth-submit-button {
+    @include mixins.button-base;
     width: 100%;
     height: 48px;
-    font-size: 1rem;
-    font-weight: 500;
-    margin-bottom: 16px;
-    border-radius: 8px !important;
+    @include mixins.typography(vars.$font-size-base, vars.$font-weight-medium);
+    margin-bottom: vars.$spacing-sm;
+    border-radius: vars.$button-border-radius !important;
     text-transform: none !important;
 
-    @media (max-width: $mobile-breakpoint) {
+    @include mixins.media-max(mobile) {
       height: 44px;
-      font-size: 0.9375rem;
+      @include mixins.typography(vars.$font-size-sm, vars.$font-weight-medium);
     }
   }
 
   .auth-divider {
     text-align: center;
-    margin: 24px 0;
+    margin: vars.$spacing-md 0;
     position: relative;
-    color: rgba(0, 0, 0, 0.54);
-    font-size: 0.875rem;
+    color: vars.$text-secondary;
+    @include mixins.typography(vars.$font-size-sm);
 
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       top: 50%;
       left: 0;
       right: 0;
-      height: 1px;
-      background: rgba(0, 0, 0, 0.12);
+      height: vars.$border-width-thin;
+      background: vars.$border-color-medium;
     }
 
     span {
-      background: rgba(255, 255, 255, 0.98);
-      padding: 0 16px;
+      background: rgba(vars.$color-white, 0.98);
+      padding: 0 vars.$spacing-sm;
       position: relative;
       z-index: 1;
     }
@@ -323,32 +390,30 @@ $desktop-breakpoint: 1200px;
   .auth-link {
     display: block;
     text-align: center;
-    margin-top: 16px;
-    font-size: 0.875rem;
-    color: rgba(0, 0, 0, 0.6);
+    margin-top: vars.$spacing-sm;
+    @include mixins.typography(vars.$font-size-sm);
+    color: vars.$text-secondary;
 
     a {
-      color: #1976d2;
+      color: vars.$color-primary;
       text-decoration: none;
-      font-weight: 500;
-      transition: color 0.2s ease;
+      font-weight: vars.$font-weight-medium;
+      transition: vars.$transition-hover;
 
       &:hover {
-        color: #1565c0;
+        color: vars.$color-primary-dark;
         text-decoration: underline;
       }
 
-      &:focus-visible {
-        outline: 2px solid #1976d2;
-        outline-offset: 2px;
-        border-radius: 2px;
-      }
+      @include mixins.focus-visible(vars.$color-primary);
     }
   }
 }
 
-// Accessibility improvements
-@media (prefers-reduced-motion: reduce) {
+// =============================================================================
+// ACCESSIBILITY ENHANCEMENTS
+// =============================================================================
+@include mixins.reduced-motion {
   .auth-background::before {
     animation: none;
   }
@@ -362,16 +427,18 @@ $desktop-breakpoint: 1200px;
   }
 }
 
-// High contrast mode support
-@media (prefers-contrast: high) {
+// =============================================================================
+// HIGH CONTRAST MODE SUPPORT
+// =============================================================================
+@include mixins.high-contrast {
   .auth-background {
-    background: #000;
+    background: vars.$color-black;
     opacity: 1;
   }
 
   .auth-card {
-    background: #fff;
-    border: 2px solid #000;
+    background: vars.$color-white;
+    border: vars.$border-width-medium solid vars.$color-black;
   }
 
   .brand-section {
@@ -379,5 +446,38 @@ $desktop-breakpoint: 1200px;
     .app-subtitle {
       text-shadow: none;
     }
+  }
+
+  ::ng-deep .auth-card {
+    .auth-divider::before {
+      background: vars.$color-black;
+    }
+  }
+}
+
+// =============================================================================
+// PRINT STYLES
+// =============================================================================
+@media print {
+  .auth-background {
+    display: none;
+  }
+
+  .auth-layout {
+    background: vars.$color-white;
+    color: vars.$color-black;
+  }
+
+  .brand-section {
+    color: vars.$color-black;
+
+    .app-title,
+    .app-subtitle {
+      text-shadow: none;
+    }
+  }
+
+  .footer-content {
+    color: vars.$color-black;
   }
 }

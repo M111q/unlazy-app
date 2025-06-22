@@ -69,63 +69,79 @@ interface PaginationState {
     SessionSetsListComponent,
   ],
   template: `
-    <div class="session-details-container">
+    <div
+      class="max-w-screen-xl mx-auto p-lg mobile-p-md"
+      style="min-height: calc(100vh - 64px);"
+    >
       <!-- Loading State -->
-      <div *ngIf="isMainLoading()" class="loading-container">
+      <div *ngIf="isMainLoading()" class="loading-state">
         <mat-spinner diameter="40"></mat-spinner>
-        <p>Ładowanie szczegółów sesji...</p>
+        <p class="text-secondary text-sm m-0">Ładowanie szczegółów sesji...</p>
       </div>
 
       <!-- Error State -->
-      <div *ngIf="state().error && !isMainLoading()" class="error-container">
-        <mat-card class="error-card">
-          <mat-card-content>
-            <div class="error-content">
-              <mat-icon class="error-icon" [class]="getErrorIconClass()">{{
-                getErrorIcon()
-              }}</mat-icon>
-              <h3>{{ getErrorTitle() }}</h3>
-              <p>{{ state().error?.message }}</p>
-              <div class="error-details" *ngIf="shouldShowErrorDetails()">
-                <details>
-                  <summary>Szczegóły techniczne</summary>
-                  <p><strong>Kod błędu:</strong> {{ state().error?.code }}</p>
-                  <p>
+      <div *ngIf="state().error && !isMainLoading()" class="error-state">
+        <mat-card class="shadow border rounded-lg bg-white max-w-md mx-auto">
+          <mat-card-content class="p-lg">
+            <div class="d-flex flex-column align-center text-center gap-md">
+              <mat-icon
+                class="text-6xl text-error"
+                [class]="getErrorIconClass()"
+                >{{ getErrorIcon() }}</mat-icon
+              >
+              <h3 class="text-lg font-medium text-primary m-0">
+                {{ getErrorTitle() }}
+              </h3>
+              <p class="text-secondary text-sm m-0">
+                {{ state().error?.message }}
+              </p>
+              <div class="w-full" *ngIf="shouldShowErrorDetails()">
+                <details class="bg-subtle border-subtle rounded p-sm mt-xs">
+                  <summary
+                    class="cursor-pointer font-medium text-secondary text-sm hover:text-primary focus-visible"
+                  >
+                    Szczegóły techniczne
+                  </summary>
+                  <p class="m-xs text-xs text-left leading-normal">
+                    <strong>Kod błędu:</strong> {{ state().error?.code }}
+                  </p>
+                  <p class="m-xs text-xs text-left leading-normal">
                     <strong>Identyfikator sesji:</strong>
                     {{ state().sessionId }}
                   </p>
-                  <p>
+                  <p class="m-xs text-xs text-left leading-normal">
                     <strong>Czas wystąpienia:</strong>
                     {{ getCurrentTimestamp() }}
                   </p>
                 </details>
               </div>
-              <div class="error-actions">
+              <div class="d-flex flex-column gap-xs w-full max-w-xs">
                 <button
                   *ngIf="canRetryOperation()"
                   mat-raised-button
-                  color="primary"
                   (click)="handleRetryAction()"
                   [disabled]="state().isLoading"
+                  class="btn-primary d-flex align-center gap-xs"
                 >
-                  <mat-icon>refresh</mat-icon>
+                  <mat-icon class="text-lg">refresh</mat-icon>
                   {{ getRetryButtonText() }}
                 </button>
                 <button
                   *ngIf="shouldShowNavigateHome()"
                   mat-button
                   (click)="navigateToSessions()"
+                  class="btn-secondary d-flex align-center gap-xs"
                 >
-                  <mat-icon>home</mat-icon>
+                  <mat-icon class="text-lg">home</mat-icon>
                   Powrót do listy sesji
                 </button>
                 <button
                   *ngIf="shouldShowContactSupport()"
                   mat-button
-                  color="accent"
                   (click)="copyErrorInfo()"
+                  class="btn-secondary d-flex align-center gap-xs"
                 >
-                  <mat-icon>content_copy</mat-icon>
+                  <mat-icon class="text-lg">content_copy</mat-icon>
                   Skopiuj informacje o błędzie
                 </button>
               </div>
@@ -137,7 +153,7 @@ interface PaginationState {
       <!-- Success State -->
       <div
         *ngIf="state().sessionDetails && !state().error"
-        class="session-content"
+        class="d-flex flex-column gap-lg"
       >
         <!-- Page Header -->
         <app-page-header

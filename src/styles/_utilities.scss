@@ -1,0 +1,1460 @@
+// =============================================================================
+// UTILITY CLASSES
+// =============================================================================
+// Atomic utility classes for common styling patterns
+// Uses modern @use directive for modular imports
+
+@use "variables" as vars;
+@use "mixins" as mixins;
+
+// =============================================================================
+// SPACING UTILITIES
+// =============================================================================
+
+// Margin utilities
+.m-0 {
+  margin: 0 !important;
+}
+.m-xs {
+  margin: vars.$spacing-xs !important;
+}
+.m-sm {
+  margin: vars.$spacing-sm !important;
+}
+.m-md {
+  margin: vars.$spacing-md !important;
+}
+.m-lg {
+  margin: vars.$spacing-lg !important;
+}
+.m-xl {
+  margin: vars.$spacing-xl !important;
+}
+.m-auto {
+  margin: auto !important;
+}
+
+// Margin top
+.mt-0 {
+  margin-top: 0 !important;
+}
+.mt-xs {
+  margin-top: vars.$spacing-xs !important;
+}
+.mt-sm {
+  margin-top: vars.$spacing-sm !important;
+}
+.mt-md {
+  margin-top: vars.$spacing-md !important;
+}
+.mt-lg {
+  margin-top: vars.$spacing-lg !important;
+}
+.mt-xl {
+  margin-top: vars.$spacing-xl !important;
+}
+
+// Margin bottom
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+.mb-xs {
+  margin-bottom: vars.$spacing-xs !important;
+}
+.mb-sm {
+  margin-bottom: vars.$spacing-sm !important;
+}
+.mb-md {
+  margin-bottom: vars.$spacing-md !important;
+}
+.mb-lg {
+  margin-bottom: vars.$spacing-lg !important;
+}
+.mb-xl {
+  margin-bottom: vars.$spacing-xl !important;
+}
+
+// Margin left
+.ml-0 {
+  margin-left: 0 !important;
+}
+.ml-xs {
+  margin-left: vars.$spacing-xs !important;
+}
+.ml-sm {
+  margin-left: vars.$spacing-sm !important;
+}
+.ml-md {
+  margin-left: vars.$spacing-md !important;
+}
+.ml-lg {
+  margin-left: vars.$spacing-lg !important;
+}
+.ml-xl {
+  margin-left: vars.$spacing-xl !important;
+}
+
+// Margin right
+.mr-0 {
+  margin-right: 0 !important;
+}
+.mr-xs {
+  margin-right: vars.$spacing-xs !important;
+}
+.mr-sm {
+  margin-right: vars.$spacing-sm !important;
+}
+.mr-md {
+  margin-right: vars.$spacing-md !important;
+}
+.mr-lg {
+  margin-right: vars.$spacing-lg !important;
+}
+.mr-xl {
+  margin-right: vars.$spacing-xl !important;
+}
+
+// Margin horizontal
+.mx-0 {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+.mx-xs {
+  margin-left: vars.$spacing-xs !important;
+  margin-right: vars.$spacing-xs !important;
+}
+.mx-sm {
+  margin-left: vars.$spacing-sm !important;
+  margin-right: vars.$spacing-sm !important;
+}
+.mx-md {
+  margin-left: vars.$spacing-md !important;
+  margin-right: vars.$spacing-md !important;
+}
+.mx-lg {
+  margin-left: vars.$spacing-lg !important;
+  margin-right: vars.$spacing-lg !important;
+}
+.mx-xl {
+  margin-left: vars.$spacing-xl !important;
+  margin-right: vars.$spacing-xl !important;
+}
+.mx-auto {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+// Margin vertical
+.my-0 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.my-xs {
+  margin-top: vars.$spacing-xs !important;
+  margin-bottom: vars.$spacing-xs !important;
+}
+.my-sm {
+  margin-top: vars.$spacing-sm !important;
+  margin-bottom: vars.$spacing-sm !important;
+}
+.my-md {
+  margin-top: vars.$spacing-md !important;
+  margin-bottom: vars.$spacing-md !important;
+}
+.my-lg {
+  margin-top: vars.$spacing-lg !important;
+  margin-bottom: vars.$spacing-lg !important;
+}
+.my-xl {
+  margin-top: vars.$spacing-xl !important;
+  margin-bottom: vars.$spacing-xl !important;
+}
+
+// Padding utilities
+.p-0 {
+  padding: 0 !important;
+}
+.p-xs {
+  padding: vars.$spacing-xs !important;
+}
+.p-sm {
+  padding: vars.$spacing-sm !important;
+}
+.p-md {
+  padding: vars.$spacing-md !important;
+}
+.p-lg {
+  padding: vars.$spacing-lg !important;
+}
+.p-xl {
+  padding: vars.$spacing-xl !important;
+}
+
+// Padding top
+.pt-0 {
+  padding-top: 0 !important;
+}
+.pt-xs {
+  padding-top: vars.$spacing-xs !important;
+}
+.pt-sm {
+  padding-top: vars.$spacing-sm !important;
+}
+.pt-md {
+  padding-top: vars.$spacing-md !important;
+}
+.pt-lg {
+  padding-top: vars.$spacing-lg !important;
+}
+.pt-xl {
+  padding-top: vars.$spacing-xl !important;
+}
+
+// Padding bottom
+.pb-0 {
+  padding-bottom: 0 !important;
+}
+.pb-xs {
+  padding-bottom: vars.$spacing-xs !important;
+}
+.pb-sm {
+  padding-bottom: vars.$spacing-sm !important;
+}
+.pb-md {
+  padding-bottom: vars.$spacing-md !important;
+}
+.pb-lg {
+  padding-bottom: vars.$spacing-lg !important;
+}
+.pb-xl {
+  padding-bottom: vars.$spacing-xl !important;
+}
+
+// Padding left
+.pl-0 {
+  padding-left: 0 !important;
+}
+.pl-xs {
+  padding-left: vars.$spacing-xs !important;
+}
+.pl-sm {
+  padding-left: vars.$spacing-sm !important;
+}
+.pl-md {
+  padding-left: vars.$spacing-md !important;
+}
+.pl-lg {
+  padding-left: vars.$spacing-lg !important;
+}
+.pl-xl {
+  padding-left: vars.$spacing-xl !important;
+}
+
+// Padding right
+.pr-0 {
+  padding-right: 0 !important;
+}
+.pr-xs {
+  padding-right: vars.$spacing-xs !important;
+}
+.pr-sm {
+  padding-right: vars.$spacing-sm !important;
+}
+.pr-md {
+  padding-right: vars.$spacing-md !important;
+}
+.pr-lg {
+  padding-right: vars.$spacing-lg !important;
+}
+.pr-xl {
+  padding-right: vars.$spacing-xl !important;
+}
+
+// Padding horizontal
+.px-0 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.px-xs {
+  padding-left: vars.$spacing-xs !important;
+  padding-right: vars.$spacing-xs !important;
+}
+.px-sm {
+  padding-left: vars.$spacing-sm !important;
+  padding-right: vars.$spacing-sm !important;
+}
+.px-md {
+  padding-left: vars.$spacing-md !important;
+  padding-right: vars.$spacing-md !important;
+}
+.px-lg {
+  padding-left: vars.$spacing-lg !important;
+  padding-right: vars.$spacing-lg !important;
+}
+.px-xl {
+  padding-left: vars.$spacing-xl !important;
+  padding-right: vars.$spacing-xl !important;
+}
+
+// Padding vertical
+.py-0 {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+.py-xs {
+  padding-top: vars.$spacing-xs !important;
+  padding-bottom: vars.$spacing-xs !important;
+}
+.py-sm {
+  padding-top: vars.$spacing-sm !important;
+  padding-bottom: vars.$spacing-sm !important;
+}
+.py-md {
+  padding-top: vars.$spacing-md !important;
+  padding-bottom: vars.$spacing-md !important;
+}
+.py-lg {
+  padding-top: vars.$spacing-lg !important;
+  padding-bottom: vars.$spacing-lg !important;
+}
+.py-xl {
+  padding-top: vars.$spacing-xl !important;
+  padding-bottom: vars.$spacing-xl !important;
+}
+
+// =============================================================================
+// DISPLAY UTILITIES
+// =============================================================================
+.d-none {
+  display: none !important;
+}
+.d-block {
+  display: block !important;
+}
+.d-inline {
+  display: inline !important;
+}
+.d-inline-block {
+  display: inline-block !important;
+}
+.d-flex {
+  display: flex !important;
+}
+.d-inline-flex {
+  display: inline-flex !important;
+}
+.d-grid {
+  display: grid !important;
+}
+.d-table {
+  display: table !important;
+}
+
+// =============================================================================
+// FLEXBOX UTILITIES
+// =============================================================================
+
+// Flex direction
+.flex-row {
+  flex-direction: row !important;
+}
+.flex-row-reverse {
+  flex-direction: row-reverse !important;
+}
+.flex-column {
+  flex-direction: column !important;
+}
+.flex-column-reverse {
+  flex-direction: column-reverse !important;
+}
+
+// Flex wrap
+.flex-wrap {
+  flex-wrap: wrap !important;
+}
+.flex-nowrap {
+  flex-wrap: nowrap !important;
+}
+
+// Justify content
+.justify-start {
+  justify-content: flex-start !important;
+}
+.justify-end {
+  justify-content: flex-end !important;
+}
+.justify-center {
+  justify-content: center !important;
+}
+.justify-between {
+  justify-content: space-between !important;
+}
+.justify-around {
+  justify-content: space-around !important;
+}
+.justify-evenly {
+  justify-content: space-evenly !important;
+}
+
+// Align items
+.align-start {
+  align-items: flex-start !important;
+}
+.align-end {
+  align-items: flex-end !important;
+}
+.align-center {
+  align-items: center !important;
+}
+.align-baseline {
+  align-items: baseline !important;
+}
+.align-stretch {
+  align-items: stretch !important;
+}
+
+// Align self
+.align-self-start {
+  align-self: flex-start !important;
+}
+.align-self-end {
+  align-self: flex-end !important;
+}
+.align-self-center {
+  align-self: center !important;
+}
+.align-self-baseline {
+  align-self: baseline !important;
+}
+.align-self-stretch {
+  align-self: stretch !important;
+}
+
+// Flex grow and shrink
+.flex-grow-0 {
+  flex-grow: 0 !important;
+}
+.flex-grow-1 {
+  flex-grow: 1 !important;
+}
+.flex-shrink-0 {
+  flex-shrink: 0 !important;
+}
+.flex-shrink-1 {
+  flex-shrink: 1 !important;
+}
+
+// Gap
+.gap-0 {
+  gap: 0 !important;
+}
+.gap-xs {
+  gap: vars.$spacing-xs !important;
+}
+.gap-sm {
+  gap: vars.$spacing-sm !important;
+}
+.gap-md {
+  gap: vars.$spacing-md !important;
+}
+.gap-lg {
+  gap: vars.$spacing-lg !important;
+}
+.gap-xl {
+  gap: vars.$spacing-xl !important;
+}
+
+// =============================================================================
+// TEXT UTILITIES
+// =============================================================================
+
+// Text alignment
+.text-left {
+  text-align: left !important;
+}
+.text-center {
+  text-align: center !important;
+}
+.text-right {
+  text-align: right !important;
+}
+.text-justify {
+  text-align: justify !important;
+}
+
+// Text colors
+.text-primary {
+  color: vars.$text-primary !important;
+}
+.text-secondary {
+  color: vars.$text-secondary !important;
+}
+.text-disabled {
+  color: vars.$text-disabled !important;
+}
+.text-success {
+  color: vars.$color-success !important;
+}
+.text-warning {
+  color: vars.$color-warning !important;
+}
+.text-error {
+  color: vars.$color-error !important;
+}
+.text-info {
+  color: vars.$color-info !important;
+}
+.text-white {
+  color: vars.$color-white !important;
+}
+
+// Text sizes
+.text-xs {
+  font-size: vars.$font-size-xs !important;
+}
+.text-sm {
+  font-size: vars.$font-size-sm !important;
+}
+.text-base {
+  font-size: vars.$font-size-base !important;
+}
+.text-lg {
+  font-size: vars.$font-size-lg !important;
+}
+.text-xl {
+  font-size: vars.$font-size-xl !important;
+}
+.text-2xl {
+  font-size: vars.$font-size-2xl !important;
+}
+.text-3xl {
+  font-size: vars.$font-size-3xl !important;
+}
+.text-4xl {
+  font-size: vars.$font-size-4xl !important;
+}
+
+// Font weights
+.font-light {
+  font-weight: vars.$font-weight-light !important;
+}
+.font-normal {
+  font-weight: vars.$font-weight-regular !important;
+}
+.font-medium {
+  font-weight: vars.$font-weight-medium !important;
+}
+.font-bold {
+  font-weight: vars.$font-weight-bold !important;
+}
+
+// Text decoration and transform
+.text-uppercase {
+  text-transform: uppercase !important;
+}
+.text-lowercase {
+  text-transform: lowercase !important;
+}
+.text-capitalize {
+  text-transform: capitalize !important;
+}
+.text-no-underline {
+  text-decoration: none !important;
+}
+.text-underline {
+  text-decoration: underline !important;
+}
+
+// Text overflow
+.text-truncate {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.text-break {
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+// Line height
+.leading-tight {
+  line-height: vars.$line-height-tight !important;
+}
+.leading-normal {
+  line-height: vars.$line-height-normal !important;
+}
+.leading-relaxed {
+  line-height: vars.$line-height-relaxed !important;
+}
+
+// =============================================================================
+// BACKGROUND UTILITIES
+// =============================================================================
+.bg-transparent {
+  background-color: transparent !important;
+}
+.bg-white {
+  background-color: vars.$color-white !important;
+}
+.bg-primary {
+  background-color: vars.$color-primary !important;
+}
+.bg-success {
+  background-color: vars.$color-success !important;
+}
+.bg-warning {
+  background-color: vars.$color-warning !important;
+}
+.bg-error {
+  background-color: vars.$color-error !important;
+}
+.bg-info {
+  background-color: vars.$color-info !important;
+}
+.bg-gray-50 {
+  background-color: vars.$color-gray-50 !important;
+}
+.bg-gray-100 {
+  background-color: vars.$color-gray-100 !important;
+}
+.bg-gray-200 {
+  background-color: vars.$color-gray-200 !important;
+}
+
+// =============================================================================
+// BORDER UTILITIES
+// =============================================================================
+.border-0 {
+  border: 0 !important;
+}
+.border {
+  border: vars.$border-width-thin solid vars.$border-color-medium !important;
+}
+.border-top {
+  border-top: vars.$border-width-thin solid vars.$border-color-medium !important;
+}
+.border-bottom {
+  border-bottom: vars.$border-width-thin solid vars.$border-color-medium !important;
+}
+.border-left {
+  border-left: vars.$border-width-thin solid vars.$border-color-medium !important;
+}
+.border-right {
+  border-right: vars.$border-width-thin solid vars.$border-color-medium !important;
+}
+
+// Border radius
+.rounded-0 {
+  border-radius: 0 !important;
+}
+.rounded-xs {
+  border-radius: vars.$border-radius-xs !important;
+}
+.rounded-sm {
+  border-radius: vars.$border-radius-sm !important;
+}
+.rounded-md {
+  border-radius: vars.$border-radius-md !important;
+}
+.rounded-lg {
+  border-radius: vars.$border-radius-lg !important;
+}
+.rounded-xl {
+  border-radius: vars.$border-radius-xl !important;
+}
+.rounded-full {
+  border-radius: vars.$border-radius-round !important;
+}
+
+// =============================================================================
+// SHADOW UTILITIES
+// =============================================================================
+.shadow-none {
+  box-shadow: none !important;
+}
+.shadow-sm {
+  box-shadow: vars.$shadow-1 !important;
+}
+.shadow {
+  box-shadow: vars.$shadow-2 !important;
+}
+.shadow-md {
+  box-shadow: vars.$shadow-3 !important;
+}
+.shadow-lg {
+  box-shadow: vars.$shadow-4 !important;
+}
+.shadow-xl {
+  box-shadow: vars.$shadow-6 !important;
+}
+.shadow-2xl {
+  box-shadow: vars.$shadow-8 !important;
+}
+
+// =============================================================================
+// POSITION UTILITIES
+// =============================================================================
+.position-static {
+  position: static !important;
+}
+.position-relative {
+  position: relative !important;
+}
+.position-absolute {
+  position: absolute !important;
+}
+.position-fixed {
+  position: fixed !important;
+}
+.position-sticky {
+  position: sticky !important;
+}
+
+// =============================================================================
+// WIDTH AND HEIGHT UTILITIES
+// =============================================================================
+.w-auto {
+  width: auto !important;
+}
+.w-full {
+  width: 100% !important;
+}
+.w-screen {
+  width: 100vw !important;
+}
+.w-fit {
+  width: fit-content !important;
+}
+
+.h-auto {
+  height: auto !important;
+}
+.h-full {
+  height: 100% !important;
+}
+.h-screen {
+  height: 100vh !important;
+}
+.h-fit {
+  height: fit-content !important;
+}
+
+// =============================================================================
+// OVERFLOW UTILITIES
+// =============================================================================
+.overflow-auto {
+  overflow: auto !important;
+}
+.overflow-hidden {
+  overflow: hidden !important;
+}
+.overflow-visible {
+  overflow: visible !important;
+}
+.overflow-scroll {
+  overflow: scroll !important;
+}
+
+.overflow-x-auto {
+  overflow-x: auto !important;
+}
+.overflow-x-hidden {
+  overflow-x: hidden !important;
+}
+.overflow-x-scroll {
+  overflow-x: scroll !important;
+}
+
+.overflow-y-auto {
+  overflow-y: auto !important;
+}
+.overflow-y-hidden {
+  overflow-y: hidden !important;
+}
+.overflow-y-scroll {
+  overflow-y: scroll !important;
+}
+
+// =============================================================================
+// ACCESSIBILITY UTILITIES
+// =============================================================================
+
+// Screen reader only
+.sr-only {
+  @include mixins.sr-only;
+}
+
+// Focus visible
+.focus-visible {
+  @include mixins.focus-visible;
+}
+
+// =============================================================================
+// RESPONSIVE UTILITIES
+// =============================================================================
+
+// Mobile only (hide on tablet and desktop)
+.mobile-only {
+  @include mixins.media(tablet) {
+    display: none !important;
+  }
+}
+
+// Tablet only
+.tablet-only {
+  display: none !important;
+
+  @include mixins.media(tablet) {
+    display: block !important;
+  }
+
+  @include mixins.media(desktop) {
+    display: none !important;
+  }
+}
+
+// Desktop only
+.desktop-only {
+  @include mixins.media-max(desktop) {
+    display: none !important;
+  }
+}
+
+// Hide on mobile
+.mobile-hidden {
+  @include mixins.media-max(tablet) {
+    display: none !important;
+  }
+}
+
+// Hide on tablet
+.tablet-hidden {
+  @include mixins.media(tablet) {
+    display: none !important;
+  }
+}
+
+// Hide on desktop
+.desktop-hidden {
+  @include mixins.media(desktop) {
+    display: none !important;
+  }
+}
+
+// =============================================================================
+// ANIMATION UTILITIES
+// =============================================================================
+.animate-fade-in {
+  @include mixins.fade-in;
+}
+
+.animate-slide-up {
+  @include mixins.slide-up;
+}
+
+.animate-none {
+  animation: none !important;
+}
+
+// Transition utilities
+.transition-none {
+  transition: none !important;
+}
+.transition-default {
+  transition: vars.$transition-default !important;
+}
+.transition-hover {
+  transition: vars.$transition-hover !important;
+}
+
+// =============================================================================
+// LOADING UTILITIES
+// =============================================================================
+.loading-center {
+  @include mixins.flex-center;
+  min-height: 200px;
+}
+
+.loading-skeleton {
+  @include mixins.skeleton-loading;
+  border-radius: vars.$border-radius-sm;
+  height: 1rem;
+}
+
+// =============================================================================
+// PRINT UTILITIES
+// =============================================================================
+.print-hidden {
+  @include mixins.print-hidden;
+}
+
+.print-only {
+  @include mixins.print-only;
+}
+
+// =============================================================================
+// INTERACTION UTILITIES
+// =============================================================================
+.cursor-pointer {
+  cursor: pointer !important;
+}
+.cursor-default {
+  cursor: default !important;
+}
+.cursor-not-allowed {
+  cursor: not-allowed !important;
+}
+.cursor-text {
+  cursor: text !important;
+}
+
+.pointer-events-none {
+  pointer-events: none !important;
+}
+.pointer-events-auto {
+  pointer-events: auto !important;
+}
+
+.select-none {
+  user-select: none !important;
+}
+.select-text {
+  user-select: text !important;
+}
+.select-all {
+  user-select: all !important;
+}
+.select-auto {
+  user-select: auto !important;
+}
+
+// =============================================================================
+// COMPONENT-SPECIFIC UTILITIES
+// =============================================================================
+
+// Action Button Utilities
+.action-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease-out !important;
+  position: relative !important;
+  overflow: hidden !important;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.05) !important;
+  }
+
+  &:active {
+    transform: scale(0.95) !important;
+  }
+
+  &:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+  }
+
+  mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  @media (max-width: 480px) {
+    width: 44px !important;
+    height: 44px !important;
+
+    mat-icon {
+      font-size: 20px !important;
+      width: 20px !important;
+      height: 20px !important;
+    }
+  }
+}
+
+.action-btn-edit {
+  color: vars.$color-primary !important;
+
+  &:hover:not(:disabled) {
+    background: rgba(25, 118, 210, 0.08) !important;
+    color: vars.$color-primary-dark !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid vars.$color-primary !important;
+    outline-offset: 2px !important;
+  }
+}
+
+.action-btn-delete {
+  color: vars.$color-error !important;
+
+  &:hover:not(:disabled) {
+    background: rgba(244, 67, 54, 0.08) !important;
+    color: vars.$color-error-dark !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid vars.$color-error !important;
+    outline-offset: 2px !important;
+  }
+}
+
+// Loading State Utilities
+.loading-state {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 400px !important;
+  gap: vars.$spacing-sm !important;
+  padding: vars.$spacing-md !important;
+
+  p,
+  .loading-text {
+    color: vars.$text-secondary !important;
+    font-size: vars.$font-size-sm !important;
+    margin: 0 !important;
+    text-align: center !important;
+  }
+
+  mat-spinner {
+    margin-bottom: vars.$spacing-xs !important;
+  }
+
+  @media (max-width: 480px) {
+    min-height: 300px !important;
+    padding: vars.$spacing-sm !important;
+    gap: vars.$spacing-xs !important;
+  }
+}
+
+// Error State Utilities
+.error-state {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 400px !important;
+  padding: vars.$spacing-md !important;
+
+  .error-icon {
+    font-size: 48px !important;
+    width: 48px !important;
+    height: 48px !important;
+    color: vars.$color-error !important;
+    margin-bottom: vars.$spacing-sm !important;
+
+    &.network-error-icon {
+      color: vars.$color-warning !important;
+    }
+
+    &.auth-error-icon {
+      color: vars.$color-error !important;
+    }
+
+    &.server-error-icon {
+      color: vars.$color-error-dark !important;
+    }
+  }
+
+  h3 {
+    color: vars.$text-primary !important;
+    font-size: vars.$font-size-lg !important;
+    margin-bottom: vars.$spacing-xs !important;
+    text-align: center !important;
+  }
+
+  p {
+    color: vars.$text-secondary !important;
+    font-size: vars.$font-size-sm !important;
+    text-align: center !important;
+    margin: 0 !important;
+  }
+}
+
+// Empty State Utilities
+.empty-state {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: vars.$spacing-xl !important;
+  gap: vars.$spacing-md !important;
+
+  .empty-icon {
+    font-size: 64px !important;
+    width: 64px !important;
+    height: 64px !important;
+    color: vars.$color-gray-400 !important;
+    margin-bottom: vars.$spacing-sm !important;
+
+    @media (max-width: 480px) {
+      font-size: 48px !important;
+      width: 48px !important;
+      height: 48px !important;
+    }
+  }
+
+  h3 {
+    color: vars.$text-primary !important;
+    font-size: vars.$font-size-xl !important;
+    font-weight: vars.$font-weight-medium !important;
+    margin-bottom: vars.$spacing-xs !important;
+
+    @media (max-width: 480px) {
+      font-size: vars.$font-size-lg !important;
+    }
+  }
+
+  p {
+    color: vars.$text-secondary !important;
+    font-size: vars.$font-size-sm !important;
+    max-width: 400px !important;
+    line-height: vars.$line-height-relaxed !important;
+    margin: 0 !important;
+
+    @media (max-width: 480px) {
+      font-size: vars.$font-size-xs !important;
+      max-width: 300px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: vars.$spacing-lg !important;
+    gap: vars.$spacing-sm !important;
+  }
+}
+
+// Card Utilities
+.card-hover {
+  transition: all vars.$transition-duration-fast
+    vars.$transition-timing-ease-out !important;
+
+  &:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: vars.$shadow-card-hover !important;
+  }
+}
+
+.card-interactive {
+  cursor: pointer !important;
+  border: 1px solid vars.$border-color-light !important;
+  transition: all vars.$transition-duration-fast
+    vars.$transition-timing-ease-out !important;
+
+  &:hover {
+    border-color: vars.$border-color-medium !important;
+    box-shadow: vars.$shadow-card-hover !important;
+  }
+
+  &:focus-within {
+    border-color: vars.$color-primary !important;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2) !important;
+  }
+}
+
+// Responsive Utilities
+@media (max-width: 480px) {
+  .mobile-stack {
+    flex-direction: column !important;
+    gap: vars.$spacing-xs !important;
+  }
+
+  .mobile-full-width {
+    width: 100% !important;
+  }
+
+  .mobile-center {
+    justify-content: center !important;
+  }
+
+  .mobile-p-sm {
+    padding: vars.$spacing-sm !important;
+  }
+
+  .mobile-text-sm {
+    font-size: vars.$font-size-sm !important;
+  }
+}
+
+// Validation Utilities
+.validation-error {
+  color: vars.$color-error !important;
+  font-size: vars.$font-size-xs !important;
+  margin-top: vars.$spacing-xs !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.validation-warning {
+  color: vars.$color-warning !important;
+  font-size: vars.$font-size-xs !important;
+  margin-top: vars.$spacing-xs !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.invalid-field {
+  color: vars.$color-error !important;
+  border-color: vars.$color-error !important;
+  background: rgba(244, 67, 54, 0.05) !important;
+}
+
+// Animation Utilities
+.deleting-animation {
+  animation: pulse-deleting 2s infinite !important;
+}
+
+@keyframes pulse-deleting {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    vars.$color-gray-200 25%,
+    vars.$color-gray-100 50%,
+    vars.$color-gray-200 75%
+  ) !important;
+  background-size: 200% 100% !important;
+  animation: shimmer 1.5s infinite !important;
+  color: transparent !important;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// High Contrast Support
+@media (prefers-contrast: high) {
+  .action-btn {
+    border: 1px solid currentColor !important;
+  }
+
+  .card-interactive {
+    border-width: 2px !important;
+  }
+
+  .validation-error,
+  .validation-warning {
+    font-weight: vars.$font-weight-medium !important;
+  }
+}
+
+// Reduced Motion Support
+@media (prefers-reduced-motion: reduce) {
+  .action-btn,
+  .card-hover,
+  .card-interactive {
+    transition: none !important;
+  }
+
+  .action-btn:hover {
+    transform: none !important;
+  }
+
+  .deleting-animation,
+  .skeleton-shimmer {
+    animation: none !important;
+  }
+}
+
+// Stats Display Utilities
+.stat-display {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 4px !important;
+  min-width: 60px !important;
+
+  @media (max-width: 768px) {
+    min-width: 50px !important;
+  }
+
+  .stat-value {
+    font-size: vars.$font-size-lg !important;
+    font-weight: vars.$font-weight-bold !important;
+    color: vars.$text-primary !important;
+    line-height: vars.$line-height-tight !important;
+
+    @media (max-width: 768px) {
+      font-size: vars.$font-size-base !important;
+    }
+  }
+
+  .stat-label {
+    font-size: vars.$font-size-xs !important;
+    color: vars.$text-secondary !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-weight: vars.$font-weight-medium !important;
+    line-height: vars.$line-height-tight !important;
+  }
+}
+
+// Session Header Utilities
+.session-header {
+  min-height: 64px !important;
+
+  @media (min-width: 768px) {
+    min-height: 72px !important;
+  }
+}
+
+.session-date-time {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: vars.$spacing-xs !important;
+
+  @media (min-width: 768px) {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: vars.$spacing-sm !important;
+  }
+}
+
+// Button Variants
+.btn-primary {
+  background: vars.$color-primary !important;
+  color: white !important;
+  border: none !important;
+  padding: vars.$spacing-xs vars.$spacing-sm !important;
+  border-radius: vars.$border-radius-sm !important;
+  font-size: vars.$font-size-sm !important;
+  font-weight: vars.$font-weight-medium !important;
+  cursor: pointer !important;
+  transition: vars.$transition-hover !important;
+  white-space: nowrap !important;
+
+  &:hover:not(:disabled) {
+    background: vars.$color-primary-dark !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid vars.$color-primary !important;
+    outline-offset: 2px !important;
+  }
+
+  &:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+  }
+}
+
+.btn-secondary {
+  background: transparent !important;
+  color: vars.$text-secondary !important;
+  border: 1px solid vars.$border-color-medium !important;
+  padding: vars.$spacing-xs vars.$spacing-sm !important;
+  border-radius: vars.$border-radius-sm !important;
+  font-size: vars.$font-size-sm !important;
+  font-weight: vars.$font-weight-medium !important;
+  cursor: pointer !important;
+  transition: vars.$transition-hover !important;
+  white-space: nowrap !important;
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: vars.$text-primary !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid vars.$text-secondary !important;
+    outline-offset: 2px !important;
+  }
+
+  &:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+  }
+}
+
+.btn-danger {
+  background: vars.$color-error !important;
+  color: white !important;
+  border: none !important;
+  padding: vars.$spacing-xs vars.$spacing-sm !important;
+  border-radius: vars.$border-radius-sm !important;
+  font-size: vars.$font-size-sm !important;
+  font-weight: vars.$font-weight-medium !important;
+  cursor: pointer !important;
+  transition: vars.$transition-hover !important;
+  white-space: nowrap !important;
+
+  &:hover:not(:disabled) {
+    background: vars.$color-error-dark !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid vars.$color-error !important;
+    outline-offset: 2px !important;
+  }
+
+  &:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+  }
+}
+
+// Subtle Background Utilities
+.bg-subtle {
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+
+.border-subtle {
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.border-top-subtle {
+  border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+// Mobile Responsive Button Layout
+@media (max-width: 768px) {
+  .mobile-btn-stack {
+    flex-direction: column !important;
+    align-items: stretch !important;
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+      width: 100% !important;
+    }
+  }
+}
+
+// Print Utilities
+@media print {
+  .action-btn,
+  .no-print {
+    display: none !important;
+  }
+
+  .card-hover,
+  .card-interactive {
+    box-shadow: none !important;
+    border: 1px solid vars.$color-gray-400 !important;
+  }
+}

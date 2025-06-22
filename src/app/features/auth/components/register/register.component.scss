@@ -1,30 +1,40 @@
-// Register Component Styles - Material Design
-@use '@angular/material' as mat;
+// =============================================================================
+// REGISTER COMPONENT STYLES
+// =============================================================================
+// Authentication registration form component
+// Uses the centralized design system for consistency
 
-// Responsive breakpoints (matching global styles)
-$mobile-breakpoint: 768px;
-$tablet-breakpoint: 1024px;
+@use "../../../../../styles/variables" as vars;
+@use "../../../../../styles/mixins" as mixins;
 
-// Password strength colors
-$strength-weak: #f44336;
-$strength-fair: #ff9800;
-$strength-good: #2196f3;
-$strength-strong: #4caf50;
+// =============================================================================
+// PASSWORD STRENGTH COLORS
+// =============================================================================
+$strength-weak: vars.$color-error;
+$strength-fair: vars.$color-warning;
+$strength-good: vars.$color-info;
+$strength-strong: vars.$color-success;
 
+// =============================================================================
+// MAIN COMPONENT CONTAINER
+// =============================================================================
 .register-component {
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
 }
 
+// =============================================================================
+// REGISTER FORM
+// =============================================================================
 .register-form {
   width: 100%;
 
   .form-row {
-    margin-bottom: 16px;
+    margin-bottom: vars.$spacing-sm;
 
     &:last-of-type {
-      margin-bottom: 24px;
+      margin-bottom: vars.$spacing-md;
     }
   }
 
@@ -32,98 +42,42 @@ $strength-strong: #4caf50;
     width: 100%;
   }
 
-  // Material Form Field customizations (inherited from login)
+  // Form field customizations (inherited from global auth styles)
   .mat-mdc-form-field {
     width: 100%;
-
-    .mat-mdc-form-field-subscript-wrapper {
-      margin-top: 4px;
-    }
-
-    // Prefix and suffix icon styling
-    .mat-mdc-form-field-icon-prefix,
-    .mat-mdc-form-field-icon-suffix {
-      color: rgba(0, 0, 0, 0.54);
-    }
-
-    // Error state styling
-    &.mat-form-field-invalid {
-      .mat-mdc-form-field-icon-prefix {
-        color: #f44336;
-      }
-    }
-
-    // Focus state styling
-    &.mat-focused {
-      .mat-mdc-form-field-icon-prefix {
-        color: #1976d2;
-      }
-    }
-  }
-
-  // Input field styling
-  .mat-mdc-input-element {
-    font-size: 16px;
-    line-height: 1.5;
-
-    &::placeholder {
-      color: rgba(0, 0, 0, 0.38);
-      opacity: 1;
-    }
-
-    // Prevent zoom on iOS
-    @media (max-width: $mobile-breakpoint) {
-      font-size: 16px;
-    }
-  }
-
-  // Password toggle buttons
-  .mat-mdc-icon-button {
-    width: 40px;
-    height: 40px;
-    padding: 8px;
-
-    .mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-    }
-
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
-    }
-
-    &:focus-visible {
-      background-color: rgba(0, 0, 0, 0.08);
-      outline: 2px solid #1976d2;
-      outline-offset: 2px;
-    }
   }
 }
 
-// Password strength indicator
+// =============================================================================
+// PASSWORD STRENGTH INDICATOR
+// =============================================================================
 .password-strength-container {
-  margin-top: 8px;
-  padding: 12px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
+  margin-top: vars.$spacing-xs;
+  padding: vars.$spacing-sm;
+  background-color: vars.$color-gray-50;
+  border-radius: vars.$border-radius-md;
+  border: vars.$border-width-thin solid vars.$border-color-light;
+  transition: vars.$transition-default;
 
   .strength-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
+    @include mixins.flex-between;
+    margin-bottom: vars.$spacing-xs;
 
     .strength-label {
-      font-size: 0.875rem;
-      color: rgba(0, 0, 0, 0.6);
-      font-weight: 500;
+      @include mixins.typography(
+        vars.$font-size-sm,
+        vars.$font-weight-medium,
+        vars.$line-height-normal
+      );
+      color: vars.$text-secondary;
     }
 
     .strength-text {
-      font-size: 0.875rem;
-      font-weight: 600;
+      @include mixins.typography(
+        vars.$font-size-sm,
+        vars.$font-weight-bold,
+        vars.$line-height-normal
+      );
       text-transform: uppercase;
       letter-spacing: 0.5px;
 
@@ -146,20 +100,24 @@ $strength-strong: #4caf50;
   }
 
   .strength-progress {
-    margin-bottom: 12px;
+    margin-bottom: vars.$spacing-sm;
 
     .progress-bar {
       height: 6px;
-      background-color: #e9ecef;
-      border-radius: 3px;
+      background-color: vars.$color-gray-200;
+      border-radius: vars.$border-radius-xs;
       overflow: hidden;
       position: relative;
 
       .progress-fill {
         height: 100%;
-        border-radius: 3px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        background-color: #e9ecef;
+        border-radius: vars.$border-radius-xs;
+        transition: vars.$transition-default;
+        background-color: vars.$color-gray-200;
+
+        @include mixins.reduced-motion {
+          transition: none;
+        }
       }
 
       &.strength-weak .progress-fill {
@@ -182,10 +140,13 @@ $strength-strong: #4caf50;
 
   .password-requirements {
     .requirements-title {
-      font-size: 0.8125rem;
-      color: rgba(0, 0, 0, 0.6);
-      margin: 0 0 6px 0;
-      font-weight: 500;
+      @include mixins.typography(
+        vars.$font-size-xs,
+        vars.$font-weight-medium,
+        vars.$line-height-normal
+      );
+      color: vars.$text-secondary;
+      margin: 0 0 vars.$spacing-xs 0;
     }
 
     .requirements-list {
@@ -194,13 +155,16 @@ $strength-strong: #4caf50;
       list-style: none;
 
       .requirement-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.75rem;
-        color: rgba(0, 0, 0, 0.6);
-        margin-bottom: 4px;
-        line-height: 1.3;
+        @include mixins.flex-center;
+        justify-content: flex-start;
+        gap: vars.$spacing-xs;
+        @include mixins.typography(
+          vars.$font-size-xs,
+          vars.$font-weight-regular,
+          vars.$line-height-tight
+        );
+        color: vars.$text-secondary;
+        margin-bottom: vars.$spacing-xs;
 
         &:last-child {
           margin-bottom: 0;
@@ -210,41 +174,43 @@ $strength-strong: #4caf50;
           font-size: 12px;
           width: 12px;
           height: 12px;
-          color: rgba(0, 0, 0, 0.38);
+          color: vars.$text-disabled;
           flex-shrink: 0;
+
+          &.met {
+            color: vars.$color-success;
+          }
+        }
+
+        &.met {
+          color: vars.$text-primary;
+
+          .requirement-icon {
+            color: vars.$color-success;
+          }
         }
       }
     }
   }
 
-  @media (max-width: $mobile-breakpoint) {
-    padding: 10px;
-    margin-top: 6px;
+  @include mixins.media-max(mobile) {
+    padding: vars.$spacing-xs;
 
-    .strength-header {
-      margin-bottom: 6px;
-
-      .strength-label,
-      .strength-text {
-        font-size: 0.8125rem;
-      }
+    .strength-header .strength-label,
+    .strength-header .strength-text {
+      font-size: vars.$font-size-xs;
     }
 
-    .strength-progress {
-      margin-bottom: 10px;
+    .strength-progress .progress-bar {
+      height: 4px;
     }
 
     .password-requirements {
       .requirements-title {
-        font-size: 0.75rem;
-        margin-bottom: 4px;
+        font-size: vars.$font-size-xs;
       }
-
       .requirements-list .requirement-item {
-        font-size: 0.6875rem;
-        margin-bottom: 3px;
-        gap: 6px;
-
+        font-size: vars.$font-size-xs;
         .requirement-icon {
           font-size: 10px;
           width: 10px;
@@ -255,312 +221,70 @@ $strength-strong: #4caf50;
   }
 }
 
-// Terms notice styling
+// =============================================================================
+// TERMS NOTICE
+// =============================================================================
 .terms-notice {
-  margin: 16px 0 24px 0;
-  padding: 12px;
-  background-color: rgba(25, 118, 210, 0.04);
-  border-radius: 8px;
-  border-left: 4px solid #1976d2;
+  margin: vars.$spacing-sm 0 vars.$spacing-md 0;
+  padding: vars.$spacing-sm;
+  background-color: rgba(vars.$color-primary, 0.04);
+  border-radius: vars.$border-radius-md;
+  border-left: 4px solid vars.$color-primary;
 
   .terms-text {
-    font-size: 0.8125rem;
-    color: rgba(0, 0, 0, 0.7);
+    @include mixins.typography(
+      vars.$font-size-xs,
+      vars.$font-weight-regular,
+      vars.$line-height-relaxed
+    );
+    color: rgba(vars.$text-primary, 0.8);
     margin: 0;
-    line-height: 1.4;
 
     .terms-link {
-      color: #1976d2;
+      color: vars.$color-primary;
       text-decoration: none;
-      font-weight: 500;
-      transition: color 0.2s ease;
+      font-weight: vars.$font-weight-medium;
+      transition: vars.$transition-hover;
 
       &:hover {
-        color: #1565c0;
+        color: vars.$color-primary-dark;
         text-decoration: underline;
       }
 
-      &:focus-visible {
-        outline: 2px solid #1976d2;
-        outline-offset: 1px;
-        border-radius: 2px;
-      }
+      @include mixins.focus-visible(vars.$color-primary);
     }
   }
 
-  @media (max-width: $mobile-breakpoint) {
-    margin: 12px 0 20px 0;
-    padding: 10px;
-
+  @include mixins.media-max(mobile) {
+    padding: vars.$spacing-xs;
     .terms-text {
-      font-size: 0.75rem;
+      font-size: vars.$font-size-xs;
     }
   }
 }
 
-// Submit button styling (inherited from login but with register-specific icon)
-.auth-submit-button {
-  width: 100%;
-  height: 48px;
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 16px;
-  border-radius: 8px !important;
-  text-transform: none !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
-  .mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
-
-  .loading-icon {
-    animation: spin 1s linear infinite;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  &:not(:disabled):hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
-  }
-
-  &:not(:disabled):active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);
-  }
-
-  @media (max-width: $mobile-breakpoint) {
-    height: 44px;
-    font-size: 0.9375rem;
-
-    &:not(:disabled):hover {
-      transform: none;
-      box-shadow: none;
-    }
-  }
+// Submit button (inherits from global auth styles)
+.loading-icon {
+  animation: spin 1s linear infinite;
 }
-
 @keyframes spin {
-  from {
+  0% {
     transform: rotate(0deg);
   }
-  to {
+  100% {
     transform: rotate(360deg);
   }
 }
 
-// Validation summary styling (inherited from login)
-.validation-summary {
-  background-color: #ffebee;
-  border: 1px solid #f44336;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 24px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
+// Validation summary (inherits from global auth styles)
 
-  .warning-icon {
-    color: #f44336;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    margin-top: 2px;
-    flex-shrink: 0;
-  }
+// Auth links and dividers inherit from global auth styles
 
-  .validation-errors {
-    flex: 1;
-
-    .validation-title {
-      font-weight: 500;
-      color: #d32f2f;
-      margin: 0 0 8px 0;
-      font-size: 0.875rem;
-    }
-
-    .validation-list {
-      margin: 0;
-      padding-left: 16px;
-      list-style-type: disc;
-
-      .validation-item {
-        color: #d32f2f;
-        font-size: 0.8125rem;
-        line-height: 1.4;
-        margin-bottom: 4px;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
-    }
-  }
-
-  @media (max-width: $mobile-breakpoint) {
-    padding: 12px;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-}
-
-// Auth link styling (inherited from login)
-.auth-link {
-  text-align: center;
-  margin-top: 16px;
-  font-size: 0.875rem;
-  color: rgba(0, 0, 0, 0.6);
-  line-height: 1.4;
-
-  a {
-    color: #1976d2;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    position: relative;
-
-    &:hover {
-      color: #1565c0;
-      text-decoration: underline;
-    }
-
-    &:focus-visible {
-      outline: 2px solid #1976d2;
-      outline-offset: 2px;
-      border-radius: 2px;
-    }
-
-    &:active {
-      color: #0d47a1;
-    }
-  }
-
-  @media (max-width: $mobile-breakpoint) {
-    font-size: 0.8125rem;
-  }
-}
-
-// Auth divider styling (inherited from login)
-.auth-divider {
-  text-align: center;
-  margin: 24px 0;
-  position: relative;
-  color: rgba(0, 0, 0, 0.54);
-  font-size: 0.875rem;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: rgba(0, 0, 0, 0.12);
-  }
-
-  span {
-    background: rgba(255, 255, 255, 0.98);
-    padding: 0 16px;
-    position: relative;
-    z-index: 1;
-    font-weight: 400;
-  }
-
-  @media (max-width: $mobile-breakpoint) {
-    margin: 20px 0;
-    font-size: 0.8125rem;
-
-    span {
-      padding: 0 12px;
-    }
-  }
-}
-
-// Loading message for screen readers
-.sr-only {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-}
-
-// Accessibility improvements
-@media (prefers-reduced-motion: reduce) {
+@include mixins.reduced-motion {
   .loading-icon {
     animation: none;
   }
-
-  .auth-submit-button {
-    transition: none;
-
-    &:hover {
-      transform: none;
-    }
-  }
-
   .password-strength-container .strength-progress .progress-fill {
     transition: none;
-  }
-}
-
-// High contrast mode support
-@media (prefers-contrast: high) {
-  .password-strength-container {
-    background-color: #fff;
-    border: 2px solid #000;
-
-    .strength-progress .progress-bar {
-      background-color: #ccc;
-      border: 1px solid #000;
-
-      .progress-fill {
-        border: 1px solid #000;
-      }
-    }
-  }
-
-  .terms-notice {
-    background-color: #fff;
-    border: 2px solid #1976d2;
-  }
-
-  .validation-summary {
-    background-color: #fff;
-    border: 2px solid #f44336;
-  }
-
-  .auth-link a {
-    text-decoration: underline;
-
-    &:hover {
-      background-color: #e3f2fd;
-    }
-  }
-}
-
-// Print styles
-@media print {
-  .register-component {
-    .password-strength-container,
-    .terms-notice,
-    .auth-submit-button,
-    .auth-link,
-    .auth-divider {
-      display: none;
-    }
   }
 }

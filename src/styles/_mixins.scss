@@ -1,0 +1,989 @@
+// =============================================================================
+// REUSABLE SCSS MIXINS
+// =============================================================================
+// Common patterns and utility mixins for the Unlazy App
+// Uses variables with @use directive
+
+@use "sass:color";
+@use "sass:map";
+@use "variables" as vars;
+
+// =============================================================================
+// RESPONSIVE MIXINS
+// =============================================================================
+
+// Media query mixin for consistent breakpoint usage
+@mixin media($breakpoint) {
+  @if map.has-key(vars.$breakpoints, $breakpoint) {
+    @media (min-width: map.get(vars.$breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint `#{$breakpoint}` not found in $breakpoints map.";
+  }
+}
+
+// Max-width media queries
+@mixin media-max($breakpoint) {
+  @if map.has-key(vars.$breakpoints, $breakpoint) {
+    @media (max-width: (map.get(vars.$breakpoints, $breakpoint) - 1px)) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint `#{$breakpoint}` not found in $breakpoints map.";
+  }
+}
+
+// Between breakpoints
+@mixin media-between($min-breakpoint, $max-breakpoint) {
+  @if map.has-key(vars.$breakpoints, $min-breakpoint) and
+    map.has-key(vars.$breakpoints, $max-breakpoint)
+  {
+    @media (min-width: map.get(vars.$breakpoints, $min-breakpoint)) and (max-width: (map.get(vars.$breakpoints, $max-breakpoint) - 1px)) {
+      @content;
+    }
+  } @else {
+    @warn "One or both breakpoints not found in $breakpoints map.";
+  }
+}
+
+// =============================================================================
+// LAYOUT MIXINS
+// =============================================================================
+
+// Flexbox utilities
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-column-center {
+  @include flex-column;
+  align-items: center;
+  justify-content: center;
+}
+
+// Grid container with responsive columns
+@mixin grid-responsive($min-column-width: 250px, $gap: vars.$spacing-md) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-column-width, 1fr));
+  gap: $gap;
+}
+
+// Container with max-width and centering
+@mixin container(
+  $max-width: vars.$breakpoint-desktop,
+  $padding: vars.$spacing-md
+) {
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: 0 $padding;
+}
+
+// =============================================================================
+// CARD MIXINS
+// =============================================================================
+
+// Base card styling
+@mixin card-base {
+  background: vars.$surface-primary;
+  border-radius: vars.$card-border-radius;
+  border: vars.$border-width-thin solid vars.$border-color-light;
+  box-shadow: vars.$card-shadow;
+  transition: vars.$transition-hover;
+}
+
+// Card with hover effect
+@mixin card-interactive {
+  @include card-base;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: vars.$card-shadow-hover;
+    transform: translateY(-1px);
+  }
+
+  &:focus-within {
+    outline: 2px solid vars.$color-primary;
+    outline-offset: 2px;
+  }
+}
+
+// Card padding responsive
+@mixin card-padding {
+  padding: vars.$card-padding;
+
+  @include media-max(mobile) {
+    padding: vars.$card-padding-mobile;
+  }
+}
+
+// =============================================================================
+// BUTTON MIXINS
+// =============================================================================
+
+// Base button styling
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: vars.$spacing-xs;
+  border: none;
+  border-radius: vars.$button-border-radius;
+  padding: vars.$button-padding-y vars.$button-padding-x;
+  min-height: vars.$button-min-height;
+  font-family: vars.$font-primary;
+  font-weight: vars.$font-weight-medium;
+  text-decoration: none;
+  cursor: pointer;
+  transition: vars.$transition-hover;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Button color variants
+@mixin button-variant(
+  $bg-color,
+  $text-color: vars.$color-white,
+  $hover-opacity: 0.9
+) {
+  background-color: $bg-color;
+  color: $text-color;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($bg-color, $hover-opacity);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $bg-color;
+    outline-offset: 2px;
+  }
+}
+
+// Outlined button variant
+@mixin button-outlined($border-color, $text-color) {
+  background-color: transparent;
+  color: $text-color;
+  border: vars.$border-width-thin solid $border-color;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($border-color, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $border-color;
+    outline-offset: 2px;
+  }
+}
+
+// =============================================================================
+// TEXT MIXINS
+// =============================================================================
+
+// Text truncation
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Multi-line text truncation
+@mixin text-truncate-lines($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Typography scale mixin
+@mixin typography(
+  $size,
+  $weight: vars.$font-weight-regular,
+  $line-height: vars.$line-height-normal
+) {
+  font-size: $size;
+  font-weight: $weight;
+  line-height: $line-height;
+}
+
+// Screen reader only text
+@mixin sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+// =============================================================================
+// FORM MIXINS
+// =============================================================================
+
+// Base form input styling
+@mixin form-input {
+  width: 100%;
+  padding: vars.$spacing-sm;
+  border: vars.$border-width-thin solid vars.$form-border-color;
+  border-radius: vars.$form-border-radius;
+  font-family: vars.$font-primary;
+  font-size: vars.$font-size-base;
+  transition: vars.$transition-focus;
+
+  &:focus {
+    outline: none;
+    border-color: vars.$form-focus-color;
+    box-shadow: 0 0 0 2px rgba(vars.$form-focus-color, 0.2);
+  }
+
+  &:disabled {
+    background-color: vars.$color-gray-100;
+    cursor: not-allowed;
+  }
+}
+
+// Form field wrapper
+@mixin form-field {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-xs;
+  margin-bottom: vars.$spacing-md;
+}
+
+// =============================================================================
+// ANIMATION MIXINS
+// =============================================================================
+
+// Loading skeleton animation
+@mixin skeleton-loading($bg-color: vars.$color-gray-200) {
+  background: linear-gradient(
+    90deg,
+    $bg-color 25%,
+    color.adjust($bg-color, $lightness: 5%) 50%,
+    $bg-color 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Fade in animation
+@mixin fade-in($duration: vars.$transition-duration-normal) {
+  animation: fade-in $duration vars.$transition-timing-ease-in-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Slide up animation
+@mixin slide-up($duration: vars.$transition-duration-normal) {
+  animation: slide-up $duration vars.$transition-timing-ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// =============================================================================
+// ACCESSIBILITY MIXINS
+// =============================================================================
+
+// Focus visible styling
+@mixin focus-visible($color: vars.$color-primary, $offset: 2px) {
+  &:focus-visible {
+    outline: 2px solid $color;
+    outline-offset: $offset;
+  }
+}
+
+// Responsive padding mixin
+@mixin responsive-padding(
+  $desktop: vars.$spacing-lg,
+  $mobile: vars.$spacing-sm
+) {
+  padding: $desktop;
+
+  @include media-max(mobile) {
+    padding: $mobile;
+  }
+}
+
+// Hover lift effect mixin
+@mixin hover-lift($translate: -1px, $shadow: vars.$shadow-card-hover) {
+  transition: vars.$transition-hover;
+
+  &:hover:not(:disabled) {
+    transform: translateY($translate);
+    box-shadow: $shadow;
+  }
+}
+
+// Button state mixin
+@mixin button-state($bg-color, $text-color: white, $hover-darken: 8%) {
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  border-radius: vars.$button-border-radius;
+  padding: vars.$button-padding-y vars.$button-padding-x;
+  min-height: vars.$button-min-height;
+  transition: vars.$transition-hover;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: darken($bg-color, $hover-darken);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    @include focus-visible();
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// High contrast mode support
+@mixin high-contrast {
+  @media (prefers-contrast: high) {
+    @content;
+  }
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+// Card base mixin
+@mixin card-base($hover: true, $padding: vars.$card-padding) {
+  border-radius: vars.$card-border-radius;
+  border: vars.$border-width-thin solid vars.$border-color-light;
+  background-color: vars.$surface-primary;
+  box-shadow: vars.$card-shadow;
+  padding: $padding;
+  transition: vars.$transition-default;
+
+  @if $hover {
+    &:hover {
+      box-shadow: vars.$card-shadow-hover;
+      transform: translateY(-1px);
+    }
+  }
+
+  @include media-max(mobile) {
+    padding: vars.$card-padding-mobile;
+  }
+}
+
+// =============================================================================
+// UTILITY MIXINS
+// =============================================================================
+
+// Clearfix
+@mixin clearfix {
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+// Aspect ratio
+@mixin aspect-ratio($width: 16, $height: 9) {
+  position: relative;
+
+  &::before {
+    content: "";
+    display: block;
+    padding-top: percentage($height / $width);
+  }
+
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// Hide scrollbar
+@mixin hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// Custom scrollbar
+@mixin custom-scrollbar(
+  $thumb-color: vars.$color-gray-400,
+  $track-color: vars.$color-gray-100
+) {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: 4px;
+
+    &:hover {
+      background: color.adjust($thumb-color, $lightness: -10%);
+    }
+  }
+}
+
+// Print styles
+@mixin print-hidden {
+  @media print {
+    display: none !important;
+  }
+}
+
+@mixin print-only {
+  display: none;
+
+  @media print {
+    display: block;
+  }
+}
+
+// =============================================================================
+// COMPONENT PATTERN MIXINS
+// =============================================================================
+
+// Action button pattern
+@mixin action-button($size: 40px) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $size;
+  height: $size;
+  min-width: $size;
+  border: none;
+  border-radius: vars.$border-radius-round;
+  background: transparent;
+  color: vars.$text-secondary;
+  cursor: pointer;
+  transition: vars.$transition-hover;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.05);
+    background-color: rgba(vars.$color-black, 0.04);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @include focus-visible();
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  mat-spinner {
+    margin: 0;
+  }
+
+  @include media-max(xs) {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  @include reduced-motion {
+    transition: none;
+    animation: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+// Action button variants
+@mixin action-button-edit {
+  &:hover:not(:disabled) {
+    background-color: rgba(vars.$color-primary, 0.1);
+    color: vars.$color-primary;
+  }
+
+  &:focus-visible {
+    outline-color: vars.$color-primary;
+  }
+}
+
+@mixin action-button-delete {
+  &:hover:not(:disabled) {
+    background-color: rgba(vars.$color-error, 0.1);
+    color: vars.$color-error;
+  }
+
+  &:focus-visible {
+    outline-color: vars.$color-error;
+  }
+}
+
+// Loading container pattern
+@mixin loading-container($min-height: 400px) {
+  @include flex-column-center;
+  min-height: $min-height;
+  gap: vars.$spacing-sm;
+  padding: vars.$spacing-xl vars.$spacing-md;
+
+  p,
+  .loading-text {
+    margin: 0;
+    color: vars.$text-secondary;
+    font-size: vars.$font-size-sm;
+    text-align: center;
+  }
+
+  mat-spinner {
+    flex-shrink: 0;
+  }
+
+  @include media-max(xs) {
+    min-height: 300px;
+    padding: vars.$spacing-md vars.$spacing-sm;
+    gap: vars.$spacing-xs;
+  }
+}
+
+// Error state pattern
+@mixin error-container($min-height: 400px) {
+  @include flex-center;
+  min-height: $min-height;
+  padding: vars.$spacing-md;
+}
+
+@mixin error-card {
+  max-width: 500px;
+  width: 100%;
+  background: vars.$surface-primary;
+  border-radius: vars.$card-border-radius;
+  box-shadow: vars.$card-shadow;
+  border: vars.$border-width-thin solid vars.$border-color-light;
+}
+
+@mixin error-content {
+  @include flex-column;
+  align-items: center;
+  text-align: center;
+  gap: vars.$spacing-sm;
+  padding: vars.$spacing-md;
+
+  .error-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: vars.$color-error;
+    flex-shrink: 0;
+
+    &.network-error-icon {
+      color: vars.$color-warning;
+    }
+
+    &.auth-error-icon {
+      color: #9c27b0;
+    }
+
+    &.server-error-icon {
+      color: #607d8b;
+    }
+  }
+
+  h3 {
+    margin: 0;
+    color: vars.$text-primary;
+    font-size: vars.$font-size-xl;
+    font-weight: vars.$font-weight-medium;
+  }
+
+  p {
+    margin: 0;
+    color: vars.$text-secondary;
+    line-height: vars.$line-height-relaxed;
+    max-width: 400px;
+  }
+}
+
+@mixin error-actions {
+  display: flex;
+  gap: vars.$spacing-xs;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: vars.$spacing-xs;
+
+  button {
+    mat-icon {
+      margin-right: vars.$spacing-xs;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  @include media-max(xs) {
+    flex-direction: column;
+    width: 100%;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// Empty state pattern
+@mixin empty-state {
+  @include flex-column;
+  align-items: center;
+  text-align: center;
+  padding: vars.$spacing-xl vars.$spacing-md;
+  gap: vars.$spacing-sm;
+
+  .empty-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: rgba(vars.$color-black, 0.3);
+    margin-bottom: vars.$spacing-xs;
+
+    @include media-max(xs) {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  h3 {
+    margin: 0;
+    font-size: vars.$font-size-xl;
+    font-weight: vars.$font-weight-medium;
+    color: vars.$text-primary;
+
+    @include media-max(xs) {
+      font-size: vars.$font-size-lg;
+    }
+  }
+
+  p {
+    margin: 0;
+    color: vars.$text-secondary;
+    max-width: 300px;
+    line-height: vars.$line-height-relaxed;
+    font-size: vars.$font-size-sm;
+
+    @include media-max(xs) {
+      max-width: 250px;
+      font-size: vars.$font-size-xs;
+    }
+  }
+
+  @include media-max(xs) {
+    padding: vars.$spacing-lg vars.$spacing-sm;
+    gap: vars.$spacing-xs;
+  }
+}
+
+// Info item pattern
+@mixin info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: vars.$spacing-xs;
+  padding: vars.$spacing-xs 0;
+
+  &:not(:last-child) {
+    border-bottom: vars.$border-width-thin solid vars.$border-color-light;
+  }
+
+  .info-icon {
+    color: vars.$color-primary;
+    margin-top: 2px;
+    flex-shrink: 0;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .info-content {
+    @include flex-column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+
+    .info-label {
+      font-weight: vars.$font-weight-medium;
+      color: vars.$text-primary;
+      font-size: vars.$font-size-sm;
+      margin-bottom: 2px;
+    }
+
+    .info-value {
+      color: vars.$text-secondary;
+      font-size: vars.$font-size-sm;
+      line-height: vars.$line-height-normal;
+      word-wrap: break-word;
+      hyphens: auto;
+    }
+  }
+
+  @include media-max(xs) {
+    gap: vars.$spacing-xs;
+    padding: vars.$spacing-xs 0;
+
+    .info-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .info-content {
+      .info-label,
+      .info-value {
+        font-size: vars.$font-size-xs;
+      }
+    }
+  }
+}
+
+// Validation states
+@mixin validation-error {
+  color: vars.$color-error !important;
+  font-weight: vars.$font-weight-bold;
+}
+
+@mixin invalid-value {
+  color: vars.$color-error;
+  font-weight: vars.$font-weight-bold;
+  text-decoration: underline;
+  text-decoration-color: vars.$color-error;
+  text-decoration-style: wavy;
+}
+
+@mixin validation-warning-icon {
+  color: vars.$color-warning-dark;
+  cursor: help;
+  flex-shrink: 0;
+}
+
+@mixin field-warning-icon {
+  color: vars.$color-error;
+  cursor: help;
+  flex-shrink: 0;
+}
+
+// Deleting/Loading states
+@mixin deleting-state {
+  opacity: 0.6;
+  pointer-events: none;
+
+  .action-button {
+    pointer-events: auto;
+
+    &.delete-button {
+      background-color: rgba(vars.$color-error, 0.1);
+    }
+  }
+}
+
+@mixin loading-state {
+  .exercise-title,
+  .info-value {
+    @include skeleton-loading;
+    border-radius: vars.$border-radius-xs;
+    color: transparent;
+    height: 1.2em;
+    display: inline-block;
+    min-width: 60px;
+  }
+
+  .action-button {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+}
+
+// Set item pattern
+@mixin set-item {
+  @include flex-between;
+  padding: vars.$spacing-sm;
+  background: rgba(vars.$color-black, 0.02);
+  border-radius: vars.$border-radius-md;
+  border: vars.$border-width-thin solid vars.$border-color-light;
+  transition: vars.$transition-hover;
+  min-height: 80px;
+
+  &:hover {
+    background: rgba(vars.$color-black, 0.04);
+    border-color: vars.$border-color-medium;
+    box-shadow: vars.$shadow-card;
+  }
+
+  &.invalid-set {
+    border-left: vars.$border-width-thick solid vars.$color-error;
+    background: rgba(vars.$color-error, 0.02);
+
+    &:hover {
+      background: rgba(vars.$color-error, 0.04);
+    }
+  }
+
+  @include media-max(xs) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: vars.$spacing-xs;
+    padding: vars.$spacing-xs;
+    min-height: auto;
+  }
+}
+
+// Success state pattern
+@mixin success-state {
+  @include flex-column;
+  align-items: center;
+  text-align: center;
+  gap: vars.$spacing-sm;
+  padding: vars.$spacing-lg vars.$spacing-md;
+
+  .success-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: vars.$color-success;
+    margin-bottom: vars.$spacing-xs;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: vars.$font-size-xl;
+    font-weight: vars.$font-weight-medium;
+    color: vars.$text-primary;
+  }
+
+  p {
+    margin: 0;
+    color: vars.$text-secondary;
+    line-height: vars.$line-height-relaxed;
+    max-width: 400px;
+  }
+}
+
+// High contrast adjustments for components
+@mixin component-high-contrast {
+  @include high-contrast {
+    .common-card,
+    .error-card {
+      border-color: rgba(vars.$color-black, 0.3);
+    }
+
+    .info-item {
+      border-bottom-color: rgba(vars.$color-black, 0.2);
+    }
+
+    .action-button {
+      border: vars.$border-width-thin solid rgba(vars.$color-black, 0.3);
+    }
+
+    .error-icon,
+    .validation-warning-icon,
+    .field-warning-icon {
+      color: vars.$text-primary !important;
+    }
+
+    .invalid-value {
+      color: vars.$color-error-dark !important;
+    }
+  }
+}
+
+// Print styles for components
+@mixin component-print-styles {
+  @media print {
+    .action-button,
+    .error-actions {
+      display: none;
+    }
+
+    .common-card,
+    .error-card {
+      box-shadow: none;
+      border: vars.$border-width-thin solid vars.$color-black;
+      break-inside: avoid;
+    }
+
+    .set-item {
+      background: vars.$color-white;
+    }
+  }
+}

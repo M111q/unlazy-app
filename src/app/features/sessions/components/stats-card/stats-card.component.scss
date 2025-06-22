@@ -1,47 +1,47 @@
+// =============================================================================
+// STATS CARD COMPONENT STYLES
+// =============================================================================
+// Component-specific styles for the stats card component
+// Uses the centralized design system for consistency
+
+@use "../../../../../styles/variables" as vars;
+@use "../../../../../styles/mixins" as mixins;
+
 .stats-card {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-
-  mat-card-header {
-    margin-bottom: 16px;
-
-    mat-card-title {
-      font-size: 20px;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.87);
-    }
-  }
+  @include mixins.card-base;
 
   .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 24px;
+    @include mixins.grid-responsive(200px, vars.$spacing-md);
 
-    @media (max-width: 960px) {
+    @include mixins.media-max(tablet) {
       grid-template-columns: repeat(2, 1fr);
     }
 
-    @media (max-width: 600px) {
+    @include mixins.media-max(mobile) {
       grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    @media (max-width: 480px) {
-      gap: 16px;
+      gap: vars.$spacing-sm;
     }
   }
 
   .stat-item {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px;
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    @include mixins.flex-center;
+    gap: vars.$spacing-sm;
+    padding: vars.$spacing-sm;
+    background: rgba(vars.$color-black, 0.02);
+    border-radius: vars.$border-radius-md;
+    border: vars.$border-width-thin solid vars.$border-color-light;
+    transition: vars.$transition-hover;
+
+    &:hover {
+      background: rgba(vars.$color-primary, 0.04);
+    }
+
+    @include mixins.high-contrast {
+      border-color: vars.$border-color-dark;
+    }
 
     mat-icon {
-      color: #1976d2;
+      color: vars.$color-primary;
       font-size: 32px;
       width: 32px;
       height: 32px;
@@ -49,20 +49,25 @@
     }
 
     .stat-content {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      @include mixins.flex-column;
+      gap: vars.$spacing-xs;
+      flex: 1;
 
       .stat-value {
-        font-size: 24px;
-        font-weight: 600;
-        color: rgba(0, 0, 0, 0.87);
-        line-height: 1;
+        @include mixins.typography(
+          vars.$font-size-2xl,
+          vars.$font-weight-bold,
+          vars.$line-height-tight
+        );
+        color: vars.$text-primary;
       }
 
       .stat-label {
-        font-size: 12px;
-        color: rgba(0, 0, 0, 0.6);
+        @include mixins.typography(
+          vars.$font-size-xs,
+          vars.$font-weight-medium
+        );
+        color: vars.$text-secondary;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -70,30 +75,23 @@
   }
 }
 
-// Material Card overrides
-mat-card-content {
-  padding: 16px;
-
-  @media (max-width: 480px) {
-    padding: 12px;
-  }
-}
-
-// High contrast mode support
-@media (prefers-contrast: high) {
+// Component-specific responsive adjustments
+@include mixins.media-max(mobile) {
   .stats-card {
-    border-color: rgba(0, 0, 0, 0.3);
-
     .stat-item {
-      border-color: rgba(0, 0, 0, 0.3);
-    }
-  }
-}
+      padding: vars.$spacing-sm;
 
-// Print styles
-@media print {
-  .stats-card {
-    box-shadow: none;
-    border: 1px solid #000;
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+
+      .stat-content {
+        .stat-value {
+          font-size: vars.$font-size-xl;
+        }
+      }
+    }
   }
 }

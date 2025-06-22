@@ -1,24 +1,32 @@
-// Login Component Styles - Material Design
-@use '@angular/material' as mat;
+// =============================================================================
+// LOGIN COMPONENT STYLES
+// =============================================================================
+// Authentication login form component
+// Uses the centralized design system for consistency
 
-// Responsive breakpoints (matching global styles)
-$mobile-breakpoint: 768px;
-$tablet-breakpoint: 1024px;
+@use "../../../../../styles/variables" as vars;
+@use "../../../../../styles/mixins" as mixins;
 
+// =============================================================================
+// MAIN COMPONENT CONTAINER
+// =============================================================================
 .login-component {
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
 }
 
+// =============================================================================
+// LOGIN FORM
+// =============================================================================
 .login-form {
   width: 100%;
 
   .form-row {
-    margin-bottom: 16px;
+    margin-bottom: vars.$spacing-sm;
 
     &:last-of-type {
-      margin-bottom: 24px;
+      margin-bottom: vars.$spacing-md;
     }
   }
 
@@ -26,56 +34,69 @@ $tablet-breakpoint: 1024px;
     width: 100%;
   }
 
-  // Material Form Field customizations
+  // =============================================================================
+  // FORM FIELD CUSTOMIZATIONS
+  // =============================================================================
   .mat-mdc-form-field {
+    @include mixins.form-field;
     width: 100%;
 
     .mat-mdc-form-field-subscript-wrapper {
-      margin-top: 4px;
+      margin-top: vars.$spacing-xs;
     }
 
     // Prefix and suffix icon styling
     .mat-mdc-form-field-icon-prefix,
     .mat-mdc-form-field-icon-suffix {
-      color: rgba(0, 0, 0, 0.54);
+      color: vars.$text-secondary;
+      transition: vars.$transition-hover;
     }
 
     // Error state styling
     &.mat-form-field-invalid {
       .mat-mdc-form-field-icon-prefix {
-        color: #f44336;
+        color: vars.$color-error;
       }
     }
 
     // Focus state styling
     &.mat-focused {
       .mat-mdc-form-field-icon-prefix {
-        color: #1976d2;
+        color: vars.$form-focus-color;
       }
     }
   }
 
-  // Input field styling
+  // =============================================================================
+  // INPUT FIELD STYLING
+  // =============================================================================
   .mat-mdc-input-element {
-    font-size: 16px;
-    line-height: 1.5;
+    @include mixins.form-input;
+    @include mixins.typography(
+      vars.$font-size-base,
+      vars.$font-weight-regular,
+      vars.$line-height-normal
+    );
 
     &::placeholder {
-      color: rgba(0, 0, 0, 0.38);
+      color: vars.$text-hint;
       opacity: 1;
     }
 
     // Prevent zoom on iOS
-    @media (max-width: $mobile-breakpoint) {
-      font-size: 16px;
+    @include mixins.media-max(mobile) {
+      font-size: vars.$font-size-base; // Prevents iOS zoom
     }
   }
 
-  // Password toggle button
+  // =============================================================================
+  // PASSWORD TOGGLE BUTTON
+  // =============================================================================
   .mat-mdc-icon-button {
     width: 40px;
     height: 40px;
-    padding: 8px;
+    padding: vars.$spacing-xs;
+    transition: vars.$transition-hover;
 
     .mat-icon {
       font-size: 20px;
@@ -83,32 +104,33 @@ $tablet-breakpoint: 1024px;
       height: 20px;
     }
 
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
+    &:hover:not(:disabled) {
+      background-color: rgba(vars.$color-primary, 0.04);
     }
 
+    @include mixins.focus-visible(vars.$color-primary);
+
     &:focus-visible {
-      background-color: rgba(0, 0, 0, 0.08);
-      outline: 2px solid #1976d2;
-      outline-offset: 2px;
+      background-color: rgba(vars.$color-primary, 0.08);
     }
   }
 }
 
-// Submit button styling
+// =============================================================================
+// SUBMIT BUTTON STYLING
+// =============================================================================
 .auth-submit-button {
+  @include mixins.button-base;
+  @include mixins.button-variant(vars.$color-primary);
   width: 100%;
   height: 48px;
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 16px;
-  border-radius: 8px !important;
+  @include mixins.typography(vars.$font-size-base, vars.$font-weight-medium);
+  margin-bottom: vars.$spacing-sm;
+  border-radius: vars.$button-border-radius !important;
   text-transform: none !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  @include mixins.flex-center;
+  gap: vars.$spacing-xs;
+  transition: vars.$transition-default;
 
   .mat-icon {
     font-size: 20px;
@@ -118,6 +140,10 @@ $tablet-breakpoint: 1024px;
 
   .loading-icon {
     animation: spin 1s linear infinite;
+
+    @include mixins.reduced-motion {
+      animation: none;
+    }
   }
 
   &:disabled {
@@ -127,17 +153,26 @@ $tablet-breakpoint: 1024px;
 
   &:not(:disabled):hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+    box-shadow: 0 4px 8px rgba(vars.$color-primary, 0.3);
+
+    @include mixins.reduced-motion {
+      transform: none;
+    }
   }
 
   &:not(:disabled):active {
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);
+    box-shadow: 0 2px 4px rgba(vars.$color-primary, 0.3);
+
+    @include mixins.reduced-motion {
+      transform: none;
+      box-shadow: none;
+    }
   }
 
-  @media (max-width: $mobile-breakpoint) {
+  @include mixins.media-max(mobile) {
     height: 44px;
-    font-size: 0.9375rem;
+    @include mixins.typography(vars.$font-size-sm, vars.$font-weight-medium);
 
     &:not(:disabled):hover {
       transform: none;
@@ -155,19 +190,22 @@ $tablet-breakpoint: 1024px;
   }
 }
 
-// Validation summary styling
+// =============================================================================
+// VALIDATION SUMMARY
+// =============================================================================
 .validation-summary {
-  background-color: #ffebee;
-  border: 1px solid #f44336;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 24px;
-  display: flex;
+  background-color: rgba(vars.$color-error, 0.08);
+  border: vars.$border-width-thin solid vars.$color-error;
+  border-radius: vars.$border-radius-md;
+  padding: vars.$spacing-sm;
+  margin-bottom: vars.$spacing-md;
+  @include mixins.flex-center;
   align-items: flex-start;
-  gap: 12px;
+  gap: vars.$spacing-sm;
+  transition: vars.$transition-default;
 
   .warning-icon {
-    color: #f44336;
+    color: vars.$color-error;
     font-size: 20px;
     width: 20px;
     height: 20px;
@@ -179,22 +217,28 @@ $tablet-breakpoint: 1024px;
     flex: 1;
 
     .validation-title {
-      font-weight: 500;
-      color: #d32f2f;
-      margin: 0 0 8px 0;
-      font-size: 0.875rem;
+      @include mixins.typography(
+        vars.$font-size-sm,
+        vars.$font-weight-medium,
+        vars.$line-height-normal
+      );
+      color: vars.$color-error-dark;
+      margin: 0 0 vars.$spacing-xs 0;
     }
 
     .validation-list {
       margin: 0;
-      padding-left: 16px;
+      padding-left: vars.$spacing-sm;
       list-style-type: disc;
 
       .validation-item {
-        color: #d32f2f;
-        font-size: 0.8125rem;
-        line-height: 1.4;
-        margin-bottom: 4px;
+        color: vars.$color-error-dark;
+        @include mixins.typography(
+          vars.$font-size-xs,
+          vars.$font-weight-regular,
+          vars.$line-height-relaxed
+        );
+        margin-bottom: vars.$spacing-xs;
 
         &:last-child {
           margin-bottom: 0;
@@ -203,109 +247,123 @@ $tablet-breakpoint: 1024px;
     }
   }
 
-  @media (max-width: $mobile-breakpoint) {
-    padding: 12px;
-    gap: 8px;
-    margin-bottom: 20px;
+  @include mixins.media-max(mobile) {
+    padding: vars.$spacing-sm;
+    gap: vars.$spacing-xs;
+    margin-bottom: vars.$spacing-sm;
+  }
+
+  @include mixins.high-contrast {
+    background-color: vars.$color-white;
+    border: vars.$border-width-medium solid vars.$color-error;
   }
 }
 
-// Auth link styling (inherited from parent but with specific overrides)
+// =============================================================================
+// AUTH LINK STYLING
+// =============================================================================
 .auth-link {
   text-align: center;
-  margin-top: 16px;
-  font-size: 0.875rem;
-  color: rgba(0, 0, 0, 0.6);
-  line-height: 1.4;
+  margin-top: vars.$spacing-sm;
+  @include mixins.typography(
+    vars.$font-size-sm,
+    vars.$font-weight-regular,
+    vars.$line-height-relaxed
+  );
+  color: vars.$text-secondary;
 
   a {
-    color: #1976d2;
+    color: vars.$color-primary;
     text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    font-weight: vars.$font-weight-medium;
+    transition: vars.$transition-hover;
     position: relative;
 
     &:hover {
-      color: #1565c0;
+      color: vars.$color-primary-dark;
       text-decoration: underline;
     }
 
-    &:focus-visible {
-      outline: 2px solid #1976d2;
-      outline-offset: 2px;
-      border-radius: 2px;
-    }
+    @include mixins.focus-visible(vars.$color-primary);
 
     &:active {
-      color: #0d47a1;
+      color: vars.$color-primary-dark;
     }
   }
 
   &:first-of-type {
-    margin-top: 12px;
+    margin-top: vars.$spacing-sm;
   }
 
-  @media (max-width: $mobile-breakpoint) {
-    font-size: 0.8125rem;
+  @include mixins.media-max(mobile) {
+    @include mixins.typography(vars.$font-size-xs);
+  }
+
+  @include mixins.high-contrast {
+    a {
+      text-decoration: underline;
+
+      &:hover {
+        background-color: rgba(vars.$color-primary, 0.1);
+      }
+    }
   }
 }
 
 .forgot-password-link {
   display: inline-block;
-  padding: 4px 0;
+  padding: vars.$spacing-xs 0;
 }
 
-// Auth divider styling (inherited from parent)
+// =============================================================================
+// AUTH DIVIDER STYLING
+// =============================================================================
 .auth-divider {
   text-align: center;
-  margin: 24px 0;
+  margin: vars.$spacing-md 0;
   position: relative;
-  color: rgba(0, 0, 0, 0.54);
-  font-size: 0.875rem;
+  color: vars.$text-secondary;
+  @include mixins.typography(vars.$font-size-sm);
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 0;
     right: 0;
-    height: 1px;
-    background: rgba(0, 0, 0, 0.12);
+    height: vars.$border-width-thin;
+    background: vars.$border-color-medium;
   }
 
   span {
-    background: rgba(255, 255, 255, 0.98);
-    padding: 0 16px;
+    background: rgba(vars.$color-white, 0.98);
+    padding: 0 vars.$spacing-sm;
     position: relative;
     z-index: 1;
-    font-weight: 400;
+    font-weight: vars.$font-weight-regular;
   }
 
-  @media (max-width: $mobile-breakpoint) {
-    margin: 20px 0;
-    font-size: 0.8125rem;
+  @include mixins.media-max(mobile) {
+    margin: vars.$spacing-sm 0;
+    @include mixins.typography(vars.$font-size-xs);
 
     span {
-      padding: 0 12px;
+      padding: 0 vars.$spacing-sm;
     }
   }
 }
 
-// Loading message for screen readers
+// =============================================================================
+// ACCESSIBILITY UTILITIES
+// =============================================================================
 .sr-only {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  @include mixins.sr-only;
 }
 
-// Accessibility improvements
-@media (prefers-reduced-motion: reduce) {
+// =============================================================================
+// ACCESSIBILITY ENHANCEMENTS
+// =============================================================================
+@include mixins.reduced-motion {
   .loading-icon {
     animation: none;
   }
@@ -319,29 +377,59 @@ $tablet-breakpoint: 1024px;
   }
 }
 
-// High contrast mode support
-@media (prefers-contrast: high) {
+// =============================================================================
+// HIGH CONTRAST MODE SUPPORT
+// =============================================================================
+@include mixins.high-contrast {
   .validation-summary {
-    background-color: #fff;
-    border: 2px solid #f44336;
+    background-color: vars.$color-white;
+    border: vars.$border-width-medium solid vars.$color-error;
   }
 
-  .auth-link a {
-    text-decoration: underline;
-
-    &:hover {
-      background-color: #e3f2fd;
-    }
+  .auth-divider::before {
+    background: vars.$color-black;
   }
 }
 
-// Print styles
+// =============================================================================
+// PRINT STYLES
+// =============================================================================
 @media print {
   .login-component {
     .auth-submit-button,
     .auth-link,
-    .auth-divider {
+    .auth-divider,
+    .validation-summary {
       display: none;
+    }
+  }
+}
+
+// =============================================================================
+// COMPONENT-SPECIFIC RESPONSIVE ADJUSTMENTS
+// =============================================================================
+@include mixins.media-max(xs) {
+  .login-form {
+    .form-row {
+      margin-bottom: vars.$spacing-xs;
+    }
+  }
+
+  .auth-submit-button {
+    height: 40px;
+    @include mixins.typography(vars.$font-size-xs, vars.$font-weight-medium);
+  }
+
+  .validation-summary {
+    padding: vars.$spacing-xs;
+
+    .validation-errors {
+      .validation-title {
+        @include mixins.typography(
+          vars.$font-size-xs,
+          vars.$font-weight-medium
+        );
+      }
     }
   }
 }

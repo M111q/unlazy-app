@@ -1,0 +1,263 @@
+// =============================================================================
+// DESIGN SYSTEM VARIABLES
+// =============================================================================
+// Core design tokens for the Unlazy App
+// This file contains all reusable design values used across components
+
+// =============================================================================
+// BREAKPOINTS
+// =============================================================================
+$breakpoint-xs: 480px;
+$breakpoint-mobile: 768px;
+$breakpoint-tablet: 1024px;
+$breakpoint-desktop: 1200px;
+$breakpoint-large: 1440px;
+
+// Breakpoint map for easier media query usage
+$breakpoints: (
+  xs: $breakpoint-xs,
+  mobile: $breakpoint-mobile,
+  tablet: $breakpoint-tablet,
+  desktop: $breakpoint-desktop,
+  large: $breakpoint-large,
+);
+
+// =============================================================================
+// SPACING SYSTEM
+// =============================================================================
+// Base spacing unit - 8px grid system
+$spacing-base: 8px;
+
+// Spacing scale
+$spacing-xs: $spacing-base; // 8px
+$spacing-sm: $spacing-base * 2; // 16px
+$spacing-md: $spacing-base * 3; // 24px
+$spacing-lg: $spacing-base * 4; // 32px
+$spacing-xl: $spacing-base * 6; // 48px
+$spacing-xxl: $spacing-base * 8; // 64px
+
+// Spacing map for programmatic access
+$spacing: (
+  xs: $spacing-xs,
+  sm: $spacing-sm,
+  md: $spacing-md,
+  lg: $spacing-lg,
+  xl: $spacing-xl,
+  xxl: $spacing-xxl,
+);
+
+// =============================================================================
+// COLOR SYSTEM
+// =============================================================================
+
+// Primary colors (Material Design Blue)
+$color-primary: #1976d2;
+$color-primary-light: #42a5f5;
+$color-primary-dark: #1565c0;
+
+// Secondary colors
+$color-accent: #ff4081;
+$color-accent-light: #ff79b0;
+$color-accent-dark: #c60055;
+
+// Status colors
+$color-success: #4caf50;
+$color-success-light: #81c784;
+$color-success-dark: #388e3c;
+
+$color-warning: #ff9800;
+$color-warning-light: #ffb74d;
+$color-warning-dark: #f57c00;
+
+$color-error: #f44336;
+$color-error-light: #e57373;
+$color-error-dark: #d32f2f;
+
+$color-info: #2196f3;
+$color-info-light: #64b5f6;
+$color-info-dark: #1976d2;
+
+// Neutral colors
+$color-white: #ffffff;
+$color-black: #000000;
+
+// Gray scale
+$color-gray-50: #fafafa;
+$color-gray-100: #f5f5f5;
+$color-gray-200: #eeeeee;
+$color-gray-300: #e0e0e0;
+$color-gray-400: #bdbdbd;
+$color-gray-500: #9e9e9e;
+$color-gray-600: #757575;
+$color-gray-700: #616161;
+$color-gray-800: #424242;
+$color-gray-900: #212121;
+
+// =============================================================================
+// TEXT COLORS (Material Design inspired)
+// =============================================================================
+$text-primary: rgba(0, 0, 0, 0.87);
+$text-secondary: rgba(0, 0, 0, 0.54);
+$text-disabled: rgba(0, 0, 0, 0.38);
+$text-hint: rgba(0, 0, 0, 0.38);
+
+// Text colors on dark backgrounds
+$text-primary-dark: rgba(255, 255, 255, 1);
+$text-secondary-dark: rgba(255, 255, 255, 0.7);
+$text-disabled-dark: rgba(255, 255, 255, 0.5);
+
+// =============================================================================
+// SURFACE COLORS
+// =============================================================================
+$surface-primary: $color-white;
+$surface-secondary: $color-gray-50;
+$surface-elevated: $color-white;
+$background-primary: $color-gray-50;
+$background-secondary: $color-white;
+
+// =============================================================================
+// BORDERS
+// =============================================================================
+$border-width-thin: 1px;
+$border-width-medium: 2px;
+$border-width-thick: 4px;
+
+$border-color-light: rgba(0, 0, 0, 0.06);
+$border-color-medium: rgba(0, 0, 0, 0.12);
+$border-color-dark: rgba(0, 0, 0, 0.24);
+
+// =============================================================================
+// BORDER RADIUS
+// =============================================================================
+$border-radius-xs: 4px;
+$border-radius-sm: 6px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-round: 50%;
+
+// =============================================================================
+// SHADOWS
+// =============================================================================
+// Material Design elevation system
+$shadow-1:
+  0 2px 1px -1px rgba(0, 0, 0, 0.2),
+  0 1px 1px 0 rgba(0, 0, 0, 0.14),
+  0 1px 3px 0 rgba(0, 0, 0, 0.12);
+$shadow-2:
+  0 3px 1px -2px rgba(0, 0, 0, 0.2),
+  0 2px 2px 0 rgba(0, 0, 0, 0.14),
+  0 1px 5px 0 rgba(0, 0, 0, 0.12);
+$shadow-3:
+  0 3px 3px -2px rgba(0, 0, 0, 0.2),
+  0 3px 4px 0 rgba(0, 0, 0, 0.14),
+  0 1px 8px 0 rgba(0, 0, 0, 0.12);
+$shadow-4:
+  0 2px 4px -1px rgba(0, 0, 0, 0.2),
+  0 4px 5px 0 rgba(0, 0, 0, 0.14),
+  0 1px 10px 0 rgba(0, 0, 0, 0.12);
+$shadow-6:
+  0 3px 5px -1px rgba(0, 0, 0, 0.2),
+  0 6px 10px 0 rgba(0, 0, 0, 0.14),
+  0 1px 18px 0 rgba(0, 0, 0, 0.12);
+$shadow-8:
+  0 5px 5px -3px rgba(0, 0, 0, 0.2),
+  0 8px 10px 1px rgba(0, 0, 0, 0.14),
+  0 3px 14px 2px rgba(0, 0, 0, 0.12);
+
+// Custom shadows for specific use cases
+$shadow-card: 0 2px 4px rgba(0, 0, 0, 0.1);
+$shadow-card-hover: 0 4px 8px rgba(0, 0, 0, 0.15);
+$shadow-fab: 0 4px 12px rgba(0, 0, 0, 0.25);
+$shadow-dialog: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+// =============================================================================
+// TYPOGRAPHY
+// =============================================================================
+// Font families
+$font-primary: "Roboto", "Helvetica Neue", Arial, sans-serif;
+$font-monospace: "Roboto Mono", "Courier New", monospace;
+
+// Font weights
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
+// Font sizes
+$font-size-xs: 0.75rem; // 12px
+$font-size-sm: 0.875rem; // 14px
+$font-size-base: 1rem; // 16px
+$font-size-lg: 1.125rem; // 18px
+$font-size-xl: 1.25rem; // 20px
+$font-size-2xl: 1.5rem; // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem; // 36px
+
+// Line heights
+$line-height-tight: 1.2;
+$line-height-normal: 1.4;
+$line-height-relaxed: 1.6;
+
+// =============================================================================
+// TRANSITIONS
+// =============================================================================
+$transition-duration-fast: 0.15s;
+$transition-duration-normal: 0.3s;
+$transition-duration-slow: 0.5s;
+
+$transition-timing-ease: ease;
+$transition-timing-ease-in: ease-in;
+$transition-timing-ease-out: ease-out;
+$transition-timing-ease-in-out: ease-in-out;
+
+// Common transitions
+$transition-default: all $transition-duration-normal $transition-timing-ease;
+$transition-hover: all $transition-duration-fast $transition-timing-ease-out;
+$transition-focus: all $transition-duration-fast $transition-timing-ease-in-out;
+
+// =============================================================================
+// Z-INDEX SCALE
+// =============================================================================
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+$z-index-toast: 1080;
+
+// =============================================================================
+// COMPONENT SPECIFIC VARIABLES
+// =============================================================================
+
+// Cards
+$card-border-radius: $border-radius-lg;
+$card-shadow: $shadow-card;
+$card-shadow-hover: $shadow-card-hover;
+$card-padding: $spacing-md;
+$card-padding-mobile: $spacing-sm;
+
+// Buttons
+$button-border-radius: $border-radius-md;
+$button-padding-x: $spacing-md;
+$button-padding-y: $spacing-sm;
+$button-min-height: 36px;
+$button-hover-transform: translateY(-1px);
+$button-focus-outline-width: 2px;
+$button-focus-outline-offset: 2px;
+
+// Responsive Design
+$padding-desktop: $spacing-lg;
+$padding-mobile: $spacing-sm;
+$padding-tablet: $spacing-md;
+
+// Forms
+$form-border-radius: $border-radius-sm;
+$form-border-color: $border-color-medium;
+$form-focus-color: $color-primary;
+
+// Navigation
+$nav-height: 64px;
+$nav-height-mobile: 56px;

@@ -1,27 +1,10 @@
-// SCSS Variables (matching application theme)
-$mobile-breakpoint: 768px;
-$tablet-breakpoint: 1024px;
-$desktop-breakpoint: 1200px;
+@use "../../../../../styles/variables" as vars;
+@use "../../../../../styles/mixins" as mixins;
 
-// Spacing variables
-$spacing-xs: 8px;
-$spacing-sm: 16px;
-$spacing-md: 24px;
-$spacing-lg: 32px;
-$spacing-xl: 48px;
-
-// Colors (Material Design inspired)
-$primary-color: #1976d2;
-$accent-color: #ff4081;
-$warn-color: #f44336;
-$success-color: #4caf50;
-$text-primary: rgba(0, 0, 0, 0.87);
-$text-secondary: rgba(0, 0, 0, 0.54);
-$text-disabled: rgba(0, 0, 0, 0.38);
-$surface-color: #ffffff;
-$background-color: #fafafa;
-$error-color: #f44336;
-$warning-color: #ff9800;
+// =============================================================================
+// SESSION FORM MODAL COMPONENT
+// =============================================================================
+// Complex form modal with validation, loading states, and accessibility
 
 .session-form-modal {
   display: flex;
@@ -30,39 +13,51 @@ $warning-color: #ff9800;
   max-width: 600px;
   width: 100%;
 
-  @media (min-width: $mobile-breakpoint) {
+  @include mixins.media(tablet) {
     min-width: 500px;
   }
 
-  @media (min-width: $tablet-breakpoint) {
+  @include mixins.media(desktop) {
     min-width: 600px;
+  }
+
+  @include mixins.media-max(xs) {
+    min-width: 280px;
+    max-width: calc(100vw - vars.$spacing-lg);
   }
 }
 
-// Dialog Title
+// =============================================================================
+// MODAL TITLE
+// =============================================================================
 .modal-title {
   display: flex;
   align-items: center;
-  gap: $spacing-sm;
-  padding: $spacing-md $spacing-md $spacing-sm;
+  gap: vars.$spacing-sm;
+  @include mixins.responsive-padding(
+    vars.$spacing-md vars.$spacing-md vars.$spacing-sm,
+    vars.$spacing-lg vars.$spacing-lg vars.$spacing-md
+  );
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: $text-primary;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  @include mixins.typography(
+    vars.$font-size-xl,
+    vars.$font-weight-medium,
+    vars.$line-height-tight
+  );
+  color: vars.$text-primary;
+  border-bottom: vars.$border-width-thin solid vars.$border-color-light;
 
-  @media (min-width: $mobile-breakpoint) {
-    font-size: 1.5rem;
-    padding: $spacing-lg $spacing-lg $spacing-md;
+  @include mixins.media(tablet) {
+    font-size: vars.$font-size-2xl;
   }
 
   .title-icon {
-    color: $primary-color;
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
+    color: vars.$color-primary;
+    font-size: vars.$font-size-2xl;
+    width: vars.$font-size-2xl;
+    height: vars.$font-size-2xl;
 
-    @media (min-width: $mobile-breakpoint) {
+    @include mixins.media(tablet) {
       font-size: 28px;
       width: 28px;
       height: 28px;
@@ -70,108 +65,124 @@ $warning-color: #ff9800;
   }
 }
 
-// Dialog Content
+// =============================================================================
+// MODAL CONTENT
+// =============================================================================
 .modal-content {
-  padding: $spacing-md;
+  @include mixins.responsive-padding(
+    vars.$spacing-md,
+    vars.$spacing-md vars.$spacing-lg
+  );
   max-height: 70vh;
   overflow-y: auto;
-
-  @media (min-width: $mobile-breakpoint) {
-    padding: $spacing-md $spacing-lg;
-  }
+  @include mixins.custom-scrollbar();
 }
 
-// Session Form
+// =============================================================================
+// SESSION FORM
+// =============================================================================
 .session-form {
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: vars.$spacing-md;
 
   .form-row {
     display: flex;
     flex-direction: column;
-    gap: $spacing-sm;
+    gap: vars.$spacing-sm;
 
     .full-width {
       width: 100%;
     }
   }
 
-  // Form Field Styling
+  // =============================================================================
+  // MATERIAL FORM FIELD OVERRIDES
+  // =============================================================================
   ::ng-deep .mat-mdc-form-field {
     &.mat-form-field-appearance-outline {
       .mat-mdc-form-field-outline {
-        border-radius: 8px;
+        border-radius: vars.$border-radius-md;
       }
 
       &.mat-focused .mat-mdc-form-field-outline-thick {
-        border-color: $primary-color;
+        border-color: vars.$color-primary;
       }
 
       &.mat-form-field-invalid .mat-mdc-form-field-outline-thick {
-        border-color: $error-color;
+        border-color: vars.$color-error;
       }
     }
 
     .mat-mdc-form-field-label {
-      color: $text-secondary;
-      font-weight: 500;
+      color: vars.$text-secondary;
+      font-weight: vars.$font-weight-medium;
     }
 
     .mat-mdc-form-field-hint {
-      color: $text-secondary;
-      font-size: 0.75rem;
+      color: vars.$text-secondary;
+      font-size: vars.$font-size-xs;
     }
 
     .mat-mdc-form-field-error {
-      color: $error-color;
-      font-size: 0.75rem;
-      font-weight: 500;
+      color: vars.$color-error;
+      font-size: vars.$font-size-xs;
+      font-weight: vars.$font-weight-medium;
     }
 
     // Textarea specific styling
     textarea.mat-mdc-input-element {
       resize: none;
-      font-family: inherit;
-      line-height: 1.5;
+      font-family: vars.$font-primary;
+      line-height: vars.$line-height-relaxed;
     }
 
     // Input with prefix icon
     .mat-mdc-form-field-prefix {
       .mat-icon {
-        color: $text-secondary;
-        margin-right: $spacing-xs;
+        color: vars.$text-secondary;
+        margin-right: vars.$spacing-xs;
       }
     }
   }
 
-  // Date picker specific styling
+  // =============================================================================
+  // DATE PICKER STYLING
+  // =============================================================================
   ::ng-deep .mat-datepicker-toggle {
     .mat-icon-button {
-      color: $text-secondary;
+      color: vars.$text-secondary;
 
       &:hover {
-        background-color: rgba(0, 0, 0, 0.04);
+        background-color: vars.$color-gray-100;
       }
+
+      @include mixins.focus-visible(vars.$color-primary);
     }
   }
 }
 
-// Validation Summary
-.validation-summary {
+// =============================================================================
+// VALIDATION SUMMARY
+// =============================================================================
+@mixin validation-summary-base {
   display: flex;
-  gap: $spacing-sm;
-  padding: $spacing-sm;
-  background-color: rgba($warning-color, 0.08);
-  border: 1px solid rgba($warning-color, 0.3);
-  border-radius: 8px;
-  margin-top: $spacing-sm;
+  gap: vars.$spacing-sm;
+  padding: vars.$spacing-sm;
+  background-color: rgba(vars.$color-warning, 0.08);
+  border: vars.$border-width-thin solid rgba(vars.$color-warning, 0.3);
+  border-radius: vars.$border-radius-md;
+  margin-top: vars.$spacing-sm;
+}
+
+.validation-summary {
+  @include validation-summary-base;
 
   .warning-icon {
-    color: $warning-color;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+    color: vars.$color-warning;
+    font-size: vars.$font-size-xl;
+    width: vars.$font-size-xl;
+    height: vars.$font-size-xl;
     flex-shrink: 0;
     margin-top: 2px;
   }
@@ -180,21 +191,24 @@ $warning-color: #ff9800;
     flex: 1;
 
     .validation-title {
-      margin: 0 0 $spacing-xs 0;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: $text-primary;
+      margin: 0 0 vars.$spacing-xs 0;
+      @include mixins.typography(vars.$font-size-sm, vars.$font-weight-medium);
+      color: vars.$text-primary;
     }
 
     .validation-list {
       margin: 0;
-      padding-left: $spacing-md;
+      padding-left: vars.$spacing-md;
       list-style-type: disc;
 
       .validation-item {
-        font-size: 0.875rem;
-        color: $text-secondary;
-        margin-bottom: 4px;
+        @include mixins.typography(
+          vars.$font-size-sm,
+          vars.$font-weight-regular,
+          vars.$line-height-normal
+        );
+        color: vars.$text-secondary;
+        margin-bottom: vars.$spacing-xs;
 
         &:last-child {
           margin-bottom: 0;
@@ -204,85 +218,153 @@ $warning-color: #ff9800;
   }
 }
 
-// Dialog Actions
+// =============================================================================
+// MODAL ACTIONS
+// =============================================================================
 .modal-actions {
-  padding: $spacing-sm $spacing-md $spacing-md;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  @include mixins.responsive-padding(
+    vars.$spacing-sm vars.$spacing-md vars.$spacing-md,
+    vars.$spacing-md vars.$spacing-lg vars.$spacing-lg
+  );
+  border-top: vars.$border-width-thin solid vars.$border-color-light;
   margin: 0;
-
-  @media (min-width: $mobile-breakpoint) {
-    padding: $spacing-md $spacing-lg $spacing-lg;
-  }
 
   .actions-container {
     display: flex;
     justify-content: flex-end;
-    gap: $spacing-sm;
+    gap: vars.$spacing-sm;
     width: 100%;
 
-    @media (max-width: $mobile-breakpoint) {
+    @include mixins.media-max(tablet) {
       flex-direction: column-reverse;
-      gap: $spacing-xs;
+      gap: vars.$spacing-xs;
     }
 
     .cancel-button {
+      @include mixins.button-outlined(
+        vars.$border-color-medium,
+        vars.$text-secondary
+      );
       min-width: 80px;
-      font-weight: 500;
-      color: $text-secondary;
+      font-weight: vars.$font-weight-medium;
 
-      @media (max-width: $mobile-breakpoint) {
-        width: 100%;
-      }
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.04);
-      }
-
-      &:disabled {
-        color: $text-disabled;
-        cursor: not-allowed;
-      }
-    }
-
-    .submit-button {
-      min-width: 120px;
-      font-weight: 600;
-      border-radius: 8px !important;
-      text-transform: none !important;
-      box-shadow: 0 2px 8px rgba($primary-color, 0.3) !important;
-
-      @media (max-width: $mobile-breakpoint) {
+      @include mixins.media-max(tablet) {
         width: 100%;
       }
 
       &:hover:not(:disabled) {
-        box-shadow: 0 4px 12px rgba($primary-color, 0.4) !important;
-        transform: translateY(-1px);
+        background-color: vars.$color-gray-100;
+        color: vars.$text-primary;
       }
 
       &:disabled {
-        background-color: rgba(0, 0, 0, 0.12) !important;
-        color: $text-disabled !important;
+        color: vars.$text-disabled;
+        cursor: not-allowed;
+      }
+
+      @include mixins.focus-visible(vars.$color-primary);
+    }
+
+    .submit-button {
+      @include mixins.button-state(vars.$color-primary, vars.$color-white);
+      min-width: 120px;
+      font-weight: vars.$font-weight-medium;
+      border-radius: vars.$border-radius-md !important;
+      text-transform: none !important;
+      box-shadow: 0 2px 8px rgba(vars.$color-primary, 0.3) !important;
+      transition: vars.$transition-default;
+
+      @include mixins.media-max(tablet) {
+        width: 100%;
+      }
+
+      &:hover:not(:disabled) {
+        box-shadow: 0 4px 12px rgba(vars.$color-primary, 0.4) !important;
+        @include mixins.hover-lift();
+      }
+
+      &:disabled {
+        background-color: vars.$color-gray-300 !important;
+        color: vars.$text-disabled !important;
         box-shadow: none !important;
         cursor: not-allowed;
         transform: none;
       }
 
       mat-icon {
-        margin-right: 6px;
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
+        margin-right: vars.$spacing-xs;
+        font-size: vars.$font-size-lg;
+        width: vars.$font-size-lg;
+        height: vars.$font-size-lg;
 
         &[ng-reflect-name="sync"] {
           animation: spin 1s linear infinite;
+
+          @include mixins.reduced-motion {
+            animation: none;
+          }
+        }
+      }
+
+      @include mixins.focus-visible(rgba(vars.$color-white, 0.5));
+    }
+  }
+}
+
+// =============================================================================
+// LOADING STATE
+// =============================================================================
+.session-form-modal[data-loading="true"] {
+  .modal-content {
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(vars.$color-white, 0.8);
+      @include mixins.flex-center;
+      z-index: vars.$z-index-modal;
+    }
+  }
+}
+
+// =============================================================================
+// FORM ACCESSIBILITY ENHANCEMENTS
+// =============================================================================
+.session-form {
+  ::ng-deep .mat-mdc-form-field-required-marker {
+    color: vars.$color-error;
+  }
+
+  ::ng-deep .mat-mdc-form-field-label-wrapper {
+    .mat-mdc-form-field-label {
+      &[aria-required="true"] {
+        &::after {
+          content: " *";
+          color: vars.$color-error;
         }
       }
     }
   }
 }
 
-// Animations
+// =============================================================================
+// FOCUS MANAGEMENT
+// =============================================================================
+.session-form-modal {
+  &:focus-within {
+    outline: none;
+  }
+}
+
+// =============================================================================
+// SPIN ANIMATION FOR LOADING ICON
+// =============================================================================
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -292,32 +374,10 @@ $warning-color: #ff9800;
   }
 }
 
-// Focus management
-.session-form-modal {
-  &:focus-within {
-    outline: none;
-  }
-}
-
-// High contrast mode support
-@media (prefers-contrast: high) {
-  .session-form-modal {
-    border: 2px solid $text-primary;
-  }
-
-  .modal-title,
-  .modal-actions {
-    border-color: $text-primary;
-  }
-
-  .validation-summary {
-    border-color: $warning-color;
-    background-color: transparent;
-  }
-}
-
-// Reduced motion support
-@media (prefers-reduced-motion: reduce) {
+// =============================================================================
+// ACCESSIBILITY ENHANCEMENTS
+// =============================================================================
+@include mixins.reduced-motion {
   .submit-button {
     transition: none !important;
 
@@ -331,74 +391,91 @@ $warning-color: #ff9800;
   }
 }
 
-// Print styles
+// =============================================================================
+// HIGH CONTRAST SUPPORT
+// =============================================================================
+@include mixins.high-contrast {
+  .session-form-modal {
+    border: vars.$border-width-medium solid vars.$text-primary;
+  }
+
+  .modal-title,
+  .modal-actions {
+    border-color: vars.$text-primary;
+  }
+
+  .validation-summary {
+    border-color: vars.$color-warning;
+    background-color: transparent;
+  }
+
+  .title-icon {
+    color: vars.$text-primary;
+  }
+}
+
+// =============================================================================
+// PRINT STYLES
+// =============================================================================
 @media print {
   .session-form-modal {
     box-shadow: none;
-    border: 1px solid #ccc;
+    border: vars.$border-width-thin solid vars.$color-gray-600;
   }
 
   .modal-actions {
     display: none;
   }
+
+  .validation-summary {
+    border: vars.$border-width-thin solid vars.$color-black;
+    background: none;
+  }
 }
 
-// Loading state
-.session-form-modal[data-loading="true"] {
-  .modal-content {
-    position: relative;
-    overflow: hidden;
+// =============================================================================
+// DARK THEME SUPPORT
+// =============================================================================
+@media (prefers-color-scheme: dark) {
+  .session-form-modal {
+    background-color: vars.$color-gray-800;
+    color: vars.$text-primary-dark;
 
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
+    .modal-title {
+      color: vars.$text-primary-dark;
+      border-color: vars.$border-color-medium;
     }
-  }
-}
 
-// Accessibility improvements
-.session-form {
-  ::ng-deep .mat-mdc-form-field-required-marker {
-    color: $error-color;
-  }
+    .validation-summary {
+      background-color: rgba(vars.$color-warning, 0.15);
+      border-color: rgba(vars.$color-warning, 0.5);
 
-  ::ng-deep .mat-mdc-form-field-label-wrapper {
-    .mat-mdc-form-field-label {
-      &[aria-required="true"] {
-        &::after {
-          content: ' *';
-          color: $error-color;
-        }
+      .validation-title {
+        color: vars.$text-primary-dark;
+      }
+
+      .validation-errors .validation-item {
+        color: vars.$text-secondary-dark;
+      }
+    }
+
+    .modal-actions {
+      border-color: vars.$border-color-medium;
+    }
+
+    .cancel-button {
+      color: vars.$text-secondary-dark;
+
+      &:hover:not(:disabled) {
+        background-color: rgba(vars.$color-white, 0.08);
+        color: vars.$text-primary-dark;
       }
     }
   }
-}
 
-// Responsive adjustments for very small screens
-@media (max-width: 320px) {
-  .session-form-modal {
-    min-width: 280px;
-  }
-
-  .modal-title {
-    font-size: 1.125rem;
-    padding: $spacing-sm;
-  }
-
-  .modal-content {
-    padding: $spacing-sm;
-  }
-
-  .modal-actions {
-    padding: $spacing-xs $spacing-sm $spacing-sm;
+  .session-form-modal[data-loading="true"] {
+    .modal-content::after {
+      background: rgba(vars.$color-gray-800, 0.8);
+    }
   }
 }
