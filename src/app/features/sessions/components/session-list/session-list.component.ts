@@ -7,7 +7,7 @@ import {
   signal,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { Router } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
@@ -45,6 +45,7 @@ export class SessionListComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   // Reactive view model from service
   protected readonly viewModel = computed(() =>
@@ -54,9 +55,16 @@ export class SessionListComponent implements OnInit {
   // Local component state
   private readonly isModalOpen = signal(false);
   private readonly editingSessionId = signal<number | null>(null);
+  private readonly expandedSessionId = signal<number | null>(null);
+
+  // Getter for template access
+  get expandedSession(): number | null {
+    return this.expandedSessionId();
+  }
 
   ngOnInit(): void {
     this.loadInitialData();
+    this.handleQueryParams();
   }
 
   /**
@@ -64,6 +72,46 @@ export class SessionListComponent implements OnInit {
    */
   private loadInitialData(): void {
     this.sessionListService.loadSessions(0);
+  }
+
+  /**
+   * Handle query parameters for editing sessions
+   */
+  private handleQueryParams(): void {
+    this.route.queryParams.subscribe((params) => {
+      const editSessionId = params["edit"];
+      if (editSessionId) {
+        const sessionId = parseInt(editSessionId, 10);
+        if (!isNaN(sessionId)) {
+          // Set expanded session for accordion
+          this.expandedSessionId.set(sessionId);
+
+          // Wait for sessions to load, then open edit modal
+          setTimeout(() => {
+            this.openEditModalForSession(sessionId);
+          }, 100);
+
+          // Clear query params
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {},
+            replaceUrl: true,
+          });
+        }
+      }
+    });
+  }
+
+  /**
+   * Open edit modal for specific session ID
+   */
+  private openEditModalForSession(sessionId: number): void {
+    const viewModel = this.viewModel();
+    const session = viewModel.sessions.find((s) => s.id === sessionId);
+
+    if (session) {
+      this.onEditSession(session);
+    }
   }
 
   /**

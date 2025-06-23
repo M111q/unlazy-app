@@ -21,6 +21,7 @@ import { SessionItemViewModel } from "../../types/sessions-view-models";
 })
 export class SessionAccordionComponent {
   @Input({ required: true }) sessions: SessionItemViewModel[] = [];
+  @Input() expandedSessionId: number | null = null;
 
   @Output() editSession = new EventEmitter<SessionItemViewModel>();
   @Output() deleteSession = new EventEmitter<number>();
@@ -45,6 +46,13 @@ export class SessionAccordionComponent {
    */
   onViewDetails(sessionId: number): void {
     this.viewDetails.emit(sessionId);
+  }
+
+  /**
+   * Check if session should be expanded
+   */
+  isSessionExpanded(sessionId: number): boolean {
+    return this.expandedSessionId === sessionId;
   }
 
   /**

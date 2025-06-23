@@ -1,7 +1,7 @@
 <mat-accordion class="sessions-accordion">
   <mat-expansion-panel
     *ngFor="let session of sessions; trackBy: trackBySessionId"
-    [expanded]="session.isExpandedByDefault"
+    [expanded]="session.isExpandedByDefault || isSessionExpanded(session.id)"
     class="session-panel">
 
     <!-- Panel Header -->

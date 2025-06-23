@@ -419,7 +419,9 @@ export class SessionDetailsComponent implements OnInit {
 
   protected navigateToEditSession(): void {
     const sessionId = this.state().sessionId;
-    this.router.navigate(["/sessions", sessionId, "edit"]);
+    this.router.navigate(["/sessions"], {
+      queryParams: { edit: sessionId },
+    });
   }
 
   protected navigateToAddSet(): void {

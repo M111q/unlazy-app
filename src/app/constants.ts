@@ -27,7 +27,7 @@ export const EXERCISE_SET_LIMITS = {
   /** Maximum number of repetitions */
   REPS_MAX: 300,
   /** Minimum weight value */
-  WEIGHT_MIN: 1,
+  WEIGHT_MIN: 0.5,
   /** Maximum weight value */
   WEIGHT_MAX: 400,
 } as const;
@@ -51,20 +51,20 @@ export const PAGINATION = {
 
 export const DATABASE_ERROR_CODES = {
   /** PostgreSQL unique constraint violation */
-  UNIQUE_VIOLATION: '23505',
+  UNIQUE_VIOLATION: "23505",
 } as const;
 
 export const APPLICATION_ERROR_CODES = {
   /** Generic duplicate entry error */
-  DUPLICATE: 'DUPLICATE',
+  DUPLICATE: "DUPLICATE",
   /** Daily session limit exceeded */
-  DAILY_LIMIT: 'DAILY_LIMIT',
+  DAILY_LIMIT: "DAILY_LIMIT",
   /** Session sets limit exceeded */
-  SETS_LIMIT: 'SETS_LIMIT',
+  SETS_LIMIT: "SETS_LIMIT",
   /** Invalid authentication credentials */
-  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
   /** User already exists */
-  USER_EXISTS: 'USER_EXISTS',
+  USER_EXISTS: "USER_EXISTS",
 } as const;
 
 // ========================================
@@ -79,14 +79,14 @@ export const ERROR_MESSAGES = {
 
   // Exercise set validation messages
   REPS_OUT_OF_RANGE: `Reps must be between ${EXERCISE_SET_LIMITS.REPS_MIN} and ${EXERCISE_SET_LIMITS.REPS_MAX}`,
-  WEIGHT_OUT_OF_RANGE: `Weight must be between ${EXERCISE_SET_LIMITS.WEIGHT_MIN} and ${EXERCISE_SET_LIMITS.WEIGHT_MAX}`,
+  WEIGHT_OUT_OF_RANGE: `Weight must be between ${EXERCISE_SET_LIMITS.WEIGHT_MIN}kg and ${EXERCISE_SET_LIMITS.WEIGHT_MAX}kg`,
   SETS_LIMIT_EXCEEDED: `Session sets limit exceeded (maximum ${SESSION_LIMITS.MAX_SETS_PER_SESSION} sets per session)`,
 
   // General error messages
-  DUPLICATE_ENTRY: 'Duplicate entry detected',
-  INVALID_CREDENTIALS: 'Invalid email or password',
-  USER_EXISTS: 'User with this email already exists',
-  UNEXPECTED_ERROR: 'An unexpected error occurred',
+  DUPLICATE_ENTRY: "Duplicate entry detected",
+  INVALID_CREDENTIALS: "Invalid email or password",
+  USER_EXISTS: "User with this email already exists",
+  UNEXPECTED_ERROR: "An unexpected error occurred",
 } as const;
 
 // ========================================
@@ -94,8 +94,8 @@ export const ERROR_MESSAGES = {
 // ========================================
 
 export const MOCK_DATA = {
-  USER_ID: 'mock-user-id',
-  USER_EMAIL: 'mock@example.com',
-  ACCESS_TOKEN: 'mock-token',
+  USER_ID: "mock-user-id",
+  USER_EMAIL: "mock@example.com",
+  ACCESS_TOKEN: "mock-token",
   INTERNAL_USER_ID: 1,
 } as const;
