@@ -109,7 +109,7 @@ interface EditSetPageState {
                   type="number"
                   formControlName="weight"
                   [disabled]="isSubmitting()"
-                  min="0"
+                  min="{{ exerciseSetLimits.WEIGHT_MIN }}"
                   max="{{ exerciseSetLimits.WEIGHT_MAX }}"
                   step="0.5"
                   placeholder="0.0"
@@ -122,7 +122,8 @@ interface EditSetPageState {
                   Podaj ciężar
                 </mat-error>
                 <mat-error *ngIf="setForm.get('weight')?.hasError('min')">
-                  Ciężar musi być większy od 0
+                  Ciężar musi być co najmniej
+                  {{ exerciseSetLimits.WEIGHT_MIN }} kg
                 </mat-error>
                 <mat-error *ngIf="setForm.get('weight')?.hasError('max')">
                   Ciężar nie może przekraczać
@@ -293,11 +294,15 @@ export class EditSetPageComponent implements OnInit {
       // Load session details first
       const session = await this.dbService.getSessionById(sessionId);
 
+      console.log("session", session);
+
       // Load all sets for the session to find the specific set
       const sessionSets = await this.dbService.getSessionSets(sessionId, {
-        page: 1,
+        page: 0,
         limit: 1000, // Get all sets to find the one we need
       });
+
+      console.log("sessionSets", sessionSets);
 
       const exerciseSet = sessionSets.find((set) => set.id === setId);
 

@@ -113,7 +113,7 @@ interface AddSetPageState {
                   type="number"
                   formControlName="weight"
                   [disabled]="isSubmitting()"
-                  min="0"
+                  min="{{ exerciseSetLimits.WEIGHT_MIN }}"
                   max="{{ exerciseSetLimits.WEIGHT_MAX }}"
                   step="0.5"
                   placeholder="0.0"
@@ -126,7 +126,8 @@ interface AddSetPageState {
                   Podaj ciężar
                 </mat-error>
                 <mat-error *ngIf="setForm.get('weight')?.hasError('min')">
-                  Ciężar musi być większy od 0
+                  Ciężar musi być co najmniej
+                  {{ exerciseSetLimits.WEIGHT_MIN }} kg
                 </mat-error>
                 <mat-error *ngIf="setForm.get('weight')?.hasError('max')">
                   Ciężar nie może przekraczać

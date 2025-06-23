@@ -12,7 +12,7 @@
 // =============================================================================
 .auth-layout {
   min-height: 100vh;
-  @include flex-center;
+  @include mixins.flex-center;
   position: relative;
   overflow: hidden;
 }
