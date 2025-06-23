@@ -9,11 +9,7 @@
 .empty-state-container {
   @include mixins.flex-center;
   min-height: 400px;
-  @include mixins.responsive-padding(
-    vars.$spacing-sm,
-    vars.$spacing-md,
-    vars.$spacing-lg
-  );
+  @include mixins.responsive-padding(vars.$spacing-lg, vars.$spacing-sm);
 
   @include mixins.media(tablet) {
     min-height: 500px;
