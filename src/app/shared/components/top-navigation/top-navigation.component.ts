@@ -1,5 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { Router } from "@angular/router";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
@@ -13,7 +14,11 @@ import { AuthService } from "../../../core/auth/auth.service";
     <mat-toolbar color="primary" class="top-navigation">
       <div class="nav-content">
         <!-- Logo -->
-        <div class="logo-section">
+        <div
+          class="logo-section"
+          [class.clickable]="authService.currentUser()"
+          (click)="onLogoClick()"
+        >
           <span class="logo-text">Unlazy</span>
           <span class="logo-subtitle">gym app</span>
         </div>
@@ -57,6 +62,15 @@ import { AuthService } from "../../../core/auth/auth.service";
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+      }
+
+      .logo-section.clickable {
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+      }
+
+      .logo-section.clickable:hover {
+        opacity: 0.8;
       }
 
       .logo-text {
@@ -105,6 +119,13 @@ import { AuthService } from "../../../core/auth/auth.service";
 })
 export class TopNavigationComponent {
   protected readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  onLogoClick(): void {
+    if (this.authService.currentUser()) {
+      this.router.navigate(["/sessions"]);
+    }
+  }
 
   async onLogout(): Promise<void> {
     await this.authService.signOut();
