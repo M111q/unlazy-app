@@ -1,4 +1,4 @@
-import { ApiError } from '../../../../types';
+import { ApiError } from "../../../../types";
 
 export interface SessionListViewModel {
   sessions: SessionItemViewModel[];
@@ -15,6 +15,7 @@ export interface SessionItemViewModel {
   location: string | null;
   totalWeight: number;
   totalReps: number;
+  exerciseCount: number;
   formattedDate: string; // dla wyświetlenia
   formattedTime: string; // dla wyświetlenia
   isExpandedByDefault: boolean; // dla pierwszego elementu

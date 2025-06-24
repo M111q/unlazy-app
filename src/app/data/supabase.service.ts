@@ -374,7 +374,11 @@ export class SupabaseService {
         *,
         exercise_sets (
           reps,
-          weight
+          weight,
+          exercises (
+            id,
+            name
+          )
         )
       `,
       )

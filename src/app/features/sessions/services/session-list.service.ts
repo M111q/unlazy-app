@@ -187,10 +187,31 @@ export class SessionListService {
       location: session.location,
       totalWeight: session.total_weight,
       totalReps: session.total_reps,
+      exerciseCount: this.calculateExerciseCount(session.exercise_sets),
       formattedDate: this.formatDate(new Date(session.session_datetime)),
       formattedTime: this.formatTime(new Date(session.session_datetime)),
       isExpandedByDefault: index === 0, // First element expanded by default
     }));
+  }
+
+  /**
+   * Calculate the number of unique exercises in a session
+   */
+  private calculateExerciseCount(
+    exerciseSets: SessionWithStats["exercise_sets"],
+  ): number {
+    if (!exerciseSets || exerciseSets.length === 0) {
+      return 0;
+    }
+
+    const uniqueExerciseIds = new Set<number>();
+    exerciseSets.forEach((set) => {
+      if (set.exercises?.id) {
+        uniqueExerciseIds.add(set.exercises.id);
+      }
+    });
+
+    return uniqueExerciseIds.size;
   }
 
   /**

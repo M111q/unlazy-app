@@ -48,6 +48,10 @@ export interface SessionWithStats extends Session {
   exercise_sets: {
     reps: number;
     weight: number;
+    exercises?: {
+      id: number;
+      name: string;
+    };
   }[];
 }
 
