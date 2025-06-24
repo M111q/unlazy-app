@@ -177,20 +177,6 @@
   }
 }
 
-// Dark theme adjustments
-@media (prefers-color-scheme: dark) {
-  .add-set-page {
-    .page-header h1 {
-      color: var(--mat-sys-on-surface, #ffffff);
-    }
-
-    .loading-container p,
-    .error-container p {
-      color: var(--mat-sys-on-surface-variant, #c7c7c7);
-    }
-  }
-}
-
 // Focus management
 .add-set-page {
   button:focus-visible,

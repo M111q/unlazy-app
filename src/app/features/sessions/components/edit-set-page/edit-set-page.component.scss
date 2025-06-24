@@ -201,30 +201,6 @@
   }
 }
 
-// Dark theme adjustments
-@media (prefers-color-scheme: dark) {
-  .edit-set-page {
-    .page-header h1 {
-      color: var(--mat-sys-on-surface, #ffffff);
-    }
-
-    .loading-container p,
-    .error-container p {
-      color: var(--mat-sys-on-surface-variant, #c7c7c7);
-    }
-
-    .form-container {
-      mat-card-content {
-        mat-form-field:has(input[readonly]) {
-          .mat-mdc-text-field-wrapper {
-            background-color: var(--mat-sys-surface-container-high);
-          }
-        }
-      }
-    }
-  }
-}
-
 // Focus management
 .edit-set-page {
   button:focus-visible,

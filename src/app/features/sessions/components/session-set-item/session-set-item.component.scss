@@ -71,55 +71,6 @@
   }
 }
 
-// Dark theme support
-@media (prefers-color-scheme: dark) {
-  .set-item {
-    background: rgba(vars.$color-white, 0.05) !important;
-    border-color: rgba(vars.$color-white, 0.12) !important;
-
-    &:hover {
-      background: rgba(vars.$color-white, 0.08) !important;
-      border-color: rgba(vars.$color-white, 0.16) !important;
-    }
-
-    &.invalid-field {
-      background: rgba(vars.$color-error, 0.1) !important;
-      border-left-color: vars.$color-error-light !important;
-    }
-
-    &.deleting-set {
-      background: rgba(vars.$color-white, 0.03) !important;
-      border-color: rgba(vars.$color-white, 0.08) !important;
-    }
-  }
-
-  .exercise-title {
-    color: vars.$text-primary-dark !important;
-  }
-
-  .set-details {
-    color: vars.$text-secondary-dark !important;
-
-    .reps-container:not(:last-child)::after {
-      color: vars.$text-disabled-dark;
-    }
-  }
-
-  mat-icon {
-    &.text-primary {
-      color: vars.$color-primary-light !important;
-    }
-
-    &.text-warning {
-      color: vars.$color-warning-light !important;
-    }
-
-    &.text-error {
-      color: vars.$color-error-light !important;
-    }
-  }
-}
-
 // High contrast support
 @include mixins.high-contrast {
   .set-item {

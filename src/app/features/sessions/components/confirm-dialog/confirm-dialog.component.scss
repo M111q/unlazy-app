@@ -69,10 +69,3 @@
     border: vars.$border-width-medium solid vars.$color-black;
   }
 }
-
-// Dark theme support (for future enhancement)
-@media (prefers-color-scheme: dark) {
-  .dialog-message {
-    color: vars.$text-secondary-dark;
-  }
-}
