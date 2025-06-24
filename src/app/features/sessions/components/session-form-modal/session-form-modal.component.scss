@@ -10,15 +10,23 @@
   display: flex;
   flex-direction: column;
   min-width: 320px;
-  max-width: 600px;
+  max-width: min(600px, 90vw);
   width: 100%;
 
   @include mixins.media(tablet) {
-    min-width: 500px;
+    min-width: 450px;
+    max-width: min(500px, 85vw);
   }
 
   @include mixins.media(desktop) {
-    min-width: 600px;
+    min-width: 500px;
+    max-width: min(600px, 80vw);
+  }
+
+  // Laptop-specific sizing (1024px - 1366px)
+  @media (min-width: 1024px) and (max-width: 1366px) {
+    min-width: 420px;
+    max-width: min(480px, 75vw);
   }
 
   @include mixins.media-max(xs) {
@@ -46,6 +54,11 @@
   );
   color: vars.$text-primary;
   border-bottom: vars.$border-width-thin solid vars.$border-color-light;
+
+  // Laptop-specific padding adjustments
+  @media (min-width: 1024px) and (max-width: 1366px) {
+    padding: vars.$spacing-md vars.$spacing-sm vars.$spacing-sm;
+  }
 
   @include mixins.media(tablet) {
     font-size: vars.$font-size-2xl;
@@ -76,6 +89,11 @@
   max-height: 70vh;
   overflow-y: auto;
   @include mixins.custom-scrollbar();
+
+  // Laptop-specific padding adjustments
+  @media (min-width: 1024px) and (max-width: 1366px) {
+    padding: vars.$spacing-md vars.$spacing-sm;
+  }
 }
 
 // =============================================================================
@@ -228,6 +246,11 @@
   );
   border-top: vars.$border-width-thin solid vars.$border-color-light;
   margin: 0;
+
+  // Laptop-specific padding adjustments
+  @media (min-width: 1024px) and (max-width: 1366px) {
+    padding: vars.$spacing-sm vars.$spacing-sm vars.$spacing-md;
+  }
 
   .actions-container {
     display: flex;
