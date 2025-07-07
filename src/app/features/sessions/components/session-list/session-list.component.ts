@@ -75,11 +75,13 @@ export class SessionListComponent implements OnInit {
   }
 
   /**
-   * Handle query parameters for editing sessions
+   * Handle query parameters for editing sessions and showing specific sessions
    */
   private handleQueryParams(): void {
     this.route.queryParams.subscribe((params) => {
       const editSessionId = params["edit"];
+      const showSessionId = params["show"];
+
       if (editSessionId) {
         const sessionId = parseInt(editSessionId, 10);
         if (!isNaN(sessionId)) {
@@ -90,6 +92,19 @@ export class SessionListComponent implements OnInit {
           setTimeout(() => {
             this.openEditModalForSession(sessionId);
           }, 100);
+
+          // Clear query params
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {},
+            replaceUrl: true,
+          });
+        }
+      } else if (showSessionId) {
+        const sessionId = parseInt(showSessionId, 10);
+        if (!isNaN(sessionId)) {
+          // Set expanded session for accordion
+          this.expandedSessionId.set(sessionId);
 
           // Clear query params
           this.router.navigate([], {
@@ -151,6 +166,8 @@ export class SessionListComponent implements OnInit {
    * Handle editing session
    */
   onEditSession(session: SessionItemViewModel): void {
+    // Set the expanded session to the one being edited
+    this.expandedSessionId.set(session.id);
     this.openSessionFormModal("edit", session);
   }
 
@@ -313,6 +330,8 @@ export class SessionListComponent implements OnInit {
           .updateSession(sessionId, sessionData as UpdateSessionDto)
           .subscribe({
             next: () => {
+              // Keep the edited session expanded
+              this.expandedSessionId.set(sessionId);
               this.snackBar.open("Sesja została zaktualizowana", "Zamknij", {
                 duration: 3000,
                 panelClass: ["success-snack-bar"],

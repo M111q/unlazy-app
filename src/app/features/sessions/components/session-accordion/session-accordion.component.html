@@ -1,7 +1,8 @@
-<mat-accordion class="sessions-accordion">
+<mat-accordion class="sessions-accordion" [displayMode]="'flat'" [togglePosition]="'before'">
   <mat-expansion-panel
     *ngFor="let session of sessions; trackBy: trackBySessionId"
-    [expanded]="session.isExpandedByDefault || isSessionExpanded(session.id)"
+    [expanded]="expandedSessionId !== null ? isSessionExpanded(session.id) : session.isExpandedByDefault"
+    [hideToggle]="false"
     class="session-panel">
 
     <!-- Panel Header -->
