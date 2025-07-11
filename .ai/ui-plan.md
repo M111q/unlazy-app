@@ -11,6 +11,8 @@ Aplikacja Unlazy MVP to Angular 19 + TypeScript + Angular Material z mobile-firs
 - Paginacja numeryczna (10 elementów na stronę)
 - Zarządzanie stanem przez Angular Signals w serwisach (signals, computed, effects)
 - Responsywne breakpointy: mobile 95%, tablet 80%, desktop max 700px, 2K+ max 900px
+- Generowanie podsumowań AI przez Edge Functions z backend-first approach
+- Toast notifications dla operacji asynchronicznych (MatSnackBar)
 
 ## 2. Lista widoków
 
@@ -66,10 +68,12 @@ Aplikacja Unlazy MVP to Angular 19 + TypeScript + Angular Material z mobile-firs
 - **Kluczowe informacje:**
   - Detale sesji (data/godzina, opis, miejsce)
   - Statystyki sesji (suma kg, suma powtórzeń)
+  - Podsumowanie AI sesji (jeśli wygenerowane)
   - Lista serii ćwiczeń z paginacją
 - **Kluczowe komponenty:**
   - PageHeaderComponent z tytułem "Szczegóły treningu {data}"
-  - StatsCardComponent dla statystyk sesji
+  - StatsCardComponent dla statystyk sesji z ikoną generowania AI
+  - AISummaryComponent dla wyświetlania/generowania podsumowania
   - Lista serii z nazwą ćwiczenia, powtórzeniami, ciężarem
   - MatPaginator dla serii (20 elementów na stronę)
   - Przyciski edycji sesji i dodawania serii
@@ -78,6 +82,9 @@ Aplikacja Unlazy MVP to Angular 19 + TypeScript + Angular Material z mobile-firs
   - Empty state dla sesji bez serii
   - Potwierdzenie usunięcia serii
   - Breadcrumb w tytule z datą sesji
+  - Ikona AI (wand/auto_awesome) widoczna tylko dla sesji z ćwiczeniami bez podsumowania
+  - Loading state podczas generowania AI bez blokowania innych funkcji
+  - Toast notification po wygenerowaniu podsumowania
 
 ### SessionFormModal
 - **Główny cel:** Dodawanie i edycja sesji treningowych
@@ -124,7 +131,11 @@ Aplikacja Unlazy MVP to Angular 19 + TypeScript + Angular Material z mobile-firs
    - Edycja sesji: przycisk edycji → SessionFormModal → powrót do listy
    - Usuwanie sesji: przycisk usunięcia → modal potwierdzenia
 5. **Szczegóły sesji:** Kliknięcie nagłówka accordion → `/sessions/:id`
-6. **Zarządzanie seriami:**
+6. **Generowanie podsumowania AI:**
+   - Kliknięcie ikony AI → generowanie w tle → toast z potwierdzeniem
+   - Wyświetlanie podsumowania pod statystykami
+   - Automatyczne usuwanie podsumowania przy zmianie serii
+7. **Zarządzanie seriami:**
    - Dodawanie serii: przycisk "Dodaj serię" → ExerciseSetFormModal
    - Edycja serii: przycisk edycji → ExerciseSetFormModal
    - Usuwanie serii: przycisk usunięcia → modal potwierdzenia
@@ -133,12 +144,18 @@ Aplikacja Unlazy MVP to Angular 19 + TypeScript + Angular Material z mobile-firs
 - **Wylogowanie:** TopNavigation → przycisk wylogowania → `/login`
 - **Błędy walidacji:** Pozostanie w modalach z komunikatami błędów
 - **Błędy połączenia:** Modal z komunikatem błędu + opcja ponowienia
+- **Błąd generowania AI:** Toast z komunikatem błędu + opcja ponownej próby
+- **AI w trakcie generowania:** Możliwość opuszczenia strony, generowanie kontynuowane w tle
 
 ### Obsługa stanów brzegowych:
 - **Nowy użytkownik:** Empty state na liście sesji z instrukcją dodania pierwszej sesji
 - **Limit sesji:** Modal z informacją o przekroczeniu limitu dziennego
 - **Limit serii:** Modal z informacją o przekroczeniu limitu sesyjnego
 - **Brak połączenia:** Loading spinner + retry mechanism
+- **AI timeout:** Toast z błędem po 30 sekundach, możliwość ponownej próby
+- **AI niedostępne:** Graceful degradation - aplikacja działa bez funkcji AI
+- **Wielokrotne generowanie:** Toast "Generowanie w toku" przy próbie ponownego kliknięcia
+- **Zmiana serii:** Automatyczne usunięcie podsumowania, ikona AI pojawia się ponownie
 
 ## 4. Układ i struktura nawigacji
 
@@ -212,9 +229,11 @@ AppComponent
 - **Implementacja:** MatExpansionPanel z custom styling
 
 #### StatsCardComponent
-- **Cel:** Wyświetlanie statystyk sesji
+- **Cel:** Wyświetlanie statystyk sesji z opcją generowania AI
 - **Dane:** Suma kilogramów, suma powtórzeń
 - **Styling:** Material Card z highlight dla ważnych danych
+- **Funkcjonalność:** Ikona AI (wand/auto_awesome) po prawej stronie napisu "Statystyki"
+- **Tooltip:** "Wygeneruj podsumowanie AI" na hover
 
 #### SessionFormComponent
 - **Cel:** Formularz dodawania/edycji sesji w modalu
@@ -233,6 +252,15 @@ AppComponent
 - **Funkcjonalność:** Paginacja, CRUD operations
 - **Wyświetlanie:** Nazwa ćwiczenia, powtórzenia, ciężar
 
+#### AISummaryComponent
+- **Cel:** Wyświetlanie i generowanie podsumowań AI
+- **Funkcjonalność:** 
+  - Wyświetlanie wygenerowanego podsumowania
+  - Animacja fade-in przy pojawieniu się
+  - Loading state z pulsującą animacją podczas generowania
+- **Styling:** Podobny do StatsCardComponent
+- **Pozycja:** Pod statystykami sesji
+
 ### Komponenty pomocnicze:
 
 #### ConfirmationModalComponent
@@ -249,3 +277,9 @@ AppComponent
 - **Cel:** Wyświetlanie błędów walidacji inline
 - **Implementacja:** mat-error z dynamic content
 - **Styling:** Material Design error styling
+
+#### ToastNotificationComponent
+- **Cel:** Wyświetlanie powiadomień systemowych
+- **Użycie:** "Podsumowanie zostało wygenerowane"
+- **Implementacja:** MatSnackBar z custom styling
+- **Funkcjonalność:** Auto-dismiss po 3 sekundach

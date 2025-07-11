@@ -2,18 +2,20 @@
 
 ## 1. Przegląd produktu
 
-Unlazy to aplikacja MVP do śledzenia sesji treningowych skierowana do osób średnio zaawansowanych w treningu. Aplikacja umożliwia użytkownikom rejestrowanie wykonanych ćwiczeń, liczby powtórzeń i używanych ciężarów, a następnie przeglądanie statystyk podsumowujących ich wysiłek treningowy.
+Unlazy to aplikacja MVP do śledzenia sesji treningowych skierowana do osób średnio zaawansowanych w treningu. Aplikacja umożliwia użytkownikom rejestrowanie wykonanych ćwiczeń, liczby powtórzeń i używanych ciężarów, a następnie przeglądanie statystyk podsumowujących ich wysiłek treningowy oraz generowanie motywujących podsumowań AI.
 
 ### Kluczowe funkcjonalności
 - Uwierzytelnianie użytkowników przez Supabase Auth
 - Zarządzanie sesjami treningowymi (CRUD)
 - Zarządzanie seriami ćwiczeń w ramach sesji (CRUD)
 - Automatyczne obliczanie statystyk sesji (suma kilogramów i powtórzeń)
+- Generowanie podsumowań sesji treningowych przy użyciu AI
 - Responsywny interfejs użytkownika z paginacją
 
 ### Stos technologiczny
 - Frontend: Angular + TypeScript + Angular Material
-- Backend: Supabase (baza danych + uwierzytelnianie)
+- Backend: Supabase (baza danych + uwierzytelnianie + Edge Functions)
+- AI: OpenRouter API
 - Język interfejsu: Polski z przygotowaniem na internacjonalizację
 
 ## 2. Problem użytkownika
@@ -23,10 +25,11 @@ Użytkownicy potrzebują prostego i skutecznego sposobu na śledzenie swoich ses
 - Łatwe rejestrowanie wykonanych ćwiczeń, liczby powtórzeń i używanych ciężarów
 - Przeglądanie statystyk podsumowujących wysiłek treningowy
 - Śledzenie całkowitego obciążenia (suma kilogramów) i objętości treningu (suma powtórzeń)
+- Otrzymywanie motywujących podsumowań treningów wygenerowanych przez AI
 - Dostęp do indywidualnych danych treningowych w sposób bezpieczny i zorganizowany
 
 ### Grupa docelowa
-Osoby średnio zaawansowane w treningu, które znają ćwiczenia i wiedzą jak je wykonać, ale potrzebują narzędzia do systematycznego śledzenia swoich postępów.
+Osoby średnio zaawansowane w treningu, które znają ćwiczenia i wiedzą jak je wykonać, ale potrzebują narzędzia do systematycznego śledzenia swoich postępów oraz motywacji do kontynuowania regularnych treningów.
 
 ## 3. Wymagania funkcjonalne
 
@@ -53,7 +56,7 @@ Osoby średnio zaawansowane w treningu, które znają ćwiczenia i wiedzą jak j
 - Maksymalnie 3 sesje na dzień dla użytkownika
 - Maksymalnie 50 serii w jednej sesji
 - Zakres powtórzeń: 1-300 na serię
-- Zakres ciężaru: 1-400 kg (tylko liczby całkowite)
+- Zakres ciężaru: 0.01-400 kg (z dokładnością do 0.01 kg)
 - Opis sesji: maksymalnie 260 znaków
 - Nazwa miejsca: maksymalnie 160 znaków
 
@@ -66,6 +69,15 @@ Osoby średnio zaawansowane w treningu, które znają ćwiczenia i wiedzą jak j
 ### 3.6 Lista ćwiczeń
 - 20 predefiniowanych ćwiczeń w bazie danych
 - Brak możliwości dodawania niestandardowych ćwiczeń w MVP
+
+### 3.7 Generowanie podsumowań AI
+- Generowanie podsumowań sesji na żądanie użytkownika
+- Integracja z OpenRouter API przez Supabase Edge Function
+- Przechowywanie wygenerowanych podsumowań w bazie danych
+- Automatyczne usuwanie podsumowania przy modyfikacji serii ćwiczeń
+- Blokada wielokrotnego generowania (jedna operacja na użytkownika)
+- Timeout 30 sekund dla operacji generowania
+- Graceful degradation przy niedostępności serwisu AI
 
 ## 4. Granice produktu
 
@@ -87,12 +99,15 @@ Osoby średnio zaawansowane w treningu, które znają ćwiczenia i wiedzą jak j
 - Eksport danych do plików zewnętrznych
 
 #### Funkcje AI i automatyzacja
-- Automatyczne podsumowania treningów
 - Rekomendacje treningowe wykorzystujące LLM
+- Automatyczne generowanie planów treningowych
+- Analiza techniki wykonania ćwiczeń
 
 #### Inne ograniczenia
 - Brak pomiaru czasu trwania sesji
 - Brak obsługi ćwiczeń cardio bez ciężarów
+- Brak mechanizmu automatycznego czyszczenia flag przy awariach systemu
+- Brak logowania analitycznego dla funkcji AI
 
 ## 5. Historyjki użytkowników
 
@@ -162,6 +177,7 @@ Kryteria akceptacji:
 - Te same walidacje co przy dodawaniu
 - Możliwość anulowania bez zapisywania zmian
 - Komunikat potwierdzenia po zapisaniu
+- Edycja metadanych sesji (opis, data, miejsce) nie usuwa istniejącego podsumowania AI
 
 #### US-008: Usuwanie sesji
 Jako użytkownik chcę usunąć sesję treningową, aby pozbyć się niepotrzebnych danych.
@@ -180,6 +196,8 @@ Kryteria akceptacji:
 - Statystyki sesji: suma kilogramów, suma powtórzeń
 - Paginowana lista serii w sesji
 - Przyciski do edycji sesji i dodania nowej serii
+- Wyświetlanie podsumowania AI jeśli zostało wygenerowane
+- Ikona generowania podsumowania AI dla sesji z ćwiczeniami bez podsumowania
 
 ### 5.3 Zarządzanie seriami ćwiczeń
 
@@ -187,10 +205,11 @@ Kryteria akceptacji:
 Jako użytkownik chcę dodać serię ćwiczenia do sesji, aby zarejestrować wykonane ćwiczenie.
 
 Kryteria akceptacji:
-- Formularz zawiera: dropdown z 20 predefiniowanymi ćwiczeniami, liczbę powtórzeń (1-300), ciężar w kg (1-400)
+- Formularz zawiera: dropdown z 20 predefiniowanymi ćwiczeniami, liczbę powtórzeń (1-300), ciężar w kg (0.01-400)
 - Walidacja limitów numerycznych
 - Komunikat błędu przy przekroczeniu 50 serii w sesji
 - Automatyczne przeliczenie statystyk sesji po dodaniu
+- Automatyczne usunięcie podsumowania AI po dodaniu nowej serii
 - Zachowanie danych formularza przy błędach
 
 #### US-011: Edycja serii
@@ -209,6 +228,7 @@ Kryteria akceptacji:
 - Modal potwierdzenia usunięcia
 - Możliwość anulowania operacji
 - Automatyczne przeliczenie statystyk sesji po usunięciu
+- Automatyczne usunięcie podsumowania AI po usunięciu serii
 - Pozostanie na stronie szczegółów sesji
 
 #### US-013: Przeglądanie serii w sesji
@@ -226,8 +246,8 @@ Kryteria akceptacji:
 Jako użytkownik chcę otrzymywać jasne komunikaty o błędach, aby poprawnie wprowadzać dane.
 
 Kryteria akceptacji:
-- Walidacja limitów: 3 sesje/dzień, 50 serii/sesja, 1-300 powtórzeń, 1-400kg ciężar
-- Walidacja długości tekstu: opis 260 znaków, miejsce 150 znaków
+- Walidacja limitów: 3 sesje/dzień, 50 serii/sesja, 1-300 powtórzeń, 0.01-400kg ciężar
+- Walidacja długości tekstu: opis 260 znaków, miejsce 160 znaków
 - Komunikaty błędów w modalu z opisem problemu
 - Podświetlenie pól z błędami w formularzu
 
@@ -267,28 +287,86 @@ Kryteria akceptacji:
 - Wyraźne komunikaty błędów z instrukcjami
 - Zachowanie stanu formularzy podczas operacji
 
+### 5.6 Generowanie podsumowań AI
+
+#### US-019: Generowanie podsumowania sesji AI
+Jako użytkownik chcę wygenerować podsumowanie mojej sesji treningowej przy użyciu AI, aby otrzymać motywującą ocenę swojego treningu.
+
+Kryteria akceptacji:
+- Ikona różdżki (wand/auto_awesome) widoczna tylko dla sesji zawierających ćwiczenia
+- Ikona umieszczona po prawej stronie naprzeciwko napisu "Statystyki"
+- Tooltip "Wygeneruj podsumowanie AI" przy najechaniu na ikonę
+- Kliknięcie ikony inicjuje generowanie podsumowania
+- Loading state z animacją podczas generowania (bez blokowania innych funkcji)
+- Toast notification "Podsumowanie zostało wygenerowane" po udanym zakończeniu
+- Debouncing przycisku zapobiegający wielokrotnym kliknięciom
+
+#### US-020: Wyświetlanie podsumowania AI
+Jako użytkownik chcę widzieć wygenerowane podsumowanie mojej sesji, aby nie musieć generować go ponownie.
+
+Kryteria akceptacji:
+- Podsumowanie wyświetlane pod statystykami sesji
+- Ten sam styl wizualny co statystyki (kg, powtórzenia)
+- Fade-in animacja przy pojawieniu się podsumowania
+- Sesje z już wygenerowanym podsumowaniem nie pokazują ikony generowania
+- Podsumowanie widoczne przy każdym wejściu do szczegółów sesji
+
+#### US-021: Obsługa błędów generowania AI
+Jako użytkownik chcę otrzymać jasny komunikat o błędzie i możliwość ponownej próby, gdy generowanie podsumowania nie powiedzie się.
+
+Kryteria akceptacji:
+- Komunikat błędu wyświetlany jako toast z opisem problemu
+- Przycisk "Spróbuj ponownie" w komunikacie błędu
+- Ikona generowania pozostaje dostępna po błędzie
+- Timeout 30 sekund zgodnie z dokumentacją Edge Function
+- Graceful degradation - aplikacja działa normalnie gdy funkcja AI jest niedostępna
+
+#### US-022: Blokada wielokrotnego generowania
+Jako użytkownik chcę mieć pewność, że nie uruchomię przypadkowo wielu operacji generowania jednocześnie.
+
+Kryteria akceptacji:
+- Flaga `is_generating` per użytkownik blokuje wielokrotne generowania
+- Walidacja po stronie frontendu przed wysłaniem żądania
+- Komunikat informujący o trwającym generowaniu
+- Możliwość opuszczenia strony podczas generowania (backend-first approach)
+
+#### US-023: Automatyczne usuwanie przestarzałych podsumowań
+Jako użytkownik chcę, aby podsumowanie było automatycznie usuwane przy modyfikacji sesji, ponieważ staje się wtedy nieaktualne.
+
+Kryteria akceptacji:
+- Dodanie nowej serii usuwa istniejące podsumowanie
+- Usunięcie serii usuwa istniejące podsumowanie
+- Edycja metadanych sesji (opis, data, miejsce) NIE usuwa podsumowania
+- Po usunięciu podsumowania ikona generowania pojawia się ponownie
+
 ## 6. Metryki sukcesu
 
 ### 6.1 Kryteria techniczne
 - Akceptowalne czasy ładowania dla paginowanych list (< 2 sekundy)
+- Czas generowania podsumowania AI < 30 sekund
 - Prawidłowe działanie na urządzeniach mobilnych i desktopowych
-- Skuteczne wykorzystanie Angular + Supabase + TypeScript
+- Skuteczne wykorzystanie Angular + Supabase + TypeScript + Edge Functions
 - Bezpieczne przechowywanie i dostęp do danych użytkowników
+- Graceful degradation przy niedostępności serwisów zewnętrznych
 
 ### 6.2 Kryteria użyteczności
-- Intuicyjny workflow: Logowanie → lista sesji → dodaj sesję → szczegóły sesji → dodaj serię
+- Intuicyjny workflow: Logowanie → lista sesji → dodaj sesję → szczegóły sesji → dodaj serię → generuj podsumowanie
 - Minimalistyczny i przejrzysty interfejs użytkownika
 - Skuteczna walidacja z jasnymi komunikatami błędów
 - Zachowanie danych użytkownika w formularzach przy błędach
+- Intuicyjność funkcji AI bez potrzeby instrukcji
 
 ### 6.3 Wskaźniki sukcesu biznesowego
 - Możliwość rejestrowania sesji treningowych przez grupę docelową bez przeszkolenia
 - Automatyczne obliczanie statystyk pozwalające na śledzenie postępów
+- Adopcja funkcji AI przez większość aktywnych użytkowników
+- Zwiększenie zaangażowania użytkowników dzięki motywującym podsumowaniom
 - Stabilne działanie aplikacji bez utraty danych użytkowników
 - Przygotowanie architektury na przyszły rozwój funkcjonalności
 
 ### 6.4 Definicja ukończenia MVP
 - Wszystkie historie użytkownika zaimplementowane i przetestowane
+- Funkcja generowania podsumowań AI w pełni zintegrowana
 - Aplikacja wdrożona i dostępna online
 - Dokumentacja techniczna i użytkownika kompletna
 - Pozytywne testy użyteczności z reprezentantami grupy docelowej

@@ -10,6 +10,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     auth_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     email VARCHAR(255) NOT NULL,
+    is_generating BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     UNIQUE(auth_user_id)
@@ -38,6 +39,7 @@ CREATE TABLE sessions (
     session_datetime TIMESTAMP NOT NULL,
     description VARCHAR(260),
     location VARCHAR(160),
+    summary TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     
@@ -45,6 +47,7 @@ CREATE TABLE sessions (
     CONSTRAINT check_description_length CHECK (LENGTH(description) <= 260),
     CONSTRAINT check_location_length CHECK (LENGTH(location) <= 160)
 );
+```
 
 -- Unique index zapobiegający duplikatom sesji w tej samej minucie
 CREATE UNIQUE INDEX idx_sessions_user_minute 
@@ -60,13 +63,13 @@ CREATE TABLE exercise_sets (
     session_id INTEGER NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
     exercise_id INTEGER NOT NULL REFERENCES exercises(id) ON DELETE CASCADE,
     reps INTEGER NOT NULL,
-    weight INTEGER NOT NULL,
+    weight NUMERIC(5,2) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     
     -- Check constraints dla ograniczeń biznesowych
     CONSTRAINT check_reps_range CHECK (reps >= 1 AND reps <= 300),
-    CONSTRAINT check_weight_range CHECK (weight >= 1 AND weight <= 400)
+    CONSTRAINT check_weight_range CHECK (weight >= 0.01 AND weight <= 400.00)
 );
 ```
 
@@ -221,6 +224,31 @@ CREATE TRIGGER trigger_check_session_sets_limit
     EXECUTE FUNCTION check_session_sets_limit();
 ```
 
+### 4.7 Funkcja usuwania podsumowania przy zmianie serii
+
+```sql
+CREATE OR REPLACE FUNCTION clear_session_summary()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Usuń podsumowanie sesji przy dodaniu lub usunięciu serii
+    UPDATE sessions 
+    SET summary = NULL 
+    WHERE id = COALESCE(NEW.session_id, OLD.session_id);
+    
+    RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+```
+
+### 4.8 Trigger usuwania podsumowania
+
+```sql
+CREATE TRIGGER trigger_clear_session_summary
+    AFTER INSERT OR DELETE ON exercise_sets
+    FOR EACH ROW
+    EXECUTE FUNCTION clear_session_summary();
+```
+
 ## 5. Row Level Security (RLS)
 
 ### 5.1 Włączenie RLS na tabelach
@@ -307,12 +335,13 @@ SELECT
     s.session_datetime,
     s.description,
     s.location,
-    COALESCE(SUM(es.weight_kg), 0) as total_weight,
+    s.summary,
+    COALESCE(SUM(es.weight), 0) as total_weight,
     COALESCE(SUM(es.reps), 0) as total_reps
 FROM sessions s
 LEFT JOIN exercise_sets es ON s.id = es.session_id
 WHERE s.id = $1
-GROUP BY s.id, s.session_datetime, s.description, s.location;
+GROUP BY s.id, s.session_datetime, s.description, s.location, s.summary;
 ```
 
 ### 7.2 Lista sesji z paginacją i statystykami
@@ -324,12 +353,13 @@ SELECT
     s.session_datetime,
     s.description,
     s.location,
-    COALESCE(SUM(es.weight_kg), 0) as total_weight,
+    s.summary,
+    COALESCE(SUM(es.weight), 0) as total_weight,
     COALESCE(SUM(es.reps), 0) as total_reps
 FROM sessions s
 LEFT JOIN exercise_sets es ON s.id = es.session_id
 WHERE s.user_id = $1
-GROUP BY s.id, s.session_datetime, s.description, s.location
+GROUP BY s.id, s.session_datetime, s.description, s.location, s.summary
 ORDER BY s.session_datetime DESC
 LIMIT $2 OFFSET $3;
 ```
@@ -341,6 +371,9 @@ LIMIT $2 OFFSET $3;
 - SERIAL zamiast UUID dla primary keys ze względu na prostotę i wydajność
 - TIMESTAMP bez timezone dla uproszczenia (kontekst tylko polski)
 - Separate users table dla przyszłej rozszerzalności profili użytkowników
+- Weight stored as NUMERIC(5,2) for precise 0.01kg granularity
+- Summary stored as TEXT to accommodate AI-generated content
+- is_generating flag per user to prevent concurrent AI operations
 
 ### 8.2 Bezpieczeństwo
 - RLS zapewnia izolację danych między użytkownikami
@@ -356,3 +389,95 @@ LIMIT $2 OFFSET $3;
 - Struktura przygotowana na przyszłe rozszerzenia (kategorie ćwiczeń, grupy mięśniowe)
 - Normalizacja do 3NF z wyjątkiem obliczanych statystyk
 - Możliwość dodania audit trails i soft delete w przyszłości
+
+## 9. Weight Storage Implementation
+
+### 9.1 Migration History
+The weight column has evolved through the following migrations:
+
+**Migration 1** (20250614114223_create_unlazy_schema.sql):
+- Initial implementation: `weight INTEGER`
+- Constraint: `weight >= 1 AND weight <= 400`
+- Storage: Whole kilograms only (1kg, 2kg, 50kg, etc.)
+
+**Migration 2** (20250618222323_change_weight_to_decimal.sql):
+- Changed to: `weight NUMERIC(5,2)`
+- Updated constraint: `weight >= 0.01 AND weight <= 400.00`
+- Storage: Decimal precision with 0.01kg accuracy
+
+### 9.2 Current Storage Format
+Weight values are stored as NUMERIC(5,2):
+- Precision: 5 total digits
+- Scale: 2 decimal places
+- Range: 0.01 kg to 999.99 kg
+- Examples: 10.25 kg, 67.75 kg, 125.50 kg
+
+### 9.3 Benefits of NUMERIC Storage
+- **Precision**: Exact decimal representation with 0.01kg accuracy
+- **Flexibility**: Supports fractional weights (e.g., 12.25 kg)
+- **Standard**: PostgreSQL standard for precise decimal values
+- **No Conversion**: Direct mapping between UI and database
+
+### 9.4 Database Constraints
+```sql
+-- Weight constraint for fitness application
+CONSTRAINT check_weight_range CHECK (weight >= 0.01 AND weight <= 400.00)
+-- Supports wide weight range from 0.01kg to 400kg with 0.01kg precision
+```
+
+## 10. AI Summary Feature Implementation
+
+### 10.1 Migration for AI Columns
+The following migration adds support for AI-generated session summaries:
+
+**Migration 3** (Add AI Summary Feature):
+```sql
+-- Add is_generating flag to users table
+ALTER TABLE users 
+ADD COLUMN is_generating BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Add summary column to sessions table
+ALTER TABLE sessions 
+ADD COLUMN summary TEXT;
+
+-- Create function to clear summary when sets change
+CREATE OR REPLACE FUNCTION clear_session_summary()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE sessions 
+    SET summary = NULL 
+    WHERE id = COALESCE(NEW.session_id, OLD.session_id);
+    
+    RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger for automatic summary cleanup
+CREATE TRIGGER trigger_clear_session_summary
+    AFTER INSERT OR DELETE ON exercise_sets
+    FOR EACH ROW
+    EXECUTE FUNCTION clear_session_summary();
+```
+
+### 10.2 AI Feature Storage Design
+- **is_generating**: Boolean flag per user to prevent concurrent AI operations
+  - Prevents multiple simultaneous summary generations
+  - Scoped per user, not per session
+  - Should be reset on completion or timeout
+  
+- **summary**: Text field for storing AI-generated content
+  - Nullable to indicate no summary exists
+  - Automatically cleared when exercise sets are modified
+  - Not cleared when session metadata (description, date, location) is edited
+
+### 10.3 Business Logic Constraints
+- Only one AI generation operation per user at a time
+- Summaries are invalidated when exercise data changes
+- Session metadata changes do not affect summaries
+- 30-second timeout for AI operations (enforced by Edge Function)
+
+### 10.4 Future Considerations
+- Add summary_generated_at timestamp for cache management
+- Consider summary versioning for history tracking
+- Add user preferences for summary language/style
+- Implement automatic cleanup for stuck is_generating flags

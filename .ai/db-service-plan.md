@@ -5,7 +5,7 @@
 ### 1.1 Main Tables Configuration
 
 #### Users Table
-Stores user profiles, linked to Supabase Auth users.
+Stores user profiles, linked to Supabase Auth users. Includes `is_generating` flag to prevent concurrent AI summary generation operations.
 
 **RLS Policy:**
 Ensures users can only access their own user profile record based on their authenticated user ID.
@@ -17,7 +17,7 @@ Contains a list of predefined exercises.
 Allows read-only access for all authenticated users to the list of exercises, while restricting other operations.
 
 #### Sessions Table
-Records user training sessions, including date, time, description, and location.
+Records user training sessions, including date, time, description, location, and AI-generated summaries.
 
 **RLS Policy:**
 Ensures users can only access (read, create, update, delete) their own training sessions.
@@ -27,6 +27,9 @@ Stores individual sets of exercises performed within a training session, includi
 
 **RLS Policy:**
 Ensures users can only access (read, create, update, delete) exercise sets that belong to their training sessions.
+
+**Automatic Triggers:**
+- `trigger_clear_session_summary`: Automatically clears the session summary when exercise sets are added or deleted, ensuring summaries always reflect current session data.
 
 
 ## 2. Service Methods
@@ -136,6 +139,7 @@ async getSessions(page: number = 0, limit: number = 10): Promise<SessionWithStat
     .from('sessions')
     .select(`
       *,
+      summary,
       exercise_sets (
         reps,
         weight
@@ -162,6 +166,7 @@ async getSessionById(id: number): Promise<SessionWithStats> {
     .from('sessions')
     .select(`
       *,
+      summary,
       exercise_sets (
         id,
         reps,
@@ -301,6 +306,9 @@ async createExerciseSet(set: CreateExerciseSetDto): Promise<ExerciseSet> {
     .single();
     
   if (error) throw new Error(error.message);
+  
+  // Summary will be automatically cleared by database trigger
+  
   return data;
 }
 ```
@@ -329,6 +337,8 @@ async deleteExerciseSet(id: number): Promise<void> {
     .eq('id', id);
     
   if (error) throw new Error(error.message);
+  
+  // Summary will be automatically cleared by database trigger
 }
 ```
 
@@ -345,6 +355,85 @@ private async validateSessionSetsLimit(sessionId: number): Promise<void> {
   if (count >= 50) {
     throw new Error('Session sets limit exceeded (maximum 50 sets per session)');
   }
+}
+```
+
+### 2.6 AI Summary Service
+
+#### Generate Session Summary
+```typescript
+async generateSessionSummary(sessionId: number): Promise<string> {
+  // Check if user is already generating a summary
+  const user = await this.getUserProfile();
+  if (user.is_generating) {
+    throw new Error('Summary generation already in progress');
+  }
+
+  // Set is_generating flag
+  await this.setGeneratingFlag(true);
+
+  try {
+    // Call Edge Function to generate summary
+    const { data, error } = await this.supabase.functions.invoke('openrouter', {
+      body: { sessionId }
+    });
+
+    if (error) throw new Error(error.message);
+
+    // Save summary to database
+    await this.updateSession(sessionId, { summary: data.summary });
+
+    return data.summary;
+  } finally {
+    // Always reset is_generating flag
+    await this.setGeneratingFlag(false);
+  }
+}
+```
+
+#### Get Session Summary
+```typescript
+async getSessionSummary(sessionId: number): Promise<string | null> {
+  const { data, error } = await this.supabase
+    .from('sessions')
+    .select('summary')
+    .eq('id', sessionId)
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data?.summary || null;
+}
+```
+
+#### Clear Session Summary
+```typescript
+async clearSessionSummary(sessionId: number): Promise<void> {
+  const { error } = await this.supabase
+    .from('sessions')
+    .update({ summary: null })
+    .eq('id', sessionId);
+
+  if (error) throw new Error(error.message);
+}
+```
+
+#### Check If Generating
+```typescript
+async isGeneratingSummary(): Promise<boolean> {
+  const user = await this.getUserProfile();
+  return user.is_generating;
+}
+```
+
+#### Set Generating Flag
+```typescript
+private async setGeneratingFlag(isGenerating: boolean): Promise<void> {
+  const { error } = await this.supabase
+    .from('users')
+    .update({ is_generating: isGenerating })
+    .eq('auth_user_id', (await this.getCurrentUser())?.id);
+
+  if (error) throw new Error(error.message);
 }
 ```
 
@@ -413,10 +502,49 @@ CONSTRAINT check_location_length CHECK (LENGTH(location) <= 160)
 #### Exercise Sets Table Constraints
 ```sql
 CONSTRAINT check_reps_range CHECK (reps >= 1 AND reps <= 300)
-CONSTRAINT check_weight_range CHECK (weight >= 1 AND weight <= 400)
+CONSTRAINT check_weight_range CHECK (weight >= 0.01 AND weight <= 400.00)
 ```
 
 ### 4.2 Frontend Validation
+
+#### Data Transfer Objects (DTOs)
+```typescript
+interface CreateSessionDto {
+  session_datetime: string;
+  description?: string;
+  location?: string;
+}
+
+interface UpdateSessionDto {
+  session_datetime?: string;
+  description?: string;
+  location?: string;
+  summary?: string;
+}
+
+interface CreateExerciseSetDto {
+  session_id: number;
+  exercise_id: number;
+  reps: number;
+  weight: number;
+}
+
+interface UpdateExerciseSetDto {
+  exercise_id?: number;
+  reps?: number;
+  weight?: number;
+}
+
+interface SessionWithStats extends Session {
+  total_weight: number;
+  total_reps: number;
+  summary?: string;
+}
+
+interface ExerciseSetWithExercise extends ExerciseSet {
+  exercises: Exercise;
+}
+```
 
 #### Form Validation Rules
 ```typescript
@@ -427,7 +555,11 @@ interface ValidationRules {
   };
   exerciseSet: {
     reps: { min: 1, max: 300 };
-    weight: { min: 1, max: 400 };
+    weight: { min: 0.01, max: 400.00, step: 0.01 };
+  };
+  aiSummary: {
+    timeout: 30000; // 30 seconds
+    maxConcurrent: 1; // per user
   };
 }
 ```
@@ -453,14 +585,112 @@ class ErrorHandler {
     if (error.message.includes('Session sets limit')) {
       return { message: 'Maximum 50 sets per session allowed', code: 'SETS_LIMIT' };
     }
+
+    if (error.message.includes('Summary generation already in progress')) {
+      return { message: 'Please wait for the current summary to complete', code: 'GENERATION_IN_PROGRESS' };
+    }
     
     return { message: error.message, code: error.code };
   }
 }
 ```
 
+### 4.3 AI Summary Validation
 
-### 4.5 Performance Optimization
+#### Summary Generation Rules
+```typescript
+interface SummaryGenerationRules {
+  // Session must have at least one exercise set
+  minExerciseSets: 1;
+  
+  // Only one generation per user at a time
+  concurrentGenerations: 1;
+  
+  // Timeout for Edge Function
+  timeoutMs: 30000;
+  
+  // Summary is cleared when exercise sets change
+  invalidateOnSetChange: true;
+  
+  // Summary is NOT cleared when metadata changes
+  preserveOnMetadataEdit: true;
+}
+```
+
+#### Summary State Management
+```typescript
+interface SummaryState {
+  isGenerating: boolean;
+  summary: string | null;
+  canGenerate: boolean; // true if session has sets and no summary exists
+}
+
+async function getSummaryState(sessionId: number): Promise<SummaryState> {
+  const session = await getSessionById(sessionId);
+  const user = await getUserProfile();
+  
+  return {
+    isGenerating: user.is_generating,
+    summary: session.summary,
+    canGenerate: session.exercise_sets.length > 0 && !session.summary && !user.is_generating
+  };
+}
+```
+
+### 4.4 Weight Precision Handling
+
+#### Weight Storage and Display
+```typescript
+interface WeightHandling {
+  // Database stores as NUMERIC(5,2)
+  databasePrecision: 2;
+  
+  // UI input step
+  inputStep: 0.01;
+  
+  // Display format
+  displayFormat: (weight: number) => `${weight.toFixed(2)} kg`;
+  
+  // Validation
+  validate: (weight: number) => weight >= 0.01 && weight <= 400.00;
+}
+```
+
+### 4.5 Database Triggers and Automation
+
+#### Automatic Summary Cleanup
+```typescript
+// Database trigger automatically clears summary when exercise sets change
+// No manual cleanup needed in application code
+
+interface TriggerBehavior {
+  // Trigger fires on INSERT or DELETE of exercise_sets
+  events: ['INSERT', 'DELETE'];
+  
+  // Action: Sets sessions.summary to NULL
+  action: 'CLEAR_SESSION_SUMMARY';
+  
+  // Note: UPDATE operations on exercise_sets do NOT clear summary
+  // This is intentional as weight/reps adjustments shouldn't invalidate summary
+}
+```
+
+#### Trigger Implementation Notes
+```typescript
+// The trigger is implemented at database level for consistency
+// Benefits:
+// 1. Works regardless of how exercise_sets are modified
+// 2. Ensures data integrity even with direct database access
+// 3. No race conditions between application instances
+// 4. Zero application code needed for cleanup
+
+// Limitations:
+// 1. No way to preserve summary when intended
+// 2. Bulk operations will trigger multiple times
+// 3. No application-level control over behavior
+```
+
+### 4.6 Performance Optimization
 
 #### Query Optimization Strategies
 - Use selective column selection with `select()`

@@ -14,13 +14,15 @@ SessionDetailsComponent to widok szczegółów sesji treningowej, który umożli
 SessionDetailsComponent (kontener)
 ├── PageHeaderComponent (nagłówek z breadcrumb)
 ├── SessionDetailsCardComponent (dane sesji)
-├── StatsCardComponent (statystyki)
+├── StatsCardComponent (statystyki z ikoną AI)
+├── AISummaryComponent (podsumowanie AI)
 ├── SessionSetsListComponent (lista serii)
 │   ├── SessionSetItemComponent (pojedyncza seria)
 │   └── MatPaginator (paginacja)
 ├── LoadingSpinnerComponent (stan ładowania)
 ├── EmptyStateComponent (brak serii)
-└── ConfirmDialogComponent (potwierdzenie operacji)
+├── ConfirmDialogComponent (potwierdzenie operacji)
+└── ToastNotificationComponent (powiadomienia)
 ```
 
 ## 4. Szczegóły komponentów
@@ -70,15 +72,21 @@ SessionDetailsComponent (kontener)
 - **Propsy:** session: SessionWithStats
 
 ### StatsCardComponent
-- **Opis:** Komponent wyświetlający statystyki sesji treningowej
+- **Opis:** Komponent wyświetlający statystyki sesji treningowej z opcją generowania podsumowania AI
 - **Główne elementy:**
   - Suma kilogramów (total_weight)
   - Suma powtórzeń (total_reps)
   - Liczba ćwiczeń
-- **Obsługiwane interakcje:** Brak
-- **Obsługiwana walidacja:** Walidacja wartości numerycznych (>= 0)
+  - Ikona AI (wand/auto_awesome) po prawej stronie napisu "Statystyki"
+- **Obsługiwane interakcje:** 
+  - Kliknięcie ikony AI uruchamia generowanie podsumowania
+  - Tooltip "Wygeneruj podsumowanie AI" przy najechaniu na ikonę
+- **Obsługiwana walidacja:** 
+  - Walidacja wartości numerycznych (>= 0)
+  - Sprawdzenie czy sesja ma serie (ikona AI nieaktywna gdy brak serii)
+  - Sprawdzenie czy nie ma już podsumowania (ikona ukryta gdy istnieje)
 - **Typy:** StatsCardProps
-- **Propsy:** totalWeight: number, totalReps: number, exerciseCount: number
+- **Propsy:** totalWeight: number, totalReps: number, exerciseCount: number, hasExerciseSets: boolean, hasSummary: boolean, isGenerating: boolean, onGenerateSummary: () => void
 
 ### SessionSetsListComponent
 - **Opis:** Komponent listy serii ćwiczeń z paginacją
@@ -124,6 +132,31 @@ SessionDetailsComponent (kontener)
 - **Typy:** ConfirmDialogProps
 - **Propsy:** isOpen: boolean, title: string, message: string, onConfirm: () => void, onCancel: () => void
 
+### AISummaryComponent
+- **Opis:** Komponent wyświetlający wygenerowane podsumowanie AI sesji treningowej
+- **Główne elementy:**
+  - Tytuł sekcji "Podsumowanie AI"
+  - Treść podsumowania w card podobnym do StatsCard
+  - Animacja fade-in przy pojawianiu się
+  - Loading state z pulsującą animacją podczas generowania
+- **Obsługiwane interakcje:** Brak (tylko wyświetlanie)
+- **Obsługiwana walidacja:** Brak
+- **Typy:** AISummaryProps
+- **Propsy:** summary: string | null, isGenerating: boolean
+
+### ToastNotificationComponent
+- **Opis:** Komponent wyświetlający powiadomienia systemowe (MatSnackBar)
+- **Główne elementy:**
+  - Ikona sukcesu/błędu
+  - Treść komunikatu
+  - Opcjonalny przycisk akcji
+- **Obsługiwane interakcje:**
+  - Auto-dismiss po 3 sekundach
+  - Ręczne zamknięcie
+- **Obsługiwana walidacja:** Brak
+- **Typy:** ToastConfig
+- **Propsy:** message: string, type: 'success' | 'error', action?: string, duration?: number
+
 ## 5. Typy
 
 ### SessionDetailsViewModel
@@ -134,6 +167,8 @@ interface SessionDetailsViewModel {
   loading: boolean;
   error: string | null;
   paginationState: PaginationState;
+  isGeneratingSummary: boolean;
+  canGenerateSummary: boolean;
 }
 ```
 
@@ -145,6 +180,7 @@ interface SessionDetailsState {
   sessionSets: ExerciseSetWithExercise[];
   isLoading: boolean;
   isLoadingSets: boolean;
+  isGeneratingSummary: boolean;
   error: ApiError | null;
   currentPage: number;
   totalSetsCount: number;
@@ -188,6 +224,10 @@ interface StatsCardProps {
   totalWeight: number;
   totalReps: number;
   exerciseCount: number;
+  hasExerciseSets: boolean;
+  hasSummary: boolean;
+  isGenerating: boolean;
+  onGenerateSummary: () => void;
 }
 ```
 
@@ -227,6 +267,33 @@ interface ConfirmDialogProps {
 }
 ```
 
+### AISummaryProps
+```typescript
+interface AISummaryProps {
+  summary: string | null;
+  isGenerating: boolean;
+}
+```
+
+### ToastConfig
+```typescript
+interface ToastConfig {
+  message: string;
+  type: 'success' | 'error';
+  action?: string;
+  duration?: number;
+}
+```
+
+### SummaryState
+```typescript
+interface SummaryState {
+  isGenerating: boolean;
+  summary: string | null;
+  canGenerate: boolean;
+}
+```
+
 ## 6. Zarządzanie stanem
 
 Stan widoku będzie zarządzany przez główny komponent SessionDetailsComponent przy użyciu Angular signals lub tradycyjnych observables. Wymagane będą następujące elementy stanu:
@@ -237,12 +304,15 @@ Stan widoku będzie zarządzany przez główny komponent SessionDetailsComponent
 - **loading states**: boolean - stany ładowania dla różnych operacji
 - **error**: ApiError | null - informacje o błędach
 - **paginationOptions**: PaginationOptions - opcje paginacji
+- **isGeneratingSummary**: boolean - stan generowania podsumowania AI
+- **userProfile**: User | null - profil użytkownika z flagą is_generating
 
 Stan będzie aktualizowany poprzez:
 - Inicjalizację przy ładowaniu komponentu
 - Reakcję na zmiany parametrów URL
-- Obsługę akcji użytkownika (paginacja, usuwanie)
+- Obsługę akcji użytkownika (paginacja, usuwanie, generowanie AI)
 - Obsługę odpowiedzi z API
+- Automatyczne usuwanie podsumowania przy modyfikacji serii (przez DB trigger)
 
 ## 7. Integracja API
 
@@ -262,7 +332,13 @@ Stan będzie aktualizowany poprzez:
 - **Endpoint:** `dbService.deleteExerciseSet(id: number)`
 - **Typ żądania:** number (ID serii)
 - **Typ odpowiedzi:** Promise<void>
-- **Obsługa:** Odświeżenie listy serii i statystyk po usunięciu
+- **Obsługa:** Odświeżenie listy serii i statystyk po usunięciu, automatyczne usunięcie podsumowania przez trigger
+
+### Generowanie podsumowania AI
+- **Endpoint:** `dbService.generateSessionSummary(sessionId: number)`
+- **Typ żądania:** number (ID sesji)
+- **Typ odpowiedzi:** Promise<string>
+- **Obsługa:** Ustawienie flagi is_generating, wywołanie Edge Function, zapisanie podsumowania
 
 ## 8. Interakcje użytkownika
 
@@ -297,6 +373,19 @@ Stan będzie aktualizowany poprzez:
 - **Akcja:** Nawigacja do `/sessions`
 - **Stan:** Powrót do listy wszystkich sesji
 
+### Generowanie podsumowania AI
+- **Trigger:** Kliknięcie ikony AI w StatsCardComponent
+- **Warunki:** Sesja musi mieć serie, nie może mieć już podsumowania, użytkownik nie może mieć aktywnego generowania
+- **Proces:** 
+  1. Sprawdzenie warunku canGenerateSummary
+  2. Ustawienie flagi is_generating = true
+  3. Wywołanie Edge Function
+  4. Zapisanie podsumowania w bazie
+  5. Zresetowanie flagi is_generating = false
+  6. Wyświetlenie toast notification
+- **Stan:** Aktualizacja session.summary, wyświetlenie AISummaryComponent
+- **Błędy:** Toast z komunikatem błędu i opcją ponownej próby
+
 ## 9. Warunki i walidacja
 
 ### Walidacja parametru URL
@@ -326,6 +415,14 @@ Stan będzie aktualizowany poprzez:
 - **Warunek:** Maksymalnie 50 serii na sesję (SESSION_LIMITS.MAX_SETS_PER_SESSION)
 - **Efekt:** Wyłączenie przycisku "Dodaj serię" jeśli limit osiągnięty
 
+### Walidacja generowania AI
+- **Komponent:** StatsCardComponent
+- **Warunki:**
+  - Sesja musi mieć co najmniej jedną serię
+  - Sesja nie może mieć już wygenerowanego podsumowania
+  - Użytkownik nie może mieć aktywnego generowania (is_generating = false)
+- **Efekt:** Ikona AI widoczna tylko gdy wszystkie warunki spełnione
+
 ## 10. Obsługa błędów
 
 ### Błędy ładowania sesji
@@ -353,6 +450,16 @@ Stan będzie aktualizowany poprzez:
 - **Obsługa:** Przekierowanie na odpowiednią stronę błędu
 - **Akcja:** Komunikat z instrukcją dla użytkownika
 
+### Błędy generowania AI
+- **Scenariusz:** Timeout Edge Function (30s), błąd API, użytkownik już generuje
+- **Obsługa:** Toast notification z komunikatem błędu
+- **Akcja:** Opcja ponownej próby, reset flagi is_generating przy timeout
+
+### Błędy współbieżności AI
+- **Scenariusz:** Użytkownik próbuje wygenerować drugie podsumowanie
+- **Obsługa:** Toast "Generowanie już w toku, proszę czekać"
+- **Akcja:** Brak - czekanie na zakończenie obecnego generowania
+
 ## 11. Kroki implementacji
 
 1. **Utworzenie podstawowej struktury komponentu**
@@ -375,27 +482,38 @@ Stan będzie aktualizowany poprzez:
    - SessionSetItemComponent dla pojedynczych pozycji
    - Integracja z DbService.getSessionSets()
 
-5. **Dodanie funkcjonalności usuwania serii**
+5. **Implementacja funkcji AI**
+   - Aktualizacja StatsCardComponent o ikonę AI i logikę
+   - Stworzenie AISummaryComponent
+   - Integracja z AI Summary Service
+   - Implementacja ToastNotificationComponent
+   - Obsługa flagi is_generating per user
+
+6. **Dodanie funkcjonalności usuwania serii**
    - ConfirmDialogComponent dla potwierdzenia
    - Integracja z DbService.deleteExerciseSet()
    - Odświeżanie danych po usunięciu
+   - Automatyczne usunięcie podsumowania przez DB trigger
 
-6. **Implementacja nawigacji**
+7. **Implementacja nawigacji**
    - Przyciski do edycji sesji i dodawania serii
    - Breadcrumb nawigacja
    - Obsługa powrotu do listy sesji
 
-7. **Dodanie obsługi stanów pustych**
+8. **Dodanie obsługi stanów pustych**
    - EmptyStateComponent dla sesji bez serii
    - LoadingSpinnerComponent dla operacji asynchronicznych
    - Komunikaty dla użytkownika
+   - Graceful degradation dla funkcji AI
 
-8. **Implementacja responsywności**
+9. **Implementacja responsywności**
    - Dostosowanie layoutu dla urządzeń mobilnych
    - Optymalizacja komponentów Material dla dotknięć
    - Testowanie na różnych rozdzielczościach
 
-9. **Dodanie walidacji i zabezpieczeń**
+10. **Dodanie walidacji i zabezpieczeń**
    - Walidacja parametrów URL
    - Ochrona przed nieautoryzowanym dostępem
    - Obsługa błędów API
+   - Timeout handling dla Edge Function (30s)
+   - Zabezpieczenie przed wielokrotnym generowaniem

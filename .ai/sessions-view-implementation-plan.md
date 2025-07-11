@@ -24,6 +24,7 @@ SessionListComponent (główny kontener)
 │   │   │   └── panel-description (opis sesji)
 │   │   └── mat-expansion-panel-content
 │   │       ├── StatsCardComponent (statystyki sesji)
+│   │       ├── AISummaryPreviewComponent (podsumowanie AI jeśli istnieje)
 │   │       ├── session-details (miejsce, pełny opis)
 │   │       └── action-buttons (Edytuj, Usuń, Szczegóły)
 │   └── mat-paginator (paginacja)
@@ -64,7 +65,7 @@ SessionListComponent (główny kontener)
   - `@Output() deleteSession: EventEmitter<number>`
   - `@Output() viewDetails: EventEmitter<number>`
 
-### StatsCardComponent
+#### StatsCardComponent
 - **Opis:** Komponent wyświetlający statystyki sesji (suma kilogramów i powtórzeń) w formie karty Material Design
 - **Główne elementy:** `mat-card`, `mat-card-content`, ikony Material, wartości liczbowe z jednostkami
 - **Obsługiwane interakcje:** Brak (tylko wyświetlanie)
@@ -73,6 +74,16 @@ SessionListComponent (główny kontener)
 - **Propsy:**
   - `totalWeight: number` - suma kilogramów w sesji
   - `totalReps: number` - suma powtórzeń w sesji
+
+#### AISummaryPreviewComponent
+- **Opis:** Komponent wyświetlający skrócone podsumowanie AI w accordion sesji
+- **Główne elementy:** `mat-card` z treścią podsumowania, ikona AI (auto_awesome)
+- **Obsługiwane interakcje:** Brak (pełne podsumowanie widoczne w szczegółach)
+- **Obsługiwana walidacja:** Sprawdzenie czy podsumowanie istnieje
+- **Typy:** `AISummaryPreview`
+- **Propsy:**
+  - `summary: string | null` - treść podsumowania AI
+  - `maxLength?: number` - maksymalna długość wyświetlanego tekstu (domyślnie 150 znaków)
 
 ### SessionFormModalComponent
 - **Opis:** Modal do dodawania i edycji sesji z formularzem reaktywnym i walidacją
@@ -140,6 +151,7 @@ interface SessionItemViewModel {
   formattedDate: string; // dla wyświetlenia
   formattedTime: string; // dla wyświetlenia
   isExpandedByDefault: boolean; // dla pierwszego elementu
+  summary: string | null; // podsumowanie AI jeśli istnieje
 }
 ```
 
@@ -170,6 +182,14 @@ interface PaginationViewModel {
 interface SessionStats {
   totalWeight: number;
   totalReps: number;
+}
+```
+
+### AISummaryPreview
+```typescript
+interface AISummaryPreview {
+  summary: string | null;
+  maxLength?: number;
 }
 ```
 
@@ -218,7 +238,7 @@ Zarządzanie stanem realizowane przez **SessionListService** z wykorzystaniem An
 #### getSessions()
 - **Typ żądania:** `PaginationOptions`
 - **Typ odpowiedzi:** `SessionWithStats[]`
-- **Użycie:** Pobieranie listy sesji z paginacją i automatycznie obliczonymi statystykami
+- **Użycie:** Pobieranie listy sesji z paginacją, automatycznie obliczonymi statystykami i podsumowaniami AI
 
 #### createSession()
 - **Typ żądania:** `CreateSessionDto`
@@ -248,6 +268,7 @@ Zarządzanie stanem realizowane przez **SessionListService** z wykorzystaniem An
 3. Wyświetlenie loading spinner
 4. Po załadowaniu: wyświetlenie accordion z pierwszym elementem rozwiniętym
 5. Jeśli brak sesji: wyświetlenie `EmptyStateComponent`
+6. Sesje z podsumowaniami AI wyświetlają preview w accordion
 
 ### Paginacja:
 1. Klikanie "Następna"/"Poprzednia" w `mat-paginator`
@@ -347,50 +368,56 @@ Zarządzanie stanem realizowane przez **SessionListService** z wykorzystaniem An
    - Stworzenie komponentu z `mat-accordion`
    - Implementacja logiki pierwszego elementu rozwiniętego
    - Dodanie przycisków akcji (edytuj, usuń, szczegóły)
+   - Integracja AISummaryPreviewComponent dla sesji z podsumowaniami
 
 4. **Implementacja StatsCardComponent**
    - Stworzenie komponentu z `mat-card`
    - Stylowanie dla wyświetlania statystyk
    - Dodanie ikon Material dla wag i powtórzeń
 
-5. **Implementacja EmptyStateComponent**
+5. **Implementacja AISummaryPreviewComponent**
+   - Stworzenie komponentu do wyświetlania skróconych podsumowań
+   - Stylowanie z ikoną AI
+   - Logika skracania tekstu z ellipsis
+
+6. **Implementacja EmptyStateComponent**
    - Stworzenie komponentu dla nowych użytkowników
    - Dodanie ilustracji i call-to-action
    - Integracja z action buttons
 
-6. **Implementacja SessionFormModalComponent**
+7. **Implementacja SessionFormModalComponent**
    - Stworzenie modala z formularzem reaktywnym
    - Implementacja walidacji (inline i async)
    - Obsługa trybów create/edit
    - Integracja z `mat-datepicker` i `mat-input`
 
-7. **Implementacja ConfirmationModalComponent**
+8. **Implementacja ConfirmationModalComponent**
    - Stworzenie prostego modala potwierdzenia
    - Dodanie ostrzeżenia o usuwaniu serii
    - Implementacja przycisków akcji
 
-8. **Implementacja paginacji**
+9. **Implementacja paginacji**
    - Integracja `mat-paginator` z SessionAccordionComponent
    - Implementacja logiki ładowania kolejnych stron
    - Dodanie loading states dla paginacji
 
-9. **Implementacja zarządzania stanem**
+10. **Implementacja zarządzania stanem**
    - Finalizacja `SessionListService` z wszystkimi metodami
    - Implementacja error handling
    - Dodanie loading states i optimistic updates
 
-10. **Stylowanie i responsywność**
+11. **Stylowanie i responsywność**
     - Implementacja mobile-first CSS
     - Optymalizacja dla różnych breakpoints
     - Stylowanie accordion i modali według Material Design
 
-11. **Testy i walidacja**
+12. **Testy i walidacja**
     - Unit testy dla komponentów
     - Integration testy dla service
     - Testy E2E dla głównych flow'ów użytkownika
     - Walidacja zgodności z PRD i User Stories
 
-12. **Optimizacja i finalizacja**
+13. **Optimizacja i finalizacja**
     - Optimizacja performance (OnPush change detection)
     - Implementacja lazy loading dla modali
     - Finalizacja error handling i edge cases
