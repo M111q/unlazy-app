@@ -10,7 +10,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     auth_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     email VARCHAR(255) NOT NULL,
-    is_generating BOOLEAN NOT NULL DEFAULT FALSE,
+    generating_started_at TIMESTAMP DEFAULT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     UNIQUE(auth_user_id)
@@ -107,6 +107,11 @@ ON exercise_sets (exercise_id);
 -- Unique index zapobiegający duplikatom sesji w tej samej minucie
 CREATE UNIQUE INDEX idx_sessions_user_minute 
 ON sessions (user_id, DATE_TRUNC('minute', session_datetime));
+
+-- Indeks dla szybkiego wyszukiwania użytkowników z aktywnym generowaniem
+CREATE INDEX idx_users_generating_started_at 
+ON users (generating_started_at) 
+WHERE generating_started_at IS NOT NULL;
 ```
 
 ## 4. Funkcje i Triggery
@@ -249,6 +254,22 @@ CREATE TRIGGER trigger_clear_session_summary
     EXECUTE FUNCTION clear_session_summary();
 ```
 
+### 4.9 Funkcja czyszczenia "martwych" procesów generowania
+
+```sql
+-- Funkcja do automatycznego czyszczenia flag generowania które utknęły
+-- Powinna być wywoływana przez cron job lub scheduled function co 5 minut
+CREATE OR REPLACE FUNCTION public.cleanup_stale_generating_flags()
+RETURNS void AS $$
+BEGIN
+    UPDATE public.users 
+    SET generating_started_at = NULL
+    WHERE generating_started_at IS NOT NULL 
+      AND generating_started_at < NOW() - INTERVAL '5 minutes';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+```
+
 ## 5. Row Level Security (RLS)
 
 ### 5.1 Włączenie RLS na tabelach
@@ -373,7 +394,7 @@ LIMIT $2 OFFSET $3;
 - Separate users table dla przyszłej rozszerzalności profili użytkowników
 - Weight stored as NUMERIC(5,2) for precise 0.01kg granularity
 - Summary stored as TEXT to accommodate AI-generated content
-- is_generating flag per user to prevent concurrent AI operations
+- generating_started_at timestamp per user to prevent concurrent AI operations
 
 ### 8.2 Bezpieczeństwo
 - RLS zapewnia izolację danych między użytkownikami
@@ -432,9 +453,9 @@ The following migration adds support for AI-generated session summaries:
 
 **Migration 3** (Add AI Summary Feature):
 ```sql
--- Add is_generating flag to users table
+-- Add generating_started_at timestamp to users table
 ALTER TABLE users 
-ADD COLUMN is_generating BOOLEAN NOT NULL DEFAULT FALSE;
+ADD COLUMN generating_started_at TIMESTAMP DEFAULT NULL;
 
 -- Add summary column to sessions table
 ALTER TABLE sessions 
@@ -460,10 +481,12 @@ CREATE TRIGGER trigger_clear_session_summary
 ```
 
 ### 10.2 AI Feature Storage Design
-- **is_generating**: Boolean flag per user to prevent concurrent AI operations
+- **generating_started_at**: Timestamp per user to prevent concurrent AI operations
   - Prevents multiple simultaneous summary generations
   - Scoped per user, not per session
-  - Should be reset on completion or timeout
+  - NULL when no generation in progress
+  - Automatically cleaned up by cleanup_stale_generating_flags() after 5 minutes
+  - Should be reset to NULL on completion or timeout
   
 - **summary**: Text field for storing AI-generated content
   - Nullable to indicate no summary exists
@@ -480,4 +503,4 @@ CREATE TRIGGER trigger_clear_session_summary
 - Add summary_generated_at timestamp for cache management
 - Consider summary versioning for history tracking
 - Add user preferences for summary language/style
-- Implement automatic cleanup for stuck is_generating flags
+- Enhance cleanup_stale_generating_flags() with more sophisticated logic

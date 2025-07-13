@@ -189,7 +189,7 @@ interface SessionStats {
 ```typescript
 interface AISummaryPreview {
   summary: string | null;
-  maxLength?: number;
+  maxLength?: number; // domyślnie 150
 }
 ```
 

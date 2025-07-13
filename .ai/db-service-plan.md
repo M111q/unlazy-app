@@ -392,16 +392,33 @@ async generateSessionSummary(sessionId: number): Promise<string> {
 ```
 
 #### Get Session Summary
+#### Refresh Session Data (with Summary) [L394-395]
 ```typescript
-async getSessionSummary(sessionId: number): Promise<string | null> {
-  const { data, error } = await this.supabase
+async refreshSessionData(sessionId: number): Promise<SessionWithStats> {
+  const { data, error } = await supabase
     .from('sessions')
-    .select('summary')
+    .select(`
+      *,
+      exercise_sets!inner (
+        id,
+        reps,
+        weight,
+        exercise:exercises (name)
+      )
+    `)
     .eq('id', sessionId)
     .single();
-
-  if (error) throw new Error(error.message);
-  return data?.summary || null;
+    
+  if (error) throw error;
+  
+  // Calculate stats
+  const stats = this.calculateSessionStats(data.exercise_sets);
+  
+  return {
+    ...data,
+    totalWeight: stats.totalWeight,
+    totalReps: stats.totalReps
+  };
 }
 ```
 
@@ -418,22 +435,63 @@ async clearSessionSummary(sessionId: number): Promise<void> {
 ```
 
 #### Check If Generating
+#### Check If Generating Summary [L420-421]
 ```typescript
 async isGeneratingSummary(): Promise<boolean> {
   const user = await this.getUserProfile();
-  return user.is_generating;
+  return user.generating_started_at !== null;
 }
 ```
 
-#### Set Generating Flag
+#### Set Generating Timestamp [L428-429]
 ```typescript
-private async setGeneratingFlag(isGenerating: boolean): Promise<void> {
+async setGeneratingTimestamp(timestamp: Date | null): Promise<void> {
   const { error } = await this.supabase
     .from('users')
-    .update({ is_generating: isGenerating })
-    .eq('auth_user_id', (await this.getCurrentUser())?.id);
+    .update({ generating_started_at: timestamp })
+    .eq('auth_user_id', this.currentUser.id);
 
   if (error) throw new Error(error.message);
+}
+```
+
+#### Generate Session Summary (Async with Polling) [L440-441]
+```typescript
+async generateSessionSummary(sessionId: number): Promise<void> {
+  try {
+    // Quick Edge Function call to start generation
+    const { data, error } = await this.supabase.functions.invoke('ai-summary', {
+      body: { sessionId }
+    });
+    
+    if (error) throw error;
+    
+    if (data.started) {
+      // Start polling for completion
+      this.startGenerationPolling(sessionId);
+    }
+  } catch (error) {
+    this.handleGenerationError(error, sessionId);
+  }
+}
+
+private startGenerationPolling(sessionId: number): void {
+  const pollInterval = setInterval(async () => {
+    const user = await this.getUserProfile();
+    
+    if (!user.generating_started_at) {
+      // Generation completed!
+      clearInterval(pollInterval);
+      await this.refreshSessionData(sessionId);
+      this.showToast('Podsumowanie zostało wygenerowane', 'success');
+    }
+  }, 2000); // Check every 2 seconds
+  
+  // Timeout after 60 seconds
+  setTimeout(() => {
+    clearInterval(pollInterval);
+    this.showToast('Generowanie trwa dłużej niż oczekiwano. Sprawdź ponownie za chwilę.', 'warning');
+  }, 60000);
 }
 ```
 
@@ -622,7 +680,8 @@ interface SummaryGenerationRules {
 interface SummaryState {
   isGenerating: boolean;
   summary: string | null;
-  canGenerate: boolean; // true if session has sets and no summary exists
+  canGenerate: boolean;
+  generatingStartedAt: Date | null;
 }
 
 async function getSummaryState(sessionId: number): Promise<SummaryState> {
@@ -630,9 +689,10 @@ async function getSummaryState(sessionId: number): Promise<SummaryState> {
   const user = await getUserProfile();
   
   return {
-    isGenerating: user.is_generating,
+    isGenerating: user.generating_started_at !== null,
     summary: session.summary,
-    canGenerate: session.exercise_sets.length > 0 && !session.summary && !user.is_generating
+    canGenerate: session.exercise_sets.length > 0 && !session.summary && user.generating_started_at === null,
+    generatingStartedAt: user.generating_started_at
   };
 }
 ```
