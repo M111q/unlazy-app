@@ -272,4 +272,42 @@ export class SessionListService {
       minute: "2-digit",
     });
   }
+
+  /**
+   * Update the generating state for a specific session
+   */
+  updateSessionGeneratingState(sessionId: number, isGenerating: boolean): void {
+    const currentSessions = this.sessions();
+    const updatedSessions = currentSessions.map((session) =>
+      session.id === sessionId
+        ? {
+            ...session,
+            isGenerating,
+          }
+        : session,
+    );
+    this.sessions.set(updatedSessions);
+  }
+
+  /**
+   * Update the summary state for a specific session
+   */
+  updateSessionSummaryState(
+    sessionId: number,
+    summary: string | null,
+    isGenerating: boolean,
+  ): void {
+    const currentSessions = this.sessions();
+    const updatedSessions = currentSessions.map((session) =>
+      session.id === sessionId
+        ? {
+            ...session,
+            isGenerating,
+            summary,
+            hasSummary: !!summary,
+          }
+        : session,
+    );
+    this.sessions.set(updatedSessions);
+  }
 }

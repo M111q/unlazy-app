@@ -12,6 +12,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
 import { MaterialModule } from "../../../../shared/material.module";
+import { AISummaryService } from "../../../ai-summary/ai-summary.service";
 import { SessionListService } from "../../services/session-list.service";
 import { SessionAccordionComponent } from "../session-accordion/session-accordion.component";
 import { EmptyStateComponent } from "../empty-state/empty-state.component";
@@ -24,7 +25,11 @@ import {
   ConfirmationModalData,
 } from "../confirmation-modal/confirmation-modal.component";
 import { SessionItemViewModel } from "../../types/sessions-view-models";
-import { CreateSessionDto, UpdateSessionDto } from "../../../../../types";
+import {
+  CreateSessionDto,
+  UpdateSessionDto,
+  AISummaryState,
+} from "../../../../../types";
 import { ERROR_MESSAGES } from "../../../../constants";
 
 @Component({
@@ -46,6 +51,7 @@ export class SessionListComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly aiSummaryService = inject(AISummaryService);
 
   // Reactive view model from service
   protected readonly viewModel = computed(() =>
@@ -186,10 +192,57 @@ export class SessionListComponent implements OnInit {
   }
 
   /**
-   * Handle AI summary generation - navigate to session details where AI functionality is available
+   * Handle AI summary generation - generate summary in place
    */
-  onGenerateAISummary(sessionId: number): void {
-    this.router.navigate(["/sessions", sessionId]);
+  async onGenerateAISummary(sessionId: number): Promise<void> {
+    try {
+      // Update the session's generating state
+      this.sessionListService.updateSessionGeneratingState(sessionId, true);
+
+      // Generate summary
+      const summaryObservable =
+        await this.aiSummaryService.generateSessionSummary(sessionId);
+
+      summaryObservable.subscribe({
+        next: (state: AISummaryState) => {
+          this.sessionListService.updateSessionSummaryState(
+            sessionId,
+            state.summary,
+            state.isGenerating,
+          );
+        },
+        error: (error) => {
+          console.error("AI summary generation failed:", error);
+          this.sessionListService.updateSessionGeneratingState(
+            sessionId,
+            false,
+          );
+          this.snackBar.open(
+            error.message || "Błąd podczas generowania podsumowania",
+            "Zamknij",
+            {
+              duration: 5000,
+              panelClass: ["error-snack-bar"],
+            },
+          );
+        },
+        complete: () => {
+          // Refresh the session data to get the latest summary
+          this.sessionListService.refreshCurrentPage();
+        },
+      });
+    } catch (error) {
+      console.error("Failed to start AI summary generation:", error);
+      this.sessionListService.updateSessionGeneratingState(sessionId, false);
+      this.snackBar.open(
+        "Nie można rozpocząć generowania podsumowania",
+        "Zamknij",
+        {
+          duration: 5000,
+          panelClass: ["error-snack-bar"],
+        },
+      );
+    }
   }
 
   /**
