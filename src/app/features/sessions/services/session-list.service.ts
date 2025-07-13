@@ -196,6 +196,7 @@ export class SessionListService {
         session.exercise_sets && session.exercise_sets.length > 0,
       hasSummary: !!session.summary,
       isGenerating: false, // Default to false, will be updated by real-time state if needed
+      summary: session.summary,
     }));
   }
 

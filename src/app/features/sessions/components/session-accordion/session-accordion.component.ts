@@ -9,12 +9,18 @@ import { CommonModule } from "@angular/common";
 
 import { MaterialModule } from "../../../../shared/material.module";
 import { StatsCardComponent } from "../stats-card/stats-card.component";
+import { AISummaryComponent } from "../../../ai-summary/components/ai-summary.component";
 import { SessionItemViewModel } from "../../types/sessions-view-models";
 
 @Component({
   selector: "app-session-accordion",
   standalone: true,
-  imports: [CommonModule, MaterialModule, StatsCardComponent],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    StatsCardComponent,
+    AISummaryComponent,
+  ],
   templateUrl: "./session-accordion.component.html",
   styleUrl: "./session-accordion.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,

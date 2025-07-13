@@ -23,6 +23,7 @@ export interface SessionItemViewModel {
   hasExerciseSets: boolean; // czy sesja ma jakiekolwiek ćwiczenia
   hasSummary: boolean; // czy sesja ma już wygenerowane podsumowanie AI
   isGenerating: boolean; // czy aktualnie generuje się podsumowanie
+  summary: string | null; // treść podsumowania AI
 }
 
 export interface SessionFormViewModel {

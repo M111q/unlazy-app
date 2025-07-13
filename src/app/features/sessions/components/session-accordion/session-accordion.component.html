@@ -36,6 +36,12 @@
         (generateSummary)="onGenerateAISummary(session.id)">
       </app-stats-card>
 
+      <!-- AI Summary -->
+      <app-ai-summary
+        [summary]="session.summary"
+        [isGenerating]="session.isGenerating">
+      </app-ai-summary>
+
       <!-- Session Details -->
       <div class="session-details" *ngIf="session.location">
         <div class="detail-item">
