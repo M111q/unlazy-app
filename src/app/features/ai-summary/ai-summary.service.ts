@@ -34,8 +34,6 @@ export class AISummaryService implements OnDestroy {
   async generateSessionSummary(
     sessionId: number,
   ): Promise<Observable<AISummaryState>> {
-    console.log("🎯 [AI Summary] Method called with sessionId:", sessionId);
-
     // Clear any existing debounce timer for this session
     this.clearDebounceTimer(sessionId);
 
@@ -68,10 +66,6 @@ export class AISummaryService implements OnDestroy {
    * @private
    */
   private executeGeneration(sessionId: number): Observable<AISummaryState> {
-    console.log(
-      "🎯 [AI Summary] executeGeneration called for sessionId:",
-      sessionId,
-    );
     const subject = new Subject<AISummaryState>();
 
     // Emit initial generating state
@@ -98,15 +92,9 @@ export class AISummaryService implements OnDestroy {
   ): Promise<void> {
     try {
       const request: GenerateSummaryRequest = { sessionId: sessionId };
-      console.log("🚀 [AI Summary] Preparing request:", request);
 
       // Call the edge function through DbService
-      console.log(
-        "🚀 [AI Summary] Calling edge function with body:",
-        JSON.stringify(request),
-      );
       const response = await this.callEdgeFunction("openrouter", request);
-      console.log("🚀 [AI Summary] Edge function response:", response);
 
       if (response.error) {
         throw new Error(
@@ -391,23 +379,19 @@ export class AISummaryService implements OnDestroy {
   private async callEdgeFunction(
     functionName: string,
     body: GenerateSummaryRequest,
+    async = true,
   ): Promise<{ data: unknown; error: { message?: string } | null }> {
-    console.log("🔥 [Edge Function] Calling:", functionName);
-    console.log("🔥 [Edge Function] Body to send:", JSON.stringify(body));
-    console.log("🔥 [Edge Function] Body type:", typeof body);
-    console.log("🔥 [Edge Function] Body keys:", Object.keys(body));
-
     const supabaseClient = (this.dbService as any).supabaseService.client;
 
     const payload = {
-      body: body,
+      body: { ...body },
     };
 
-    console.log("🔥 [Edge Function] Full payload:", JSON.stringify(payload));
+    if (async) {
+      payload.body.async = true;
+    }
 
     const result = await supabaseClient.functions.invoke(functionName, payload);
-
-    console.log("🔥 [Edge Function] Raw result:", result);
 
     return result;
   }
