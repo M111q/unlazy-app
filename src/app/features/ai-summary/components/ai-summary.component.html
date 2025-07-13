@@ -1,0 +1,28 @@
+<mat-card class="ai-summary-card" *ngIf="summary || isGenerating">
+  <mat-card-header>
+    <mat-card-title class="ai-title">
+      <mat-icon class="ai-icon">auto_awesome</mat-icon>
+      <span>Podsumowanie AI</span>
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Generating State -->
+    <div class="generating-state" *ngIf="isGenerating">
+      <mat-progress-bar
+        mode="indeterminate"
+        class="progress-bar"
+        color="primary">
+      </mat-progress-bar>
+      <p class="generating-text">
+        <mat-icon>hourglass_empty</mat-icon>
+        Generowanie podsumowania...
+      </p>
+    </div>
+
+    <!-- Summary Content -->
+    <div class="summary-content" *ngIf="summary && !isGenerating">
+      <p class="summary-text">{{ summary }}</p>
+    </div>
+  </mat-card-content>
+</mat-card>

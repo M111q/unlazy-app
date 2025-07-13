@@ -1,7 +1,15 @@
-import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  inject,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 
 import { MaterialModule } from "../../../../shared/material.module";
+import { AISummaryService } from "../../../ai-summary/ai-summary.service";
 
 @Component({
   selector: "app-stats-card",
@@ -12,9 +20,33 @@ import { MaterialModule } from "../../../../shared/material.module";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatsCardComponent {
+  private readonly aiSummaryService = inject(AISummaryService);
+
   @Input({ required: true }) totalWeight = 0;
   @Input({ required: true }) totalReps = 0;
   @Input({ required: true }) exerciseCount = 0;
+  @Input() hasExerciseSets = false;
+  @Input() hasSummary = false;
+  @Input() isGenerating = false;
+
+  @Output() generateSummary = new EventEmitter<void>();
+
+  /**
+   * Check if AI icon should be shown
+   * Shows when session has exercise sets but no summary and is not generating
+   */
+  get canShowAIIcon(): boolean {
+    return this.hasExerciseSets && !this.hasSummary && !this.isGenerating;
+  }
+
+  /**
+   * Handle AI generation button click
+   */
+  onGenerateAI(): void {
+    if (this.canShowAIIcon) {
+      this.generateSummary.emit();
+    }
+  }
 
   /**
    * Get validated total weight value

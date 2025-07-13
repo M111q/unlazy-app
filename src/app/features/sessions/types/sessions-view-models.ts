@@ -19,6 +19,10 @@ export interface SessionItemViewModel {
   formattedDate: string; // dla wyświetlenia
   formattedTime: string; // dla wyświetlenia
   isExpandedByDefault: boolean; // dla pierwszego elementu
+  // AI Summary related properties
+  hasExerciseSets: boolean; // czy sesja ma jakiekolwiek ćwiczenia
+  hasSummary: boolean; // czy sesja ma już wygenerowane podsumowanie AI
+  isGenerating: boolean; // czy aktualnie generuje się podsumowanie
 }
 
 export interface SessionFormViewModel {

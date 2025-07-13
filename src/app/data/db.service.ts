@@ -3,6 +3,7 @@ import { SupabaseService } from "./supabase.service";
 import { DatabaseValidationService } from "./database-validation.service";
 import {
   UserProfile,
+  User,
   Exercise,
   Session,
   ExerciseSet,
@@ -171,6 +172,36 @@ export class DbService {
     }
   }
 
+  /**
+   * Get current user with AI generation status
+   * @returns Promise with user data including is_generating field
+   * @throws Error if user not found or retrieval fails
+   */
+  async getCurrentUserWithAIStatus(): Promise<User | null> {
+    try {
+      const authUser = await this.getCurrentUser();
+      if (!authUser) {
+        return null;
+      }
+
+      const { data, error } = await this.supabaseService.client
+        .from("users")
+        .select("id, auth_user_id, email, generating_started_at")
+        .eq("auth_user_id", authUser.id)
+        .single();
+
+      if (error) {
+        console.error("Error getting user with AI status:", error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Exception getting user with AI status:", error);
+      return null;
+    }
+  }
+
   // ========================================
   // EXERCISES SERVICE
   // ========================================
@@ -329,6 +360,52 @@ export class DbService {
       if (dailyCount >= SESSION_LIMITS.MAX_DAILY_SESSIONS) {
         throw new Error(ERROR_MESSAGES.DAILY_LIMIT_EXCEEDED);
       }
+    } catch (error) {
+      throw this.handleDatabaseError(error);
+    }
+  }
+
+  /**
+   * Get session by ID (simple version for AI Summary)
+   * @param id - Session ID
+   * @returns Promise with basic session data
+   * @throws Error if session not found or retrieval fails
+   */
+  async getSession(id: number): Promise<Session | null> {
+    try {
+      this.databaseValidationService.validateId(id, "Session ID");
+
+      const { data, error } = await this.supabaseService.client
+        .from("sessions")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        if (error.code === "PGRST116") {
+          return null; // Session not found
+        }
+        throw new Error(error.message);
+      }
+
+      return data;
+    } catch (error) {
+      throw this.handleDatabaseError(error);
+    }
+  }
+
+  /**
+   * Refresh session data after AI summary generation
+   * @param sessionId - Session ID to refresh
+   * @throws Error if refresh fails
+   */
+  async refreshSession(sessionId: number): Promise<void> {
+    try {
+      this.databaseValidationService.validateId(sessionId, "Session ID");
+
+      // For now, this is a no-op since we're using real-time subscriptions
+      // In the future, this could trigger cache invalidation or emit events
+      console.log(`Session ${sessionId} data refreshed`);
     } catch (error) {
       throw this.handleDatabaseError(error);
     }

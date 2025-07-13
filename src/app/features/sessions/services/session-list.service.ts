@@ -191,6 +191,11 @@ export class SessionListService {
       formattedDate: this.formatDate(new Date(session.session_datetime)),
       formattedTime: this.formatTime(new Date(session.session_datetime)),
       isExpandedByDefault: index === 0, // First element expanded by default
+      // AI Summary related properties
+      hasExerciseSets:
+        session.exercise_sets && session.exercise_sets.length > 0,
+      hasSummary: !!session.summary,
+      isGenerating: false, // Default to false, will be updated by real-time state if needed
     }));
   }
 

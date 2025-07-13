@@ -14,12 +14,15 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 
 import { MaterialModule } from "../../../../shared/material.module";
 import { DbService } from "../../../../data/db.service";
+import { AISummaryService } from "../../../ai-summary/ai-summary.service";
+import { AISummaryComponent } from "../../../ai-summary/components/ai-summary.component";
 import { PAGINATION, SESSION_LIMITS } from "../../../../constants";
 import {
   SessionWithStats,
   ExerciseSetWithExercise,
   ApiError,
   PaginationOptions,
+  AISummaryState,
 } from "../../../../../types";
 import { PageHeaderComponent } from "../page-header/page-header.component";
 import { SessionDetailsCardComponent } from "../session-details-card/session-details-card.component";
@@ -45,6 +48,11 @@ interface SessionDetailsState {
   currentPage: number;
   totalSetsCount: number;
   itemsPerPage: number;
+  // AI Summary related state
+  aiSummary: string | null;
+  isGeneratingAI: boolean;
+  aiError: string | null;
+  canGenerateAI: boolean;
 }
 
 interface PaginationState {
@@ -67,6 +75,7 @@ interface PaginationState {
     SessionDetailsCardComponent,
     StatsCardComponent,
     SessionSetsListComponent,
+    AISummaryComponent,
   ],
   template: `
     <div
@@ -180,7 +189,17 @@ interface PaginationState {
           [totalWeight]="state().sessionDetails?.total_weight || 0"
           [totalReps]="state().sessionDetails?.total_reps || 0"
           [exerciseCount]="exerciseCount()"
+          [hasExerciseSets]="state().sessionSets.length > 0"
+          [hasSummary]="!!state().aiSummary"
+          [isGenerating]="state().isGeneratingAI"
+          (generateSummary)="onGenerateSummary()"
         ></app-stats-card>
+
+        <!-- AI Summary Component -->
+        <app-ai-summary
+          [summary]="state().aiSummary"
+          [isGenerating]="state().isGeneratingAI"
+        ></app-ai-summary>
 
         <!-- Sets List -->
         <app-session-sets-list
@@ -205,6 +224,7 @@ export class SessionDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly dbService = inject(DbService);
+  private readonly aiSummaryService = inject(AISummaryService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
@@ -223,6 +243,11 @@ export class SessionDetailsComponent implements OnInit {
     currentPage: 1,
     totalSetsCount: 0,
     itemsPerPage: PAGINATION.DEFAULT_SETS_LIMIT,
+    // AI Summary related state
+    aiSummary: null,
+    isGeneratingAI: false,
+    aiError: null,
+    canGenerateAI: false,
   });
 
   // Computed values
@@ -262,6 +287,16 @@ export class SessionDetailsComponent implements OnInit {
       this.state().isChangingPage ||
       this.state().isLoading,
   );
+
+  protected readonly aiSummaryState = computed((): AISummaryState => {
+    const state = this.state();
+    return {
+      isGenerating: state.isGeneratingAI,
+      summary: state.aiSummary,
+      canGenerate: state.canGenerateAI,
+      error: state.aiError,
+    };
+  });
 
   ngOnInit(): void {
     this.initializeComponent();
@@ -330,14 +365,23 @@ export class SessionDetailsComponent implements OnInit {
         return;
       }
 
+      // Initialize AI Summary state based on session data
+      const hasExerciseSets = setsData.sets.length > 0;
+      const hasSummary = !!sessionDetails.summary;
+      const canGenerateAI = hasExerciseSets && !hasSummary;
+
       this.state.update((state) => ({
         ...state,
         sessionDetails,
         sessionSets: setsData.sets,
         totalSetsCount: setsData.totalCount,
-        currentPage: 1,
-        error: null,
         isLoading: false,
+        error: null,
+        // AI Summary state initialization
+        aiSummary: sessionDetails.summary || null,
+        isGeneratingAI: false,
+        aiError: null,
+        canGenerateAI,
       }));
     } catch (error) {
       console.error("Error loading session data:", error);
@@ -556,7 +600,7 @@ export class SessionDetailsComponent implements OnInit {
     return new Date(datetime).toLocaleString("pl-PL");
   }
 
-  private handleSetLoadingError(error: any): void {
+  private handleSetLoadingError(error: unknown): void {
     console.error("Failed to load session sets:", error);
     // In a real app, you might want to show a toast notification or update state
   }
@@ -842,6 +886,70 @@ Przeglądarka: ${errorInfo.userAgent}`;
         this.showErrorMessage("Nie udało się skopiować informacji o błędzie");
       }
       document.body.removeChild(textArea);
+    }
+  }
+
+  /**
+   * Handle AI summary generation
+   */
+  protected async onGenerateSummary(): Promise<void> {
+    const currentState = this.state();
+
+    if (!currentState.sessionDetails || currentState.isGeneratingAI) {
+      return;
+    }
+
+    try {
+      // Update state to show generating
+      this.state.update((state) => ({
+        ...state,
+        isGeneratingAI: true,
+        aiError: null,
+      }));
+
+      // Start AI summary generation
+      const summaryObservable =
+        await this.aiSummaryService.generateSessionSummary(
+          currentState.sessionDetails.id,
+        );
+
+      // Subscribe to summary generation updates
+      summaryObservable.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: (aiState: AISummaryState) => {
+          this.state.update((state) => ({
+            ...state,
+            isGeneratingAI: aiState.isGenerating,
+            aiSummary: aiState.summary,
+            aiError: aiState.error,
+            canGenerateAI: aiState.canGenerate,
+          }));
+
+          // If generation completed successfully, refresh session data
+          if (!aiState.isGenerating && aiState.summary && !aiState.error) {
+            this.refreshSessionData();
+          }
+        },
+        error: (error) => {
+          console.error("AI summary generation failed:", error);
+          this.state.update((state) => ({
+            ...state,
+            isGeneratingAI: false,
+            aiError:
+              error.message || "Wystąpił błąd podczas generowania podsumowania",
+            canGenerateAI: true,
+          }));
+          this.showErrorMessage("Nie udało się wygenerować podsumowania AI");
+        },
+      });
+    } catch (error) {
+      console.error("Error starting AI summary generation:", error);
+      this.state.update((state) => ({
+        ...state,
+        isGeneratingAI: false,
+        aiError: error instanceof Error ? error.message : "Nieznany błąd",
+        canGenerateAI: true,
+      }));
+      this.showErrorMessage("Nie udało się rozpocząć generowania podsumowania");
     }
   }
 }

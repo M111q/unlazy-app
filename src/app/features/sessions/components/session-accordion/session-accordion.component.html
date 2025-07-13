@@ -29,7 +29,11 @@
       <app-stats-card
         [totalWeight]="session.totalWeight"
         [totalReps]="session.totalReps"
-        [exerciseCount]="session.exerciseCount">
+        [exerciseCount]="session.exerciseCount"
+        [hasExerciseSets]="session.hasExerciseSets"
+        [hasSummary]="session.hasSummary"
+        [isGenerating]="session.isGenerating"
+        (generateSummary)="onGenerateAISummary(session.id)">
       </app-stats-card>
 
       <!-- Session Details -->

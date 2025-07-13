@@ -146,24 +146,24 @@ export type Database = {
           auth_user_id: string
           created_at: string
           email: string
+          generating_started_at: string | null
           id: number
-          is_generating: boolean
           updated_at: string
         }
         Insert: {
           auth_user_id: string
           created_at?: string
           email: string
+          generating_started_at?: string | null
           id?: number
-          is_generating?: boolean
           updated_at?: string
         }
         Update: {
           auth_user_id?: string
           created_at?: string
           email?: string
+          generating_started_at?: string | null
           id?: number
-          is_generating?: boolean
           updated_at?: string
         }
         Relationships: []
@@ -173,7 +173,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_stale_generating_flags: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

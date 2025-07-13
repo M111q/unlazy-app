@@ -26,6 +26,7 @@ export class SessionAccordionComponent {
   @Output() editSession = new EventEmitter<SessionItemViewModel>();
   @Output() deleteSession = new EventEmitter<number>();
   @Output() viewDetails = new EventEmitter<number>();
+  @Output() generateAISummary = new EventEmitter<number>();
 
   /**
    * Handle edit session button click
@@ -46,6 +47,13 @@ export class SessionAccordionComponent {
    */
   onViewDetails(sessionId: number): void {
     this.viewDetails.emit(sessionId);
+  }
+
+  /**
+   * Handle AI summary generation button click
+   */
+  onGenerateAISummary(sessionId: number): void {
+    this.generateAISummary.emit(sessionId);
   }
 
   /**

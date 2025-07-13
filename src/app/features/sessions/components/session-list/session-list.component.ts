@@ -186,6 +186,13 @@ export class SessionListComponent implements OnInit {
   }
 
   /**
+   * Handle AI summary generation - navigate to session details where AI functionality is available
+   */
+  onGenerateAISummary(sessionId: number): void {
+    this.router.navigate(["/sessions", sessionId]);
+  }
+
+  /**
    * Handle retry when error occurs
    */
   onRetry(): void {

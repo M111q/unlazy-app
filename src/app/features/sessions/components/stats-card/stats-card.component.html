@@ -1,6 +1,18 @@
 <mat-card class="stats-card">
   <mat-card-header>
-    <mat-card-title>Statystyki</mat-card-title>
+    <mat-card-title class="title-with-ai">
+      <span>Statystyki</span>
+      <button
+        mat-icon-button
+        class="ai-icon-button"
+        *ngIf="canShowAIIcon"
+        (click)="onGenerateAI()"
+        [disabled]="isGenerating"
+        matTooltip="Wygeneruj podsumowanie AI"
+        aria-label="Wygeneruj podsumowanie AI">
+        <mat-icon>auto_awesome</mat-icon>
+      </button>
+    </mat-card-title>
   </mat-card-header>
   <mat-card-content>
     <div class="stats-grid">

@@ -75,6 +75,28 @@
   }
 }
 
+// AI Button Styles
+.title-with-ai {
+  @include mixins.flex-between;
+  align-items: center;
+  width: 100%;
+}
+
+.ai-icon-button {
+  color: vars.$color-primary;
+  transition: vars.$transition-hover;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(vars.$color-primary, 0.1);
+    color: vars.$color-primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
 // Component-specific responsive adjustments
 @include mixins.media-max(mobile) {
   .stats-card {
