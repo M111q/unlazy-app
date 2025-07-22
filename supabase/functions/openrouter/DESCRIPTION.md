@@ -2,7 +2,7 @@
 
 ## Opis
 
-Edge Function generująca podsumowanie sesji treningowej przy użyciu AI. Funkcja pobiera dane o sesji treningowej użytkownika i zwraca krótkie, motywujące podsumowanie w języku polskim.
+Edge Function generująca podsumowanie sesji treningowej przy użyciu AI w trybie asynchronicznym. Funkcja pobiera dane o sesji treningowej użytkownika, rozpoczyna generowanie w tle i natychmiast zwraca odpowiedź. Podsumowanie jest generowane w języku polskim i zapisywane bezpośrednio w bazie danych.
 
 ## Endpoint
 
@@ -51,19 +51,33 @@ Token musi być ważnym tokenem Supabase Auth dla zalogowanego użytkownika.
 
 ```typescript
 {
-  "summary": string,      // Podsumowanie sesji wygenerowane przez AI
-  "sessionId": number,    // ID podsumowanej sesji
-  "tokensUsed": number    // Liczba tokenów zużytych przez AI (opcjonalne)
+  "requestId": string,    // Unikalny identyfikator żądania
+  "status": "started" | "generating" | "completed" | "error",  // Status generowania
+  "sessionId": number,    // ID sesji do podsumowania
+  "summary"?: string,     // Podsumowanie (tylko gdy status = "completed")
+  "tokensUsed"?: number,  // Liczba tokenów (tylko gdy status = "completed")
+  "error"?: string        // Komunikat błędu (tylko gdy status = "error")
 }
 ```
 
-### Przykład odpowiedzi
+### Przykład odpowiedzi (rozpoczęcie generowania)
 
 ```json
 {
-  "summary": "Świetny trening! Skupiłeś się na górnych partiach ciała, wykonując łącznie 3 serie wyciskania sztangi i 4 serie podciągania. Twoje mięśnie klatki piersiowej i pleców z pewnością odczują ten wysiłek. Tak trzymaj i pamiętaj o regularności - następny trening czeka!",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "started",
+  "sessionId": 123
+}
+```
+
+### Przykład odpowiedzi (błąd podczas generowania)
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "error",
   "sessionId": 123,
-  "tokensUsed": 156
+  "error": "Failed to generate summary"
 }
 ```
 
@@ -138,14 +152,28 @@ Token musi być ważnym tokenem Supabase Auth dla zalogowanego użytkownika.
 - W przyszłości możliwe będzie dostosowanie języka per użytkownik
 
 
+## Mechanizm blokowania
+
+Funkcja implementuje mechanizm blokowania wielokrotnego generowania:
+
+1. **Flaga `generating_started_at`**: Ustawiana w tabeli `users` przy rozpoczęciu generowania
+2. **Blokowanie**: Użytkownik nie może rozpocząć nowego generowania, gdy flaga jest ustawiona
+3. **Automatyczne czyszczenie**: Flaga jest czyszczona po zakończeniu generowania (sukces lub błąd)
+
 ## Notatki dla developera
 
 1. **Bezpieczeństwo**: Funkcja automatycznie weryfikuje własność sesji - użytkownik może podsumować tylko swoje sesje
 
-2. **Cache**: Podsumowania nie są cache'owane - każde wywołanie generuje nowe podsumowanie
+2. **Tryb asynchroniczny**: Funkcja zawsze działa asynchronicznie - zwraca natychmiastową odpowiedź i generuje podsumowanie w tle
 
-3. **Koszty**: Każde wywołanie zużywa tokeny AI - rozważ zapisywanie podsumowań w bazie
+3. **Polling**: Frontend powinien odpytywać o status generowania sprawdzając pole `generating_started_at` użytkownika
 
-4. **Rate limiting**: Obecnie brak limitów, ale warto dodać throttling po stronie frontendu
+4. **Zapis do bazy**: Wygenerowane podsumowanie jest automatycznie zapisywane w polu `summary` tabeli `sessions`
 
-5. **Offline**: Funkcja wymaga połączenia z internetem - obsłuż błędy sieciowe
+5. **Koszty**: Każde wywołanie zużywa tokeny AI - podsumowania są zapisywane w bazie, więc nie generuj ich wielokrotnie
+
+6. **Rate limiting**: Mechanizm blokowania zapobiega wielokrotnemu generowaniu przez tego samego użytkownika
+
+7. **Offline**: Funkcja wymaga połączenia z internetem - obsłuż błędy sieciowe
+
+8. **Timeout**: Frontend powinien implementować timeout (np. 60 sekund) dla pollingu
