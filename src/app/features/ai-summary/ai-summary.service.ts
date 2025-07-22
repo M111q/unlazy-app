@@ -21,10 +21,7 @@ export class AISummaryService implements OnDestroy {
   private readonly dbService = inject(DbService);
   private readonly snackBar = inject(MatSnackBar);
 
-  private pollingIntervals = new Map<number, ReturnType<typeof setInterval>>();
   private debounceTimers = new Map<number, ReturnType<typeof setTimeout>>();
-
-  private readonly destroy$ = new Subject<void>();
 
   /**
    * Generates AI summary for a training session
@@ -33,27 +30,24 @@ export class AISummaryService implements OnDestroy {
    */
   async generateSessionSummary(
     sessionId: number,
-  ): Promise<Observable<AISummaryState>> {
+  ): Promise<void> {
     // Clear any existing debounce timer for this session
     this.clearDebounceTimer(sessionId);
 
+    // Check if can generate
+    const canGenerate = await this.canGenerateSummary(sessionId);
+    if (!canGenerate) {
+      throw new Error("Cannot generate summary for this session");
+    }
+
     // Set up debounce timer to prevent rapid successive calls
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const debounceTimer = setTimeout(async () => {
         try {
-          const canGenerate = await this.canGenerateSummary(sessionId);
-          if (!canGenerate) {
-            resolve(
-              throwError(
-                () => new Error("Cannot generate summary for this session"),
-              ),
-            );
-            return;
-          }
-
-          resolve(this.executeGeneration(sessionId));
+          await this.executeGeneration(sessionId);
+          resolve();
         } catch (error) {
-          resolve(throwError(() => error));
+          reject(error);
         }
       }, AI_SUMMARY.DEBOUNCE_DELAY);
 
@@ -65,35 +59,11 @@ export class AISummaryService implements OnDestroy {
    * Executes the actual generation process
    * @private
    */
-  private executeGeneration(sessionId: number): Observable<AISummaryState> {
-    const subject = new Subject<AISummaryState>();
-
-    // Emit initial generating state
-    subject.next({
-      isGenerating: true,
-      summary: null,
-      canGenerate: false,
-      error: null,
-    });
-
-    // Start the API call
-    this.performAPICall(sessionId, subject);
-
-    return subject.asObservable().pipe(takeUntil(this.destroy$));
-  }
-
-  /**
-   * Performs the actual API call to generate summary
-   * @private
-   */
-  private async performAPICall(
-    sessionId: number,
-    subject: Subject<AISummaryState>,
-  ): Promise<void> {
+  private async executeGeneration(sessionId: number): Promise<void> {
     try {
       const request: GenerateSummaryRequest = { sessionId: sessionId };
 
-      // Call the edge function through DbService
+      // Call the edge function in async mode
       const response = await this.callEdgeFunction("openrouter", request);
 
       if (response.error) {
@@ -104,71 +74,24 @@ export class AISummaryService implements OnDestroy {
 
       const data = response.data as GenerateSummaryAsyncResponse;
 
-      // Emit success state
-      subject.next({
-        isGenerating: false,
-        summary: data.summary,
-        canGenerate: true,
-        error: null,
-      });
+      // Check if generation started successfully
+      if (data.status === "error") {
+        throw new Error(data.error || "Failed to start generation");
+      }
 
-      // Handle completion
-      await this.handleGenerationComplete(sessionId);
-
-      subject.complete();
+      // Show success message - generation started
+      this.showMessage(AI_MESSAGES.GENERATING, "info");
     } catch (error) {
       this.handleGenerationError(sessionId, error);
-
-      // Emit error state
-      subject.next({
-        isGenerating: false,
-        summary: null,
-        canGenerate: true,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-
-      subject.complete();
+      throw error;
     }
   }
 
-  /**
-   * Starts polling for generation status updates
-   * @private
-   */
-  private startGenerationPolling(
-    sessionId: number,
-  ): Observable<SummaryGenerationStatus> {
-    return timer(0, AI_SUMMARY.POLLING_INTERVAL).pipe(
-      switchMap(() => this.getSession(sessionId)),
-      map(
-        (session) =>
-          ({
-            isGenerating: session?.summary ? false : true,
-            summary: session?.summary || null,
-            error: null,
-          }) as SummaryGenerationStatus,
-      ),
-      takeUntil(this.destroy$),
-      catchError((error) => {
-        this.handlePollingError(sessionId, error);
-        return throwError(() => error);
-      }),
-    );
-  }
 
-  /**
-   * Handles completion of summary generation
-   * @private
-   */
-  private async handleGenerationComplete(sessionId: number): Promise<void> {
-    try {
-      await this.refreshSessionData(sessionId);
-      this.showMessage(AI_MESSAGES.SUCCESS, "success");
-      this.stopPolling(sessionId);
-    } catch (error) {
-      console.error("Error handling generation completion:", error);
-    }
-  }
+
+
+
+
 
   /**
    * Checks if summary can be generated for the session
@@ -219,16 +142,7 @@ export class AISummaryService implements OnDestroy {
     }
   }
 
-  /**
-   * Stops polling for a specific session
-   */
-  stopPolling(sessionId: number): void {
-    const interval = this.pollingIntervals.get(sessionId);
-    if (interval) {
-      clearInterval(interval);
-      this.pollingIntervals.delete(sessionId);
-    }
-  }
+
 
   /**
    * Clears debounce timer for a session
@@ -258,18 +172,7 @@ export class AISummaryService implements OnDestroy {
     return this.dbService.getSession(sessionId);
   }
 
-  /**
-   * Refreshes session data after summary generation
-   * @private
-   */
-  private async refreshSessionData(sessionId: number): Promise<void> {
-    try {
-      await this.dbService.refreshSession(sessionId);
-    } catch (error) {
-      console.error("Error refreshing session data:", error);
-      throw error;
-    }
-  }
+
 
   /**
    * Handles generation errors
@@ -298,30 +201,17 @@ export class AISummaryService implements OnDestroy {
       errorObj?.message?.includes("not found")
     ) {
       message = AI_MESSAGES.ERROR_SESSION_NOT_FOUND;
+    } else if (
+      errorObj?.message?.includes("Cannot generate") ||
+      errorObj?.message?.includes("already generating")
+    ) {
+      message = AI_MESSAGES.ALREADY_GENERATING;
     }
 
     this.showMessage(message, "error");
-    this.stopPolling(sessionId);
   }
 
-  /**
-   * Handles timeout errors
-   * @private
-   */
-  private handleTimeout(sessionId: number): void {
-    this.showMessage(AI_MESSAGES.ERROR_TIMEOUT, "error");
-    this.stopPolling(sessionId);
-  }
 
-  /**
-   * Handles polling errors
-   * @private
-   */
-  private handlePollingError(sessionId: number, error: unknown): void {
-    console.error("Polling error for session", sessionId, ":", error);
-    this.showMessage(AI_MESSAGES.ERROR_GENERIC, "error");
-    this.stopPolling(sessionId);
-  }
 
   /**
    * Shows message to user via snackbar
@@ -359,17 +249,9 @@ export class AISummaryService implements OnDestroy {
    * Cleanup on service destruction
    */
   ngOnDestroy(): void {
-    // Clear all polling intervals
-    this.pollingIntervals.forEach((interval) => clearInterval(interval));
-    this.pollingIntervals.clear();
-
     // Clear all debounce timers
     this.debounceTimers.forEach((timer) => clearTimeout(timer));
     this.debounceTimers.clear();
-
-    // Complete destroy subject
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   /**
@@ -379,20 +261,9 @@ export class AISummaryService implements OnDestroy {
   private async callEdgeFunction(
     functionName: string,
     body: GenerateSummaryRequest,
-    async = true,
   ): Promise<{ data: unknown; error: { message?: string } | null }> {
-    const supabaseClient = (this.dbService as any).supabaseService.client;
+    const payload: Record<string, unknown> = { ...body };
 
-    const payload = {
-      body: { ...body },
-    };
-
-    if (async) {
-      payload.body.async = true;
-    }
-
-    const result = await supabaseClient.functions.invoke(functionName, payload);
-
-    return result;
+    return this.dbService.callEdgeFunction(functionName, payload);
   }
 }

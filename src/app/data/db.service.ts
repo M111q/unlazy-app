@@ -537,6 +537,30 @@ export class DbService {
   // Note: validateExerciseSetData moved to DatabaseValidationService
 
   // ========================================
+  // ========================================
+  // EDGE FUNCTIONS SERVICE
+  // ========================================
+
+  /**
+   * Call a Supabase Edge Function
+   * @param functionName - Name of the edge function to call
+   * @param payload - Request payload to send to the function
+   * @returns Promise with the function response
+   */
+  async callEdgeFunction(
+    functionName: string,
+    payload: Record<string, unknown>
+  ): Promise<{ data: unknown; error: { message?: string } | null }> {
+    try {
+      const result = await this.supabaseService.client.functions.invoke(functionName, {
+        body: payload
+      });
+      return result;
+    } catch (error) {
+      throw this.handleDatabaseError(error);
+    }
+  }
+
   // ERROR HANDLING
   // ========================================
 

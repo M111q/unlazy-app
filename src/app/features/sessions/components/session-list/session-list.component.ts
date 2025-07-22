@@ -28,7 +28,6 @@ import { SessionItemViewModel } from "../../types/sessions-view-models";
 import {
   CreateSessionDto,
   UpdateSessionDto,
-  AISummaryState,
 } from "../../../../../types";
 import { ERROR_MESSAGES } from "../../../../constants";
 
@@ -66,6 +65,11 @@ export class SessionListComponent implements OnInit {
   // Getter for template access
   get expandedSession(): number | null {
     return this.expandedSessionId();
+  }
+
+  // Getter to check if any session is generating
+  get isAnyGenerating(): boolean {
+    return this.viewModel().sessions.some(session => session.isGenerating);
   }
 
   ngOnInit(): void {
@@ -195,47 +199,36 @@ export class SessionListComponent implements OnInit {
    * Handle AI summary generation - generate summary in place
    */
   async onGenerateAISummary(sessionId: number): Promise<void> {
+    // Check if user is already generating a summary
+    const isGenerating = await this.aiSummaryService.isGenerating();
+    if (isGenerating) {
+      this.snackBar.open(
+        "Poczekaj na zakończenie bieżącego generowania podsumowania",
+        "Zamknij",
+        {
+          duration: 3000,
+          panelClass: ["warning-snack-bar"],
+        },
+      );
+      return;
+    }
+
     try {
-      // Update the session's generating state
+      // Update the session's generating state locally
       this.sessionListService.updateSessionGeneratingState(sessionId, true);
 
-      // Generate summary
-      const summaryObservable =
-        await this.aiSummaryService.generateSessionSummary(sessionId);
+      // Generate summary - this now returns void and works in the background
+      await this.aiSummaryService.generateSessionSummary(sessionId);
 
-      summaryObservable.subscribe({
-        next: (state: AISummaryState) => {
-          this.sessionListService.updateSessionSummaryState(
-            sessionId,
-            state.summary,
-            state.isGenerating,
-          );
-        },
-        error: (error) => {
-          console.error("AI summary generation failed:", error);
-          this.sessionListService.updateSessionGeneratingState(
-            sessionId,
-            false,
-          );
-          this.snackBar.open(
-            error.message || "Błąd podczas generowania podsumowania",
-            "Zamknij",
-            {
-              duration: 5000,
-              panelClass: ["error-snack-bar"],
-            },
-          );
-        },
-        complete: () => {
-          // Refresh the session data to get the latest summary
-          this.sessionListService.refreshCurrentPage();
-        },
-      });
+      // Start polling for completion
+      this.startSummaryPolling(sessionId);
     } catch (error) {
       console.error("Failed to start AI summary generation:", error);
       this.sessionListService.updateSessionGeneratingState(sessionId, false);
+
+      const errorMessage = error instanceof Error ? error.message : "Nie można rozpocząć generowania podsumowania";
       this.snackBar.open(
-        "Nie można rozpocząć generowania podsumowania",
+        errorMessage,
         "Zamknij",
         {
           duration: 5000,
@@ -243,6 +236,43 @@ export class SessionListComponent implements OnInit {
         },
       );
     }
+  }
+
+  /**
+   * Poll for summary generation completion
+   */
+  private startSummaryPolling(sessionId: number): void {
+    const pollInterval = setInterval(async () => {
+      try {
+        // Check if generation is still in progress
+        const isGenerating = await this.aiSummaryService.isGenerating();
+
+        if (!isGenerating) {
+          // Generation completed - refresh to get the new summary
+          clearInterval(pollInterval);
+          this.sessionListService.updateSessionGeneratingState(sessionId, false);
+          this.sessionListService.refreshCurrentPage();
+          this.snackBar.open(
+            "Podsumowanie zostało wygenerowane",
+            "Zamknij",
+            {
+              duration: 3000,
+              panelClass: ["success-snack-bar"],
+            },
+          );
+        }
+      } catch (error) {
+        console.error("Error polling for summary status:", error);
+        clearInterval(pollInterval);
+        this.sessionListService.updateSessionGeneratingState(sessionId, false);
+      }
+    }, 2000); // Poll every 2 seconds
+
+    // Stop polling after 60 seconds
+    setTimeout(() => {
+      clearInterval(pollInterval);
+      this.sessionListService.updateSessionGeneratingState(sessionId, false);
+    }, 60000);
   }
 
   /**

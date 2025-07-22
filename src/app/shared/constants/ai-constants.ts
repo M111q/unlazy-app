@@ -26,6 +26,7 @@ export const AI_ERROR_CODES = {
 export const AI_MESSAGES = {
   GENERATING: 'Generowanie podsumowania...',
   SUCCESS: 'Podsumowanie zostało wygenerowane',
+  ALREADY_GENERATING: 'Już trwa generowanie innego podsumowania',
   ERROR_GENERIC: 'Wystąpił błąd podczas generowania podsumowania',
   ERROR_NETWORK: 'Błąd połączenia. Sprawdź połączenie internetowe',
   ERROR_UNAUTHORIZED: 'Sesja wygasła. Zaloguj się ponownie',

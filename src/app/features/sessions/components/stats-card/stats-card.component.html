@@ -5,10 +5,10 @@
       <button
         mat-icon-button
         class="ai-icon-button"
-        *ngIf="canShowAIIcon"
+        *ngIf="hasExerciseSets && !hasSummary"
         (click)="onGenerateAI()"
-        [disabled]="isGenerating"
-        matTooltip="Wygeneruj podsumowanie AI"
+        [disabled]="isGenerating || isAnyGenerating"
+        [matTooltip]="isAnyGenerating ? 'Trwa generowanie innego podsumowania' : 'Wygeneruj podsumowanie AI'"
         aria-label="Wygeneruj podsumowanie AI">
         <mat-icon>auto_awesome</mat-icon>
       </button>

@@ -28,22 +28,31 @@ export class StatsCardComponent {
   @Input() hasExerciseSets = false;
   @Input() hasSummary = false;
   @Input() isGenerating = false;
+  @Input() isAnyGenerating = false;
 
   @Output() generateSummary = new EventEmitter<void>();
 
   /**
    * Check if AI icon should be shown
-   * Shows when session has exercise sets but no summary and is not generating
+   * Shows when session has exercise sets but no summary
    */
   get canShowAIIcon(): boolean {
-    return this.hasExerciseSets && !this.hasSummary && !this.isGenerating;
+    return this.hasExerciseSets && !this.hasSummary;
+  }
+
+  /**
+   * Check if AI generation is currently allowed
+   * Blocked when this session or any other session is generating
+   */
+  get canGenerateNow(): boolean {
+    return !this.isGenerating && !this.isAnyGenerating;
   }
 
   /**
    * Handle AI generation button click
    */
   onGenerateAI(): void {
-    if (this.canShowAIIcon) {
+    if (this.canShowAIIcon && this.canGenerateNow) {
       this.generateSummary.emit();
     }
   }

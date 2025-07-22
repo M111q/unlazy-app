@@ -899,6 +899,13 @@ Przeglądarka: ${errorInfo.userAgent}`;
       return;
     }
 
+    // Check if user is already generating a summary
+    const isGenerating = await this.aiSummaryService.isGenerating();
+    if (isGenerating) {
+      this.showErrorMessage("Już trwa generowanie innego podsumowania");
+      return;
+    }
+
     try {
       // Update state to show generating
       this.state.update((state) => ({
@@ -907,40 +914,13 @@ Przeglądarka: ${errorInfo.userAgent}`;
         aiError: null,
       }));
 
-      // Start AI summary generation
-      const summaryObservable =
-        await this.aiSummaryService.generateSessionSummary(
-          currentState.sessionDetails.id,
-        );
+      // Start AI summary generation (now returns void)
+      await this.aiSummaryService.generateSessionSummary(
+        currentState.sessionDetails.id,
+      );
 
-      // Subscribe to summary generation updates
-      summaryObservable.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: (aiState: AISummaryState) => {
-          this.state.update((state) => ({
-            ...state,
-            isGeneratingAI: aiState.isGenerating,
-            aiSummary: aiState.summary,
-            aiError: aiState.error,
-            canGenerateAI: aiState.canGenerate,
-          }));
-
-          // If generation completed successfully, refresh session data
-          if (!aiState.isGenerating && aiState.summary && !aiState.error) {
-            this.refreshSessionData();
-          }
-        },
-        error: (error) => {
-          console.error("AI summary generation failed:", error);
-          this.state.update((state) => ({
-            ...state,
-            isGeneratingAI: false,
-            aiError:
-              error.message || "Wystąpił błąd podczas generowania podsumowania",
-            canGenerateAI: true,
-          }));
-          this.showErrorMessage("Nie udało się wygenerować podsumowania AI");
-        },
-      });
+      // Start polling for completion
+      this.startSummaryPolling();
     } catch (error) {
       console.error("Error starting AI summary generation:", error);
       this.state.update((state) => ({
@@ -949,7 +929,56 @@ Przeglądarka: ${errorInfo.userAgent}`;
         aiError: error instanceof Error ? error.message : "Nieznany błąd",
         canGenerateAI: true,
       }));
-      this.showErrorMessage("Nie udało się rozpocząć generowania podsumowania");
+      const errorMessage = error instanceof Error ? error.message : "Nie udało się rozpocząć generowania podsumowania";
+      this.showErrorMessage(errorMessage);
     }
+  }
+
+  /**
+   * Poll for summary generation completion
+   */
+  private startSummaryPolling(): void {
+    const pollInterval = setInterval(async () => {
+      try {
+        // Check if generation is still in progress
+        const isGenerating = await this.aiSummaryService.isGenerating();
+
+        if (!isGenerating) {
+          // Generation completed - refresh session data
+          clearInterval(pollInterval);
+          await this.refreshSessionData();
+          this.state.update((state) => ({
+            ...state,
+            isGeneratingAI: false,
+            canGenerateAI: true,
+          }));
+          this.showSuccessMessage("Podsumowanie AI zostało wygenerowane");
+        }
+      } catch (error) {
+        console.error("Error polling for summary status:", error);
+        clearInterval(pollInterval);
+        this.state.update((state) => ({
+          ...state,
+          isGeneratingAI: false,
+          aiError: "Błąd podczas sprawdzania statusu generowania",
+          canGenerateAI: true,
+        }));
+      }
+    }, 2000); // Poll every 2 seconds
+
+    // Stop polling after 60 seconds
+    setTimeout(() => {
+      clearInterval(pollInterval);
+      const currentState = this.state();
+      if (currentState.isGeneratingAI) {
+        this.state.update((state) => ({
+          ...state,
+          isGeneratingAI: false,
+          aiError: "Przekroczono czas oczekiwania na wygenerowanie podsumowania",
+          canGenerateAI: true,
+        }));
+        this.showErrorMessage("Przekroczono czas oczekiwania na wygenerowanie podsumowania");
+      }
+    }, 60000);
   }
 }

@@ -40,6 +40,7 @@
     <app-session-accordion
       [sessions]="viewModel().sessions"
       [expandedSessionId]="expandedSession"
+      [isAnyGenerating]="isAnyGenerating"
       (editSession)="onEditSession($event)"
       (deleteSession)="onDeleteSession($event)"
       (viewDetails)="onViewSessionDetails($event)"

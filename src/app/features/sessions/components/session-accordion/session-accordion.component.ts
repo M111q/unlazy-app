@@ -28,6 +28,7 @@ import { SessionItemViewModel } from "../../types/sessions-view-models";
 export class SessionAccordionComponent {
   @Input({ required: true }) sessions: SessionItemViewModel[] = [];
   @Input() expandedSessionId: number | null = null;
+  @Input() isAnyGenerating = false;
 
   @Output() editSession = new EventEmitter<SessionItemViewModel>();
   @Output() deleteSession = new EventEmitter<number>();

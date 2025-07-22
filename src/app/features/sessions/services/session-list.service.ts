@@ -287,6 +287,9 @@ export class SessionListService {
         : session,
     );
     this.sessions.set(updatedSessions);
+
+    // Update global generation state
+    // Update sessions with new state
   }
 
   /**
@@ -309,5 +312,18 @@ export class SessionListService {
         : session,
     );
     this.sessions.set(updatedSessions);
+
+    // Update global generation state
+    // Update sessions with new state
+  }
+
+  /**
+   * Check if AI generation is allowed (no other generation in progress)
+   * @deprecated Use AISummaryService.isGenerating() instead
+   */
+  canGenerateAI(): boolean {
+    // This method is deprecated - components should check AISummaryService.isGenerating() directly
+    console.warn('SessionListService.canGenerateAI() is deprecated. Use AISummaryService.isGenerating() instead.');
+    return true; // Always return true, let the service handle the check
   }
 }
