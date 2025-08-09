@@ -10,7 +10,6 @@ import {
   FIELD_LIMITS,
   EXERCISE_SET_LIMITS,
   ERROR_MESSAGES,
-  PAGINATION,
 } from "../constants";
 
 /**

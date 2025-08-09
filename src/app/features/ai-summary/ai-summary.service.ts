@@ -1,14 +1,10 @@
 import { Injectable, OnDestroy, inject } from "@angular/core";
-import { Observable, Subject, throwError, timer } from "rxjs";
-import { catchError, map, switchMap, takeUntil } from "rxjs/operators";
 
 import { DbService } from "../../data/db.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import {
-  AISummaryState,
   GenerateSummaryRequest,
   GenerateSummaryAsyncResponse,
-  SummaryGenerationStatus,
   Session,
   User,
 } from "../../../types";
@@ -28,9 +24,7 @@ export class AISummaryService implements OnDestroy {
    * @param sessionId - ID of the session to summarize
    * @returns Observable with generation status updates
    */
-  async generateSessionSummary(
-    sessionId: number,
-  ): Promise<void> {
+  async generateSessionSummary(sessionId: number): Promise<void> {
     // Clear any existing debounce timer for this session
     this.clearDebounceTimer(sessionId);
 
@@ -87,12 +81,6 @@ export class AISummaryService implements OnDestroy {
     }
   }
 
-
-
-
-
-
-
   /**
    * Checks if summary can be generated for the session
    */
@@ -142,8 +130,6 @@ export class AISummaryService implements OnDestroy {
     }
   }
 
-
-
   /**
    * Clears debounce timer for a session
    * @private
@@ -171,8 +157,6 @@ export class AISummaryService implements OnDestroy {
   private async getSession(sessionId: number): Promise<Session | null> {
     return this.dbService.getSession(sessionId);
   }
-
-
 
   /**
    * Handles generation errors
@@ -210,8 +194,6 @@ export class AISummaryService implements OnDestroy {
 
     this.showMessage(message, "error");
   }
-
-
 
   /**
    * Shows message to user via snackbar

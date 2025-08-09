@@ -12,12 +12,6 @@ interface SessionSummaryRequest {
 }
 
 // Response to frontend
-interface SessionSummaryResponse {
-  summary: string;
-  sessionId: number;
-  tokensUsed?: number;
-  error?: string;
-}
 
 // Async response for background generation
 interface SessionSummaryAsyncResponse {
@@ -249,6 +243,7 @@ async function generateSummaryInBackground(
 
       openRouterResponse = responseData;
     } catch (error) {
+      console.error("error:", error);
       if (error instanceof SessionSummaryError) throw error;
       console.error("Error calling OpenRouter:", error);
       throw new SessionSummaryError(
@@ -614,8 +609,6 @@ serve(async (req) => {
       );
     }
 
-
-
     // ===== STEP 2: VERIFY AUTHORIZATION =====
 
     // Get JWT token from Authorization header
@@ -685,45 +678,45 @@ serve(async (req) => {
 
     // First, get user data to set generating_started_at
     try {
-        const { data: userData, error: userError } = await supabase
-          .from("users")
-          .select("id")
-          .eq("auth_user_id", authUserId)
-          .single();
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("auth_user_id", authUserId)
+        .single();
 
-        if (userError || !userData) {
-          throw new SessionSummaryError("User not found", 404, "USER_NOT_FOUND");
-        }
-
-        // Set generating_started_at to indicate generation is in progress
-        const { error: updateError } = await supabase
-          .from("users")
-          .update({ generating_started_at: new Date().toISOString() })
-          .eq("id", userData.id);
-
-        if (updateError) {
-          console.error("Failed to set generating_started_at:", updateError);
-          throw new SessionSummaryError(
-            "Failed to start generation",
-            500,
-            "DB_ERROR"
-          );
-        }
-      } catch (error) {
-        if (error instanceof SessionSummaryError) throw error;
-        throw new SessionSummaryError(
-          "Failed to initialize generation",
-          500,
-          "INIT_ERROR"
-        );
+      if (userError || !userData) {
+        throw new SessionSummaryError("User not found", 404, "USER_NOT_FOUND");
       }
 
-      // Generate summary in background and return immediately
-      const asyncResult = await generateSummaryInBackground(
-        requestBody.sessionId,
-        authUserId,
-        supabase,
+      // Set generating_started_at to indicate generation is in progress
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({ generating_started_at: new Date().toISOString() })
+        .eq("id", userData.id);
+
+      if (updateError) {
+        console.error("Failed to set generating_started_at:", updateError);
+        throw new SessionSummaryError(
+          "Failed to start generation",
+          500,
+          "DB_ERROR",
+        );
+      }
+    } catch (error) {
+      if (error instanceof SessionSummaryError) throw error;
+      throw new SessionSummaryError(
+        "Failed to initialize generation",
+        500,
+        "INIT_ERROR",
       );
+    }
+
+    // Generate summary in background and return immediately
+    const asyncResult = await generateSummaryInBackground(
+      requestBody.sessionId,
+      authUserId,
+      supabase,
+    );
 
     return new Response(JSON.stringify(asyncResult), {
       status: asyncResult.status === "error" ? 500 : 200,
