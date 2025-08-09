@@ -1,11 +1,14 @@
 import { Tables } from "./db/database.types";
 
 // Base types from database
-export type User = Pick<Tables<"users">, "auth_user_id" | "email" | "id">;
+export type User = Pick<
+  Tables<"users">,
+  "auth_user_id" | "email" | "id" | "generating_started_at"
+>;
 export type Exercise = Pick<Tables<"exercises">, "id" | "name">;
 export type Session = Pick<
   Tables<"sessions">,
-  "description" | "id" | "location" | "session_datetime" | "user_id"
+  "description" | "id" | "location" | "session_datetime" | "user_id" | "summary"
 >;
 export type ExerciseSet = Pick<
   Tables<"exercise_sets">,
@@ -27,6 +30,7 @@ export interface UpdateSessionDto {
   session_datetime?: string;
   description?: string | null;
   location?: string | null;
+  summary?: string | null;
 }
 
 export interface CreateExerciseSetDto {
@@ -60,6 +64,38 @@ export interface ExerciseSetWithExercise extends ExerciseSet {
     id: number;
     name: string;
   };
+}
+
+// AI Summary related types
+export interface AISummaryState {
+  isGenerating: boolean;
+  summary: string | null;
+  canGenerate: boolean;
+  error: string | null;
+}
+
+export interface GenerateSummaryStartResponse {
+  message: string;
+  sessionId: number;
+}
+
+export interface SummaryGenerationStatus {
+  isGenerating: boolean;
+  summary: string | null;
+  error: string | null;
+}
+
+export interface GenerateSummaryRequest {
+  sessionId: number;
+}
+
+export interface GenerateSummaryAsyncResponse {
+  requestId: string;
+  status: "started" | "generating" | "completed" | "error";
+  sessionId: number;
+  summary?: string;
+  tokensUsed?: number;
+  error?: string;
 }
 
 // Auth related types
