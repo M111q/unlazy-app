@@ -4,29 +4,9 @@
 
 This document describes the current implementation of the AI Summary feature for the Unlazy fitness tracking application. The system allows users to generate AI-powered summaries of their workout sessions using an async background processing approach with a robust blocking mechanism.
 
-## Current Implementation Status: ✅ COMPLETED
-
-### Key Features Implemented
-
-1. **Async-Only Edge Function**: Simplified processing with immediate response
-2. **Database-Level Blocking**: Prevents concurrent generations per user
-3. **Automatic Cleanup**: Ensures blocking flags are always cleared
-4. **Client-Side Polling**: Real-time status updates without complexity
-5. **Error Resilience**: Comprehensive error handling and recovery
-
 ## Architecture Overview
 
-### 1. Database Schema
-
-```sql
--- Users table includes generation tracking
-ALTER TABLE users ADD COLUMN generating_started_at TIMESTAMP NULL;
-
--- Sessions table stores the generated summaries
-ALTER TABLE sessions ADD COLUMN summary TEXT NULL;
-```
-
-### 2. Edge Function (`/functions/v1/openrouter`)
+### 1. Edge Function (`/functions/v1/openrouter`)
 
 **Location**: `supabase/functions/openrouter/index.ts`
 
@@ -60,7 +40,7 @@ interface SessionSummaryAsyncResponse {
 }
 ```
 
-### 3. Frontend Service Layer
+### 2. Frontend Service Layer
 
 #### AISummaryService (`src/app/features/ai-summary/ai-summary.service.ts`)
 
