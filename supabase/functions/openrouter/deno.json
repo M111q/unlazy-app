@@ -1,3 +1,33 @@
 {
-  "imports": {}
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["deno.ns", "deno.window"],
+    "strict": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitOverride": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "exclude": ["no-explicit-any"]
+    }
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": false,
+    "proseWrap": "preserve"
+  },
+  "imports": {
+    "std/": "https://deno.land/std@0.200.0/",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.40.0"
+  }
 }

@@ -1,7 +1,11 @@
 import { serve } from "https://deno.land/std@0.200.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.40.0";
+import {
+  createClient,
+  SupabaseClient,
+} from "https://esm.sh/@supabase/supabase-js@2.40.0";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+// @ts-expect-error - Deno global is available in edge function runtime
 const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
 
 // ===== INTERFACES AND TYPES =====
@@ -87,7 +91,7 @@ class SessionSummaryError extends Error {
 async function generateSummaryInBackground(
   sessionId: number,
   authUserId: string,
-  supabase: any,
+  supabase: SupabaseClient,
 ): Promise<SessionSummaryAsyncResponse> {
   const requestId = crypto.randomUUID();
   let userData: UserData | null = null;
@@ -166,14 +170,18 @@ async function generateSummaryInBackground(
       }
 
       if (data.exercise_sets && data.exercise_sets.length > 0) {
-        exerciseSets = data.exercise_sets.map((set: any) => ({
-          id: set.id,
-          exercise_id: set.exercise_id,
-          exercise_name: set.exercises?.name || "Unknown exercise",
-          reps: set.reps,
-          weight: Number(set.weight),
-          created_at: set.created_at,
-        }));
+        exerciseSets = data.exercise_sets.map(
+          (set: Record<string, unknown>): ExerciseSetData => ({
+            id: set["id"] as number,
+            exercise_id: set["exercise_id"] as number,
+            exercise_name:
+              (set["exercises"] as { name: string } | null)?.name ||
+              "Unknown exercise",
+            reps: set["reps"] as number,
+            weight: Number(set["weight"]),
+            created_at: set["created_at"] as string,
+          }),
+        );
       }
     } catch (error) {
       if (error instanceof SessionSummaryError) throw error;
@@ -224,6 +232,7 @@ async function generateSummaryInBackground(
         headers: {
           Authorization: `Bearer ${OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
+          // @ts-expect-error - Deno global is available in edge function runtime
           "HTTP-Referer": Deno.env.get("SUPABASE_URL") || "",
           "X-Title": "Unlazy App Session Summary",
         },
@@ -356,7 +365,9 @@ async function handleStatusRequest(req: Request): Promise<Response> {
     }
 
     // Create Supabase client
+    // @ts-expect-error - Deno global is available in edge function runtime
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    // @ts-expect-error - Deno global is available in edge function runtime
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!supabaseUrl || !supabaseServiceKey) {
@@ -528,7 +539,7 @@ async function handleStatusRequest(req: Request): Promise<Response> {
 
 // ===== MAIN HANDLER =====
 
-serve(async (req) => {
+serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response("ok", {
@@ -631,7 +642,9 @@ serve(async (req) => {
     }
 
     // Create Supabase client
+    // @ts-expect-error - Deno global is available in edge function runtime
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    // @ts-expect-error - Deno global is available in edge function runtime
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!supabaseUrl || !supabaseServiceKey) {
