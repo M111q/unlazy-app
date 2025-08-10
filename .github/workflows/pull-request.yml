@@ -16,6 +16,9 @@ jobs:
       CI: true
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Node.js and Dependencies
         uses: ./.github/actions/setup-node
         with:
@@ -32,6 +35,9 @@ jobs:
       CI: true
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Node.js and Dependencies
         uses: ./.github/actions/setup-node
         with:
