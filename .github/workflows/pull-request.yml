@@ -1,0 +1,148 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+
+    steps:
+      - name: Setup Node.js and Dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Run ESLint
+        run: npm run lint
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+
+    steps:
+      - name: Setup Node.js and Dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Run tests with coverage
+        run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: coverage/
+          retention-days: 7
+
+  status-comment:
+    name: Status Comment
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    if: always() && (needs.lint.result == 'success' && needs.test.result == 'success')
+
+    env:
+      CI: true
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Download coverage reports
+        uses: actions/download-artifact@v5
+        with:
+          name: coverage-reports
+          path: coverage/
+        continue-on-error: true
+
+      - name: Parse coverage summary
+        id: coverage
+        run: |
+          if [ -f "coverage/unlazy-app/lcov-report/index.html" ]; then
+            echo "coverage_available=true" >> $GITHUB_OUTPUT
+
+            # Try to extract coverage percentages from the HTML report
+            if grep -q "headerCovTableEntryLo\|headerCovTableEntryMed\|headerCovTableEntryHi" coverage/unlazy-app/lcov-report/index.html; then
+              STATEMENTS=$(grep -oP 'headerCovTableEntry[^>]*>\K[0-9.]+(?=%.*Statements)' coverage/unlazy-app/lcov-report/index.html || echo "N/A")
+              BRANCHES=$(grep -oP 'headerCovTableEntry[^>]*>\K[0-9.]+(?=%.*Branches)' coverage/unlazy-app/lcov-report/index.html || echo "N/A")
+              FUNCTIONS=$(grep -oP 'headerCovTableEntry[^>]*>\K[0-9.]+(?=%.*Functions)' coverage/unlazy-app/lcov-report/index.html || echo "N/A")
+              LINES=$(grep -oP 'headerCovTableEntry[^>]*>\K[0-9.]+(?=%.*Lines)' coverage/unlazy-app/lcov-report/index.html || echo "N/A")
+
+              echo "statements_coverage=$STATEMENTS" >> $GITHUB_OUTPUT
+              echo "branches_coverage=$BRANCHES" >> $GITHUB_OUTPUT
+              echo "functions_coverage=$FUNCTIONS" >> $GITHUB_OUTPUT
+              echo "lines_coverage=$LINES" >> $GITHUB_OUTPUT
+            else
+              echo "statements_coverage=N/A" >> $GITHUB_OUTPUT
+              echo "branches_coverage=N/A" >> $GITHUB_OUTPUT
+              echo "functions_coverage=N/A" >> $GITHUB_OUTPUT
+              echo "lines_coverage=N/A" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "coverage_available=false" >> $GITHUB_OUTPUT
+            echo "statements_coverage=N/A" >> $GITHUB_OUTPUT
+            echo "branches_coverage=N/A" >> $GITHUB_OUTPUT
+            echo "functions_coverage=N/A" >> $GITHUB_OUTPUT
+            echo "lines_coverage=N/A" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Post success comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const coverageAvailable = '${{ steps.coverage.outputs.coverage_available }}' === 'true';
+            const statements = '${{ steps.coverage.outputs.statements_coverage }}';
+            const branches = '${{ steps.coverage.outputs.branches_coverage }}';
+            const functions = '${{ steps.coverage.outputs.functions_coverage }}';
+            const lines = '${{ steps.coverage.outputs.lines_coverage }}';
+
+            let commentBody = `## ✅ Pull Request Checks Passed
+
+            All checks have completed successfully:
+
+            - ✅ **Linting**: Code follows project style guidelines
+            - ✅ **Unit Tests**: All tests are passing`;
+
+            if (coverageAvailable) {
+              commentBody += `
+            - 📊 **Test Coverage**: Report generated with the following metrics:
+              - **Statements**: ${statements}%
+              - **Branches**: ${branches}%
+              - **Functions**: ${functions}%
+              - **Lines**: ${lines}%`;
+            } else {
+              commentBody += `
+            - ⚠️ **Test Coverage**: Report not available`;
+            }
+
+            commentBody += `
+
+            Your changes are ready for review! 🚀
+
+            ---
+            <sub>Generated automatically by GitHub Actions</sub>`;
+
+            try {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody
+              });
+            } catch (error) {
+              console.error('Failed to create comment:', error);
+              core.setFailed('Failed to post status comment');
+            }
