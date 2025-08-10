@@ -1,7 +1,7 @@
 # UnlazyApp
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.4.
-
+Unlazy is an MVP application for tracking training sessions. The application allows users to log exercises performed, repetitions, and weights used, then view statistics summarizing their training efforts, and generate motivating AI summaries. 
+ 
 ## Development server
 
 To start a local development server, run:
