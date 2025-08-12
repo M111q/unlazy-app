@@ -8,15 +8,6 @@ import {
 import { CommonModule } from "@angular/common";
 import { MaterialModule } from "../../../../shared/material.module";
 
-// Component props interface
-interface PageHeaderProps {
-  title: string;
-  sessionId: number;
-  sessionDate: string;
-  onEditSession: () => void;
-  onAddSet: () => void;
-}
-
 @Component({
   selector: "app-page-header",
   standalone: true,
@@ -29,7 +20,7 @@ interface PageHeaderProps {
       >
         <button
           mat-button
-          (click)="onBackToSessions.emit()"
+          (click)="backToSessions.emit()"
           class="d-flex align-center gap-xs p-xs rounded border-0 bg-transparent text-secondary cursor-pointer hover:bg-primary hover:bg-opacity-10 transition-hover"
         >
           <mat-icon class="text-lg">arrow_back</mat-icon>
@@ -50,7 +41,7 @@ interface PageHeaderProps {
         >
           <button
             mat-raised-button
-            (click)="onEditSession.emit()"
+            (click)="editSession.emit()"
             [disabled]="disabled"
             class="btn-primary d-flex align-center gap-xs mobile-full-width"
           >
@@ -59,7 +50,7 @@ interface PageHeaderProps {
           </button>
           <button
             mat-raised-button
-            (click)="onAddSet.emit()"
+            (click)="addSet.emit()"
             [disabled]="disabled || isSetLimitReached"
             class="btn-secondary d-flex align-center gap-xs mobile-full-width"
             [class.btn-primary]="!disabled && !isSetLimitReached"
@@ -80,7 +71,7 @@ export class PageHeaderComponent {
   @Input() disabled = false;
   @Input() isSetLimitReached = false;
 
-  @Output() onBackToSessions = new EventEmitter<void>();
-  @Output() onEditSession = new EventEmitter<void>();
-  @Output() onAddSet = new EventEmitter<void>();
+  @Output() backToSessions = new EventEmitter<void>();
+  @Output() editSession = new EventEmitter<void>();
+  @Output() addSet = new EventEmitter<void>();
 }

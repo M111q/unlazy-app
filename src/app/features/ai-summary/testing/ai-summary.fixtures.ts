@@ -172,8 +172,21 @@ export const testScenarios = {
   },
 };
 
+// Helper type for the mock DbService
+type MockDbService = ReturnType<typeof createMockDbService>;
+
+// Helper type for a test scenario used in setup
+interface ScenarioForSetup {
+  user?: User | null;
+  session?: Session | null;
+  error?: Error;
+}
+
 // Helper Functions for Test Setup
-export const setupMockDbService = (mockDbService: any, scenario: any) => {
+export const setupMockDbService = (
+  mockDbService: MockDbService,
+  scenario: ScenarioForSetup,
+) => {
   if (scenario.user !== undefined) {
     mockDbService.getCurrentUserWithAIStatus.and.returnValue(
       Promise.resolve(scenario.user),

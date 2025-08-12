@@ -18,6 +18,12 @@ import { AuthService } from "../../../core/auth/auth.service";
           class="logo-section"
           [class.clickable]="authService.currentUser()"
           (click)="onLogoClick()"
+          (keydown.enter)="onLogoClick()"
+          [tabindex]="authService.currentUser() ? 0 : -1"
+          [attr.role]="authService.currentUser() ? 'button' : null"
+          [attr.aria-label]="
+            authService.currentUser() ? 'Przejdź do listy sesji' : null
+          "
         >
           <span class="logo-text">Unlazy</span>
           <span class="logo-subtitle">gym app</span>

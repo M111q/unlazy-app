@@ -174,9 +174,9 @@ interface PaginationState {
           [sessionDate]="state().sessionDetails?.session_datetime || ''"
           [disabled]="isMainLoading() || isAnyOperationInProgress()"
           [isSetLimitReached]="isSetLimitReached()"
-          (onBackToSessions)="navigateToSessions()"
-          (onEditSession)="navigateToEditSession()"
-          (onAddSet)="navigateToAddSet()"
+          (backToSessions)="navigateToSessions()"
+          (editSession)="navigateToEditSession()"
+          (addSet)="navigateToAddSet()"
         ></app-page-header>
 
         <!-- Session Details Card -->
@@ -210,10 +210,10 @@ interface PaginationState {
           [itemsPerPage]="state().itemsPerPage"
           [deletingSetId]="state().deletingSetId"
           [disabled]="isAnyOperationInProgress()"
-          (onPageChange)="onPageChange($event)"
-          (onEditSet)="navigateToEditSet($event)"
-          (onDeleteSet)="confirmDeleteSet($event)"
-          (onAddSet)="navigateToAddSet()"
+          (pageChange)="onPageChange($event)"
+          (editSet)="navigateToEditSet($event)"
+          (deleteSet)="confirmDeleteSet($event)"
+          (addSet)="navigateToAddSet()"
         ></app-session-sets-list>
       </div>
     </div>
@@ -606,7 +606,12 @@ export class SessionDetailsComponent implements OnInit {
   }
 
   private transformError(error: unknown): ApiError {
-    const err = error as any;
+    const err = error as {
+      name?: string;
+      code?: string;
+      message?: string;
+      status?: number;
+    };
     // Network errors
     if (err?.name === "NetworkError" || err?.code === "NETWORK_ERROR") {
       return {
@@ -647,7 +652,10 @@ export class SessionDetailsComponent implements OnInit {
     }
 
     // Server errors
-    if (err?.status >= 500 || err?.code === "INTERNAL_SERVER_ERROR") {
+    if (
+      (err?.status && err.status >= 500) ||
+      err?.code === "INTERNAL_SERVER_ERROR"
+    ) {
       return {
         message:
           "Wystąpił błąd serwera. Spróbuj ponownie za chwilę lub skontaktuj się z pomocą techniczną.",
@@ -929,7 +937,10 @@ Przeglądarka: ${errorInfo.userAgent}`;
         aiError: error instanceof Error ? error.message : "Nieznany błąd",
         canGenerateAI: true,
       }));
-      const errorMessage = error instanceof Error ? error.message : "Nie udało się rozpocząć generowania podsumowania";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Nie udało się rozpocząć generowania podsumowania";
       this.showErrorMessage(errorMessage);
     }
   }
@@ -974,10 +985,13 @@ Przeglądarka: ${errorInfo.userAgent}`;
         this.state.update((state) => ({
           ...state,
           isGeneratingAI: false,
-          aiError: "Przekroczono czas oczekiwania na wygenerowanie podsumowania",
+          aiError:
+            "Przekroczono czas oczekiwania na wygenerowanie podsumowania",
           canGenerateAI: true,
         }));
-        this.showErrorMessage("Przekroczono czas oczekiwania na wygenerowanie podsumowania");
+        this.showErrorMessage(
+          "Przekroczono czas oczekiwania na wygenerowanie podsumowania",
+        );
       }
     }, 60000);
   }

@@ -1,4 +1,4 @@
-import { Component, Inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, ChangeDetectionStrategy, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   MAT_DIALOG_DATA,
@@ -72,10 +72,13 @@ export interface ConfirmDialogResult {
   styleUrls: ["./confirm-dialog.component.scss"],
 })
 export class ConfirmDialogComponent {
-  constructor(
-    public dialogRef: MatDialogRef<ConfirmDialogComponent, ConfirmDialogResult>,
-    @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData,
-  ) {
+  dialogRef =
+    inject<MatDialogRef<ConfirmDialogComponent, ConfirmDialogResult>>(
+      MatDialogRef,
+    );
+  data = inject<ConfirmDialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
     // Set dialog configuration
     this.dialogRef.disableClose = false;
   }

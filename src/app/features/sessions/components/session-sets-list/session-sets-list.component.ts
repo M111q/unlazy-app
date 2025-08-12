@@ -12,18 +12,6 @@ import { MaterialModule } from "../../../../shared/material.module";
 import { ExerciseSetWithExercise } from "../../../../../types";
 import { SessionSetItemComponent } from "../session-set-item/session-set-item.component";
 
-// Component props interface
-interface SessionSetsListProps {
-  sets: ExerciseSetWithExercise[];
-  loading: boolean;
-  totalCount: number;
-  currentPage: number;
-  itemsPerPage: number;
-  onPageChange: (page: number) => void;
-  onEditSet: (setId: number) => void;
-  onDeleteSet: (setId: number) => void;
-}
-
 @Component({
   selector: "app-session-sets-list",
   standalone: true,
@@ -63,7 +51,7 @@ interface SessionSetsListProps {
           </p>
           <button
             mat-raised-button
-            (click)="onAddSet.emit()"
+            (click)="addSet.emit()"
             [disabled]="disabled"
             class="btn-primary d-flex align-center gap-xs mt-xs mobile-full-width"
             style="max-width: 200px;"
@@ -83,8 +71,8 @@ interface SessionSetsListProps {
               [set]="set"
               [isDeleting]="deletingSetId === set.id"
               [disabled]="disabled || deletingSetId !== null"
-              (editSet)="onEditSet.emit($event)"
-              (deleteSet)="onDeleteSet.emit($event)"
+              (editSet)="editSet.emit($event)"
+              (deleteSet)="deleteSet.emit($event)"
               class="w-full"
             ></app-session-set-item>
           </div>
@@ -99,7 +87,7 @@ interface SessionSetsListProps {
             [showFirstLastButtons]="true"
             [hidePageSize]="true"
             [disabled]="disabled || loading"
-            (page)="onPageChange.emit($event.pageIndex + 1)"
+            (page)="pageChange.emit($event.pageIndex + 1)"
             aria-label="Wybierz stronę serii ćwiczeń"
             class="mt-md border-top-subtle pt-md mobile-mt-sm mobile-pt-sm"
           >
@@ -119,10 +107,10 @@ export class SessionSetsListComponent {
   @Input() deletingSetId: number | null = null;
   @Input() disabled = false;
 
-  @Output() onPageChange = new EventEmitter<number>();
-  @Output() onEditSet = new EventEmitter<number>();
-  @Output() onDeleteSet = new EventEmitter<number>();
-  @Output() onAddSet = new EventEmitter<void>();
+  @Output() pageChange = new EventEmitter<number>();
+  @Output() editSet = new EventEmitter<number>();
+  @Output() deleteSet = new EventEmitter<number>();
+  @Output() addSet = new EventEmitter<void>();
 
   /**
    * Get appropriate label for sets count
@@ -180,7 +168,7 @@ export class SessionSetsListComponent {
     const newPage = event.pageIndex + 1;
 
     if (newPage !== this.currentPage) {
-      this.onPageChange.emit(newPage);
+      this.pageChange.emit(newPage);
     }
   }
 

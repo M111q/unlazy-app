@@ -111,8 +111,7 @@ export class AISummaryService implements OnDestroy {
       }
 
       return true;
-    } catch (error) {
-      console.error("Error checking if can generate summary:", error);
+    } catch {
       return false;
     }
   }
@@ -124,8 +123,7 @@ export class AISummaryService implements OnDestroy {
     try {
       const user = await this.getCurrentUser();
       return !!user?.generating_started_at;
-    } catch (error) {
-      console.error("Error checking generation status:", error);
+    } catch {
       return false;
     }
   }

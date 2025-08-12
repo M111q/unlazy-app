@@ -1,38 +1,29 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Inject,
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 
-import { MaterialModule } from '../../../../shared/material.module';
+import { MaterialModule } from "../../../../shared/material.module";
 
 export interface ConfirmationModalData {
   title: string;
   message: string;
   confirmText: string;
   cancelText: string;
-  confirmColor?: 'primary' | 'accent' | 'warn';
+  confirmColor?: "primary" | "accent" | "warn";
   sessionDescription?: string;
 }
 
 @Component({
-  selector: 'app-confirmation-modal',
+  selector: "app-confirmation-modal",
   standalone: true,
   imports: [CommonModule, MaterialModule],
-  templateUrl: './confirmation-modal.component.html',
-  styleUrl: './confirmation-modal.component.scss',
+  templateUrl: "./confirmation-modal.component.html",
+  styleUrl: "./confirmation-modal.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfirmationModalComponent {
-  constructor(
-    private readonly dialogRef: MatDialogRef<ConfirmationModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public readonly data: ConfirmationModalData,
-  ) {}
+  private readonly dialogRef = inject(MatDialogRef<ConfirmationModalComponent>);
+  public readonly data = inject<ConfirmationModalData>(MAT_DIALOG_DATA);
 
   /**
    * Handle confirmation action
@@ -59,16 +50,16 @@ export class ConfirmationModalComponent {
    * Get the appropriate icon for the confirmation type
    */
   get confirmationIcon(): string {
-    if (this.data.confirmColor === 'warn') {
-      return 'warning';
+    if (this.data.confirmColor === "warn") {
+      return "warning";
     }
-    return 'help_outline';
+    return "help_outline";
   }
 
   /**
    * Get the confirmation button color
    */
-  get confirmButtonColor(): 'primary' | 'accent' | 'warn' {
-    return this.data.confirmColor || 'primary';
+  get confirmButtonColor(): "primary" | "accent" | "warn" {
+    return this.data.confirmColor || "primary";
   }
 }

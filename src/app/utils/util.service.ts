@@ -47,6 +47,6 @@ export class UtilService {
     const format = this.configService.dateFormat;
     // Placeholder for actual date formatting logic using 'format'
     // Example: return new DatePipe('en-US').transform(date, format);
-    return `Formatted using format: ${format}`; // Placeholder implementation
+    return `Date: ${date.toString()} - Formatted using format: ${format}`; // Placeholder implementation
   }
 }

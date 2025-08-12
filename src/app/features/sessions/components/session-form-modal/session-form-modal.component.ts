@@ -1,9 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Inject,
   OnInit,
   signal,
+  inject,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
@@ -11,6 +11,7 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators,
+  ValidationErrors,
 } from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 
@@ -20,11 +21,7 @@ import {
   ValidationError,
 } from "../../types/sessions-view-models";
 import { CreateSessionDto, UpdateSessionDto } from "../../../../../types";
-import {
-  ERROR_MESSAGES,
-  FIELD_LIMITS,
-  SESSION_LIMITS,
-} from "../../../../constants";
+import { ERROR_MESSAGES, FIELD_LIMITS } from "../../../../constants";
 
 export interface SessionFormModalData {
   mode: "create" | "edit";
@@ -40,6 +37,11 @@ export interface SessionFormModalData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SessionFormModalComponent implements OnInit {
+  // Injected dependencies
+  private readonly fb = inject(FormBuilder);
+  private readonly dialogRef = inject(MatDialogRef<SessionFormModalComponent>);
+  public readonly data = inject<SessionFormModalData>(MAT_DIALOG_DATA);
+
   // Form and state
   sessionForm!: FormGroup;
   protected readonly isSubmitting = signal<boolean>(false);
@@ -75,12 +77,6 @@ export class SessionFormModalComponent implements OnInit {
   get isFormValid(): boolean {
     return this.sessionForm?.valid && !this.isSubmitting();
   }
-
-  constructor(
-    private readonly fb: FormBuilder,
-    private readonly dialogRef: MatDialogRef<SessionFormModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public readonly data: SessionFormModalData,
-  ) {}
 
   ngOnInit(): void {
     this.initializeForm();
@@ -151,7 +147,7 @@ export class SessionFormModalComponent implements OnInit {
    */
   private getFieldErrors(
     fieldName: string,
-    controlErrors: any,
+    controlErrors: Record<string, unknown>,
   ): ValidationError[] {
     const errors: ValidationError[] = [];
 
@@ -219,7 +215,9 @@ export class SessionFormModalComponent implements OnInit {
   /**
    * Custom validator for future date
    */
-  private futureDateValidator(control: any) {
+  private futureDateValidator(control: {
+    value?: string;
+  }): ValidationErrors | null {
     if (!control.value) return null;
 
     const selectedDate = new Date(control.value);
@@ -283,9 +281,11 @@ export class SessionFormModalComponent implements OnInit {
   /**
    * Create session DTO from form values
    */
-  private createSessionDto(
-    formValue: any,
-  ): CreateSessionDto | UpdateSessionDto {
+  private createSessionDto(formValue: {
+    sessionDatetime: string;
+    description?: string;
+    location?: string;
+  }): CreateSessionDto | UpdateSessionDto {
     const baseDto = {
       session_datetime: new Date(formValue.sessionDatetime).toISOString(),
       description: formValue.description?.trim() || null,

@@ -1,19 +1,10 @@
-import {
-  Component,
-  Input,
-  ChangeDetectionStrategy,
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MaterialModule } from '../../../../shared/material.module';
-import { SessionWithStats } from '../../../../../types';
-
-// Component props interface
-interface SessionDetailsProps {
-  session: SessionWithStats;
-}
+import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { MaterialModule } from "../../../../shared/material.module";
+import { SessionWithStats } from "../../../../../types";
 
 @Component({
-  selector: 'app-session-details-card',
+  selector: "app-session-details-card",
   standalone: true,
   imports: [CommonModule, MaterialModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,7 +19,9 @@ interface SessionDetailsProps {
             <mat-icon class="info-icon">schedule</mat-icon>
             <div class="info-content">
               <strong class="info-label">Data i godzina:</strong>
-              <span class="info-value">{{ formatSessionDateTime(session.session_datetime) }}</span>
+              <span class="info-value">{{
+                formatSessionDateTime(session.session_datetime)
+              }}</span>
             </div>
           </div>
 
@@ -51,33 +44,33 @@ interface SessionDetailsProps {
       </mat-card-content>
     </mat-card>
   `,
-  styleUrls: ['./session-details-card.component.scss'],
+  styleUrls: ["./session-details-card.component.scss"],
 })
 export class SessionDetailsCardComponent {
   @Input({ required: true }) session!: SessionWithStats;
 
   protected formatSessionDateTime(datetime: string): string {
-    if (!datetime) return '';
+    if (!datetime) return "";
 
     try {
       const date = new Date(datetime);
 
       // Validate date
       if (isNaN(date.getTime())) {
-        console.warn('Invalid date format:', datetime);
+        console.warn("Invalid date format:", datetime);
         return datetime;
       }
 
-      return date.toLocaleString('pl-PL', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
+      return date.toLocaleString("pl-PL", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       });
     } catch (error) {
-      console.error('Error formatting date:', error);
+      console.error("Error formatting date:", error);
       return datetime;
     }
   }
